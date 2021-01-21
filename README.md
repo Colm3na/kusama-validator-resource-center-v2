@@ -11,6 +11,44 @@ Aside from that, Phase 2 introduces a staking dashboard, which gives important v
 - Milestone 1: Completed
 - Milestone 2: In progress
 
+## Install
+
+Install mono-repo:
+
+```
+git clone https://github.com/Colm3na/kusama-validator-resource-center-v2.git
+cd kusama-validator-resource-center-v2
+yarn
+```
+
+### Frontend
+
+You will need `nodejs`:
+
+```
+yarn workspace frontend dev
+```
+
+That will start a dev frontend with hot reload. 
+
+### Backend
+
+You will need `nodejs`, `docker` and `docker-compose`:
+
+```
+git clone https://github.com/Colm3na/kusama-validator-resource-center-v2.git
+cd kusama-validator-resource-center-v2
+yarn
+yarn workspace backend docker
+```
+
+That will start all the required component dockers:
+
+- PostgreSQL
+- Hasura GraphQL server
+- Parity Polkadot client
+- Nodejs crawler
+
 ## Project funded by Kusama Treasury
 
 The development of this project is being funded by Kusama Treasury, you can review the full proposal [here](https://docs.google.com/document/d/14pvmbMMzNAqVzQkoXi_nRS-1wDti2y03X4VqOp9nNTw).
