@@ -7,9 +7,22 @@
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "docker": "docker-compose -f docker/backend/docker-compose-kusama.yml up -d",
+    "docker:build": "docker-compose -f docker/backend/docker-compose-kusama.yml build",
+    "docker:clean": "bash docker/backend/clean-dockers",
+    "docker:stop": "docker stop backend_crawler_1 backend_graphql-engine_1 backend_postgres_1 backend_substrate-node_1 backend_phragmen_1",
+    "docker:postgres:backup": "docker exec -t backend_postgres_1 pg_dump vrc -c -U vrc > vrc_dump.sql",
+    "docker:rebuild:graphql": "docker-compose -f docker/backend/docker-compose-kusama.yml up -d graphql-engine"
   },
   "dependencies": {
-    "@polkadot/api": "^3.5.1"
+    "@polkadot/api": "^3.5.1",
+    "axios": "^0.21.1",
+    "bignumber.js": "^9.0.1",
+    "dotenv": "^8.2.0",
+    "lodash": "^4.17.20",
+    "pg": "^8.4.2",
+    "pg-format": "^1.0.4",
+    "pg-native": "^3.0.0",
+    "pino": "^6.7.0"
   }
 }
