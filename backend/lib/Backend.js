@@ -5,7 +5,7 @@ const { wait } = require('./utils.js');
 
 const logger = pino();
 
-class BackendV3 {
+class Backend {
   constructor(config) {
     this.config = config;
     this.nodeisSyncing = true;
@@ -72,4 +72,4 @@ class BackendV3 {
   }
 }
 
-module.exports = BackendV3;
+module.exports = Backend;
