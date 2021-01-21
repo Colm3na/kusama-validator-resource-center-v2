@@ -36,13 +36,10 @@ That will start a dev frontend with hot reload.
 You will need `nodejs`, `docker` and `docker-compose`:
 
 ```
-git clone https://github.com/Colm3na/kusama-validator-resource-center-v2.git
-cd kusama-validator-resource-center-v2
-yarn
 yarn workspace backend docker
 ```
 
-That will start all the required component dockers:
+That will build and start all the required dockers automagically:
 
 - PostgreSQL
 - Hasura GraphQL server
