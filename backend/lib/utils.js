@@ -14,7 +14,7 @@ module.exports = {
       setTimeout(resolve, ms);
     });
   },
-  storeExtrinsics: async function (pool, blockNumber, extrinsics, blockEvents, loggerOptions) {
+  storeExtrinsics: async function (pool, blockNumber, extrinsics, blockEvents, timestamp, loggerOptions) {
     // Start execution
     const startTime = new Date().getTime();
 
@@ -40,7 +40,8 @@ module.exports = {
           args,
           hash,
           doc,
-          success
+          success,
+          timestamp
         ) VALUES (
           '${blockNumber}',
           '${index}',
@@ -51,7 +52,8 @@ module.exports = {
           '${args}',
           '${hash}',
           '${doc}',
-          '${success}'
+          '${success}',
+          '${timestamp}'
         )
         ON CONFLICT ON CONSTRAINT extrinsic_pkey 
         DO NOTHING;

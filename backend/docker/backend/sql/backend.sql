@@ -29,6 +29,7 @@ CREATE TABLE IF NOT EXISTS event  (
   method TEXT NOT NULL,
   phase TEXT NOT NULL,
   data TEXT NOT NULL,
+  timestamp BIGINT NOT NULL,
   PRIMARY KEY ( block_number, event_index ) 
 );
 
@@ -43,6 +44,7 @@ CREATE TABLE IF NOT EXISTS extrinsic  (
   hash TEXT NOT NULL,
   doc TEXT NOT NULL,
   success BOOLEAN NOT NULL,
+  timestamp BIGINT NOT NULL,
   PRIMARY KEY ( block_number, extrinsic_index ) 
 );
 

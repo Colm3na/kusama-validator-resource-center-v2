@@ -132,7 +132,7 @@ module.exports = {
         }
 
         // Store block extrinsics
-        await storeExtrinsics(pool, blockNumber, block.extrinsics, blockEvents, loggerOptions);
+        await storeExtrinsics(pool, blockNumber, block.extrinsics, blockEvents, timestamp, loggerOptions);
 
         // Loop through the Vec<EventRecord>
         await blockEvents.forEach( async (record, index) => {
@@ -151,14 +151,16 @@ module.exports = {
                 section,
                 method,
                 phase,
-                data
+                data,
+                timestamp
               ) VALUES (
                 '${blockNumber}',
                 '${index}',
                 '${event.section}',
                 '${event.method}',
                 '${phase.toString()}',
-                '${JSON.stringify(event.data)}'
+                '${JSON.stringify(event.data)}',
+                '${timestamp}'
               )
               ON CONFLICT ON CONSTRAINT event_pkey 
               DO NOTHING

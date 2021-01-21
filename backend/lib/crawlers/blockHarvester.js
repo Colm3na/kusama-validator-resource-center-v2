@@ -1,5 +1,4 @@
 // @ts-check
-const { BigNumber } = require('bignumber.js');
 const { shortHash, storeExtrinsics, getDisplayName } = require('../utils.js');
 const pino = require('pino');
 const logger = pino();
@@ -64,12 +63,16 @@ module.exports = {
       try {
         const blockHash = await api.rpc.chain.getBlockHash(endBlock);
         const [
+          { block },
+          blockEvents,
           blockHeader,
           timestampMs,
           ChainCurrentIndex,
           ChainActiveEra,
           electionStatus,
         ] = await Promise.all([
+          api.rpc.chain.getBlock(blockHash),
+          api.query.system.events.at(blockHash),
           api.derive.chain.getHeader(blockHash),
           api.query.timestamp.now.at(blockHash),
           api.query.session.currentIndex.at(blockHash),
@@ -89,10 +92,8 @@ module.exports = {
         // Get election status
         const isElection = electionStatus.toString() === `Close` ? false : true
 
-        // Get block events
-        let blockEvents = [];
+        // Store block events
         try {
-          blockEvents = await api.query.system.events.at(blockHash);
           blockEvents.forEach( async (record, index) => {
             const { event, phase } = record;
             const sql = 
@@ -102,14 +103,16 @@ module.exports = {
                 section,
                 method,
                 phase,
-                data
+                data,
+                timestamp
               ) VALUES (
                 '${endBlock}',
                 '${index}',
                 '${event.section}',
                 '${event.method}',
                 '${phase.toString()}',
-                '${JSON.stringify(event.data)}'
+                '${JSON.stringify(event.data)}',
+                '${timestamp}'
               )
               ON CONFLICT ON CONSTRAINT event_pkey 
               DO NOTHING
@@ -135,14 +138,9 @@ module.exports = {
           }
         }
         
-        // Get block extrinsics
-        let extrinsics = [];
-        let totalExtrinsics = 0;
+        // Store block extrinsics
         try {
-          const { block } = await api.rpc.chain.getBlock(blockHash);
-          extrinsics = block.extrinsics;
-          totalExtrinsics = block.extrinsics.length;
-          await storeExtrinsics(pool, endBlock, extrinsics, blockEvents, loggerOptions);
+          await storeExtrinsics(pool, endBlock, block.extrinsics, blockEvents, timestamp, loggerOptions);
         } catch (error) {
           logger.error(loggerOptions, `Error getting extrinsics for block ${endBlock} (${blockHash}): ${error}`);
           try {
@@ -157,8 +155,9 @@ module.exports = {
           }
         }
               
-        // Total events
+        // Totals
         const totalEvents = blockEvents.length;
+        const totalExtrinsics = block.extrinsics.length;
 
         const sqlInsert =
           `INSERT INTO block (
