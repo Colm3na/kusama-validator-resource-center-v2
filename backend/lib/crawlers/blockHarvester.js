@@ -169,7 +169,7 @@ module.exports = {
             extrinsics_root,
             state_root,
             active_era,
-            current_index,
+            session_index,
             is_election,
             total_events,
             total_extrinsics,
