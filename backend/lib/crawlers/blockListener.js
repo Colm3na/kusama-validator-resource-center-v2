@@ -36,7 +36,7 @@ module.exports = {
 
       ]);
 
-      const activeEra = ChainActiveEra.toString();
+      const activeEra = ChainActiveEra.index.toString();
       const sessionIndex = ChainCurrentIndex.toString();
 
       // Get block parent hash
