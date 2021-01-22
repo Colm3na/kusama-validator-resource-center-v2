@@ -1,5 +1,6 @@
 // @ts-check
 const { BigNumber } = require('bignumber.js');
+const { ApiPromise, WsProvider } = require('@polkadot/api');
 const pino = require('pino');
 const logger = pino();
 
@@ -8,23 +9,24 @@ const loggerOptions = {
 };
 
 module.exports = {
-  start: async function (api, pool, config) {
+  start: async function (pool, config) {
     logger.info(loggerOptions, `Starting staking crawler...`);
-    const startTime = new Date().getTime()
+    const startTime = new Date().getTime();
 
     //
     // data collection
     //
-    // const wsProvider = new WsProvider(config.nodeWs)
-    // const api = await ApiPromise.create({ provider: wsProvider })
-    const withActive = false
-    const erasHistoric = await api.derive.staking.erasHistoric(withActive)
+    const wsProvider = new WsProvider(config.nodeWs);
+    const api = await ApiPromise.create({ provider: wsProvider });
+    const withActive = false;
+    const erasHistoric = await api.derive.staking.erasHistoric(withActive);
     const eraIndexes = erasHistoric.slice(
       Math.max(erasHistoric.length - config.historySize, 0)
-    )
+    );
+    const maxNominatorRewardedPerValidator = api.consts.staking.maxNominatorRewardedPerValidator;
 
-    let validators = []
-    let intentions = []
+    let validators = [];
+    let intentions = [];
 
     const [
       { block },
@@ -37,20 +39,18 @@ module.exports = {
       erasSlashes,
       proposals,
       referendums,
-      maxNominatorRewardedPerValidator,
     ] = await Promise.all([
       api.rpc.chain.getBlock(),
       api.query.session.validators(),
       api.derive.staking.waitingInfo(),
       api.query.staking.nominators.entries(),
       api.derive.council.votes(),
-      api.derive.staking._erasPoints(eraIndexes),
-      api.derive.staking._erasPrefs(eraIndexes),
-      api.derive.staking._erasSlashes(eraIndexes),
+      api.derive.staking._erasPoints(eraIndexes, withActive),
+      api.derive.staking._erasPrefs(eraIndexes, withActive),
+      api.derive.staking._erasSlashes(eraIndexes, withActive),
       api.derive.democracy.proposals(),
       api.derive.democracy.referendums(),
-      api.consts.staking.maxNominatorRewardedPerValidator,
-    ])
+    ]);
     validators = await Promise.all(
       validatorAddresses.map((authorityId) =>
         api.derive.staking.query(authorityId, {
@@ -85,29 +85,29 @@ module.exports = {
       )
     )
     // api.disconnect()
-    const dataCollectionEndTime = new Date().getTime()
-    const dataCollectionTime = dataCollectionEndTime - startTime
+    const dataCollectionEndTime = new Date().getTime();
+    const dataCollectionTime = dataCollectionEndTime - startTime;
     
     logger.info(loggerOptions, `data collection time: ${(dataCollectionTime / 1000).toFixed(3)}s`);
 
     //
     // data processing
     //
-    const blockHeight = parseInt(block.header.number.toString())
-    const numActiveValidators = validatorAddresses.length
-    const eraPointsHistoryTotals = []
+    const blockHeight = parseInt(block.header.number.toString());
+    const numActiveValidators = validatorAddresses.length;
+    const eraPointsHistoryTotals = [];
     erasPoints.forEach(({ eraPoints }) => {
-      eraPointsHistoryTotals.push(parseInt(eraPoints.toString()))
+      eraPointsHistoryTotals.push(parseInt(eraPoints.toString()));
     })
     const eraPointsHistoryTotalsSum = eraPointsHistoryTotals.reduce(
       (total, num) => total + num,
       0
-    )
-    const erasPointsJSON = JSON.parse(JSON.stringify(erasPoints))
-    const eraPointsAverage = eraPointsHistoryTotalsSum / numActiveValidators
+    );
+    const erasPointsJSON = JSON.parse(JSON.stringify(erasPoints));
+    const eraPointsAverage = eraPointsHistoryTotalsSum / numActiveValidators;
     const nominations = nominators.map(([key, nominations]) => {
-      const nominator = key.toHuman()[0]
-      const targets = nominations.toHuman().targets
+      const nominator = key.toHuman()[0];
+      const targets = nominations.toJSON()['targets'];
       return {
         nominator,
         targets,
@@ -115,28 +115,28 @@ module.exports = {
     })
     const participateInGovernance = []
     proposals.forEach(({ seconds, proposer }) => {
-      participateInGovernance.push(proposer.toString())
+      participateInGovernance.push(proposer.toString());
       seconds.forEach((accountId) =>
         participateInGovernance.push(accountId.toString())
-      )
-    })
+      );
+    });
     referendums.forEach(({ votes }) => {
       votes.forEach(({ accountId }) =>
         participateInGovernance.push(accountId.toString())
-      )
-    })
-    validators = validators.concat(intentions)
+      );
+    });
+    validators = validators.concat(intentions);
     const ranking = validators
       .map((validator) => {
         // active
-        const active = validator.active
-        const activeRating = active ? 2 : 0
+        const active = validator.active;
+        const activeRating = active ? 2 : 0;
 
         // stash
-        const stashAddress = validator.stashId.toString()
+        const stashAddress = validator.stashId.toString();
 
         // controller
-        const controllerAddress = validator.controllerId.toString()
+        const controllerAddress = validator.controllerId.toString();
 
         // identity
         const {
@@ -144,18 +144,18 @@ module.exports = {
           hasSubIdentity,
           name,
           identityRating,
-        } = parseIdentity(validator.identity)
-        const identity = JSON.parse(JSON.stringify(validator.identity))
+        } = parseIdentity(validator.identity);
+        const identity = JSON.parse(JSON.stringify(validator.identity));
 
         // sub-accounts
         const clusterMembers = getClusterMembers(
           hasSubIdentity,
           validators,
           validator.identity
-        )
-        const partOfCluster = clusterMembers > 1
-        const clusterName = getClusterName(validator.identity)
-        const subAccountsRating = hasSubIdentity ? 2 : 0
+        );
+        const partOfCluster = clusterMembers > 1;
+        const clusterName = getClusterName(validator.identity);
+        const subAccountsRating = hasSubIdentity ? 2 : 0;
 
         // nominators
         const nominators = active
@@ -164,30 +164,30 @@ module.exports = {
               nomination.targets.some(
                 (target) => target === validator.accountId.toString()
               )
-            ).length
+            ).length;
         const nominatorsRating =
-          nominators > 0 && nominators <= maxNominatorRewardedPerValidator
+          nominators > 0 && nominators <= maxNominatorRewardedPerValidator.toNumber()
             ? 2
-            : 0
+            : 0;
 
         // slashes
         const slashes =
           erasSlashes.filter(
-            ({ validators }) => validators[validator.accountId]
-          ) || []
-        const slashed = slashes.length > 0
-        const slashRating = slashed ? 0 : 2
+            ({ validators }) => validators[validator.accountId.toString()]
+          ) || [];
+        const slashed = slashes.length > 0;
+        const slashRating = slashed ? 0 : 2;
 
         // commission
-        const commission = validator.validatorPrefs.commission / 10000000
+        const commission = validator.validatorPrefs.commission.toNumber() / 10000000;
         const commissionHistory = getCommissionHistory(
           validator.accountId,
           erasPreferences
-        )
+        );
         const commissionRating = getCommissionRating(
           commission,
           commissionHistory
-        )
+        );
 
         // governance
         const councilBacking = validator.identity?.parent
@@ -200,27 +200,27 @@ module.exports = {
             )
           : councilVotes.some(
               (vote) => vote[0].toString() === validator.accountId.toString()
-            )
+            );
         const activeInGovernance = validator.identity?.parent
           ? participateInGovernance.includes(validator.accountId.toString()) ||
             participateInGovernance.includes(
               validator.identity.parent.toString()
             )
-          : participateInGovernance.includes(validator.accountId.toString())
+          : participateInGovernance.includes(validator.accountId.toString());
         const governanceRating =
           councilBacking && activeInGovernance
             ? 3
             : councilBacking || activeInGovernance
             ? 2
-            : 0
+            : 0;
 
         // era points
-        const eraPointsHistory = []
+        const eraPointsHistory = [];
         erasPoints.forEach(({ validators }) => {
-          if (validators[validator.accountId]) {
-            eraPointsHistory.push(parseInt(validators[validator.accountId]))
+          if (validators[validator.accountId.toString()]) {
+            eraPointsHistory.push(parseInt(validators[validator.accountId]));
           } else {
-            eraPointsHistory.push(0)
+            eraPointsHistory.push(0);
           }
         })
         const eraPointsHistoryValidator = eraPointsHistory.reduce(
@@ -228,39 +228,39 @@ module.exports = {
           0
         )
         const eraPointsPercent =
-          (eraPointsHistoryValidator * 100) / eraPointsHistoryTotalsSum
+          (eraPointsHistoryValidator * 100) / eraPointsHistoryTotalsSum;
         const eraPointsRating =
-          eraPointsHistoryValidator > eraPointsAverage ? 2 : 0
+          eraPointsHistoryValidator > eraPointsAverage ? 2 : 0;
 
         // frecuency of payouts
         const claimedRewards = JSON.parse(
           JSON.stringify(validator.stakingLedger.claimedRewards)
-        )
-        const payoutHistory = []
+        );
+        const payoutHistory = [];
         erasPointsJSON.forEach((eraPoints) => {
-          const eraIndex = parseInt(eraPoints.era)
-          let eraPayoutState = 'inactive'
+          const eraIndex = parseInt(eraPoints.era);
+          let eraPayoutState = 'inactive';
           if (Object.keys(eraPoints.validators).includes(stashAddress)) {
             if (claimedRewards.includes(eraIndex)) {
-              eraPayoutState = 'paid'
+              eraPayoutState = 'paid';
             } else {
-              eraPayoutState = 'pending'
+              eraPayoutState = 'pending';
             }
           }
-          payoutHistory.push(eraPayoutState)
+          payoutHistory.push(eraPayoutState);
         })
-        const payoutRating = getPayoutRating(payoutHistory)
+        const payoutRating = getPayoutRating(payoutHistory);
 
         // stake
         const selfStake = active
           ? new BigNumber(validator.exposure.own)
-          : new BigNumber(validator.stakingLedger.total)
+          : new BigNumber(validator.stakingLedger.total);
         const totalStake = active
           ? new BigNumber(validator.exposure.total)
-          : selfStake
+          : selfStake;
         const otherStake = active
           ? totalStake.minus(selfStake)
-          : new BigNumber(0)
+          : new BigNumber(0);
 
         // total rating
         const totalRating =
@@ -272,7 +272,7 @@ module.exports = {
           eraPointsRating +
           slashRating +
           governanceRating +
-          payoutRating
+          payoutRating;
 
         return {
           active,
@@ -308,7 +308,7 @@ module.exports = {
           otherStake,
           totalStake,
           totalRating,
-        }
+        };
       })
       .sort((a, b) => (a.totalRating < b.totalRating ? 1 : -1))
       .map((validator, rank) => {
@@ -318,8 +318,8 @@ module.exports = {
         }
       })
     // console.log(JSON.parse(JSON.stringify(ranking)))
-    const endTime = new Date().getTime()
-    const dataProcessingTime = endTime - dataCollectionEndTime
+    const endTime = new Date().getTime();
+    const dataProcessingTime = endTime - dataCollectionEndTime;
     
     logger.info(loggerOptions, `data processing time: ${(dataProcessingTime / 1000).toFixed(3)}s`);
     logger.info(loggerOptions, `total processing time: ${((dataCollectionTime + dataProcessingTime) / 1000).toFixed(3)}s`);

@@ -1,4 +1,5 @@
 // @ts-check
+const { ApiPromise, WsProvider } = require('@polkadot/api');
 const { shortHash, storeExtrinsics, getDisplayName } = require('../utils.js');
 const pino = require('pino');
 const logger = pino();
@@ -8,9 +9,11 @@ const loggerOptions = {
 };
 
 module.exports = {
-  start: async function(api, pool, config) {
+  start: async function(pool, config) {
     logger.info(loggerOptions, `Starting block harvester...`);
     const startTime = new Date().getTime();
+    const wsProvider = new WsProvider(config.nodeWs);
+    const api = await ApiPromise.create({ provider: wsProvider });
     let addedBlocks = 0;
 
     // Get gaps from block table

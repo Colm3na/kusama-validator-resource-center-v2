@@ -27,7 +27,7 @@ class Backend {
 
     this.config.crawlers
       .filter(crawler => crawler.enabled)
-      .forEach(crawler => crawler.module.start(api, pool, crawler.config, this.config.substrateNetwork));
+      .forEach(crawler => crawler.module.start(pool, crawler.config, this.config.substrateNetwork));
   }
 
   async getPolkadotAPI() {

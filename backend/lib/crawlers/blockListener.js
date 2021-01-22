@@ -1,4 +1,5 @@
 // @ts-check
+const { ApiPromise, WsProvider } = require('@polkadot/api');
 const { shortHash, storeExtrinsics, getDisplayName } = require('../utils.js');
 const pino = require('pino');
 const logger = pino();
@@ -8,9 +9,10 @@ const loggerOptions = {
 };
 
 module.exports = {
-  start: async function (api, pool, _config) {
+  start: async function (pool, config) {
     logger.info(loggerOptions, `Starting block listener...`);
-
+    const wsProvider = new WsProvider(config.nodeWs);
+    const api = await ApiPromise.create({ provider: wsProvider });
     // Subscribe to new blocks
     await api.rpc.chain.subscribeNewHeads(async (header) => {
 
