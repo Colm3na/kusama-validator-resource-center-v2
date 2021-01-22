@@ -80,7 +80,7 @@ module.exports = {
           api.query.staking.eraElectionStatus.at(blockHash),
         ]);
 
-        const activeEra = ChainActiveEra.index.toString();
+        const activeEra = ChainActiveEra.toJSON()['index'];
         const sessionIndex = ChainCurrentIndex.toString();
         const blockAuthorIdentity = await api.derive.accounts.info(blockHeader.author);
         const blockAuthorName = getDisplayName(blockAuthorIdentity.identity);
