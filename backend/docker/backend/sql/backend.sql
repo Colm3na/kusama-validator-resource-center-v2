@@ -23,7 +23,7 @@ CREATE TABLE IF NOT EXISTS harvester_error (
   timestamp BIGINT NOT NULL
 );
 
-CREATE TABLE IF NOT EXISTS event  (  
+CREATE TABLE IF NOT EXISTS event (  
   block_number BIGINT NOT NULL,
   event_index INT NOT NULL,
   section TEXT NOT NULL,
@@ -34,7 +34,7 @@ CREATE TABLE IF NOT EXISTS event  (
   PRIMARY KEY ( block_number, event_index ) 
 );
 
-CREATE TABLE IF NOT EXISTS extrinsic  (  
+CREATE TABLE IF NOT EXISTS extrinsic (  
   block_number BIGINT NOT NULL,
   extrinsic_index INT NOT NULL,
   is_signed BOOLEAN NOT NULL,
@@ -49,11 +49,43 @@ CREATE TABLE IF NOT EXISTS extrinsic  (
   PRIMARY KEY ( block_number, extrinsic_index ) 
 );
 
-CREATE TABLE IF NOT EXISTS phragmen  (  
+CREATE TABLE IF NOT EXISTS validator (
   block_height BIGINT NOT NULL,
-  phragmen_json TEXT NOT NULL,
+  active BOOLEAN NOT NULL,
+  activeRating INT NOT NULL,
+  name TEXT NOT NULL,
+  identity TEXT NOT NULL,
+  hasSubIdentity BOOLEAN NOT NULL,
+  subAccountsRating INT NOT NULL,
+  verifiedIdentity BOOLEAN NOT NULL,
+  identityRating INT NOT NULL,
+  stashAddress TEXT NOT NULL,
+  controllerAddress TEXT NOT NULL,
+  partOfCluster BOOLEAN NOT NULL,
+  clusterName TEXT NOT NULL,
+  clusterMembers TEXT NOT NULL,
+  nominators INT NOT NULL,
+  nominatorsRating INT NOT NULL,
+  commission TEXT NOT NULL,
+  commissionHistory TEXT NOT NULL,
+  commissionRating INT NOT NULL,
+  eraPointsHistory TEXT NOT NULL,
+  eraPointsPercent TEXT NOT NULL,
+  eraPointsRating INT NOT NULL,
+  slashed BOOLEAN NOT NULL,
+  slashRating INT NOT NULL,
+  slashes TEXT NOT NULL,
+  councilBacking BOOLEAN NOT NULL,
+  activeInGovernance BOOLEAN NOT NULL,
+  governanceRating INT NOT NULL,
+  payoutHistory TEXT NOT NULL,
+  payoutRating INT NOT NULL,
+  selfStake BIGINT NOT NULL,
+  otherStake BIGINT NOT NULL,
+  totalStake BIGINT NOT NULL,
+  totalRating INT NOT NULL,
   timestamp BIGINT NOT NULL,
-  PRIMARY KEY ( block_height )  
+  PRIMARY KEY ( block_height, stashAddress )
 );
 
 CREATE INDEX IF NOT EXISTS extrinsic_section_idx ON extrinsic (section);
@@ -64,4 +96,4 @@ GRANT ALL PRIVILEGES ON TABLE block TO vrc;
 GRANT ALL PRIVILEGES ON TABLE harvester_error TO vrc;
 GRANT ALL PRIVILEGES ON TABLE event TO vrc;
 GRANT ALL PRIVILEGES ON TABLE extrinsic TO vrc;
-GRANT ALL PRIVILEGES ON TABLE phragmen TO vrc;
+GRANT ALL PRIVILEGES ON TABLE validator TO vrc;
