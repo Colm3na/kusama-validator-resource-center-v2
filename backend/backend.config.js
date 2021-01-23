@@ -10,27 +10,30 @@ module.exports = {
     password: process.env.POSTGRES_PASSWORD || 'vrc',
     port: process.env.POSTGRES_PORT || 5432,
   },
-  crawlers: [    
+  crawlers: [
     {
       enabled: !process.env.CRAWLER_BLOCK_LISTENER_DISABLE,
+      // eslint-disable-next-line global-require
       module: require('./lib/crawlers/blockListener'),
     },
     {
       enabled: !process.env.CRAWLER_BLOCK_HARVESTER_DISABLE,
+      // eslint-disable-next-line global-require
       module: require('./lib/crawlers/blockHarvester'),
       config: {
         pollingTime:
-          parseInt(process.env.CRAWLER_BLOCK_LISTENER_POLLING_TIME_MS) ||
-          60 * 60 * 1000,
+          parseInt(process.env.CRAWLER_BLOCK_LISTENER_POLLING_TIME_MS, 10)
+          || 60 * 60 * 1000,
       },
     },
     {
       enabled: !process.env.CRAWLER_STAKING_DISABLE,
+      // eslint-disable-next-line global-require
       module: require('./lib/crawlers/staking'),
       config: {
         pollingTime:
-          parseInt(process.env.CRAWLER_STAKING_POLLING_TIME_MS) ||
-          5 * 60 * 1000,
+          parseInt(process.env.CRAWLER_STAKING_POLLING_TIME_MS, 10)
+          || 5 * 60 * 1000,
         historySize: 84,
         erasPerDay: 4,
       },

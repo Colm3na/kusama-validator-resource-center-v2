@@ -1,8 +1,8 @@
 const config = require('./backend.config.js');
 const Backend = require('./lib/Backend.js');
 
-async function main () {
-  const backend = new Backend(config); 
+async function main() {
+  const backend = new Backend(config);
   backend.runCrawlers();
 }
 
