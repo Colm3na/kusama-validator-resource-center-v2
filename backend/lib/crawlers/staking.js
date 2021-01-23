@@ -358,6 +358,7 @@ module.exports = {
           totalRating,
           timestamp
         ) VALUES (
+          '${blockHeight}',
           '${validator.active}',
           '${validator.activeRating}',
           '${validator.name}',
