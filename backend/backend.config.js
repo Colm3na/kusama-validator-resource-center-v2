@@ -32,6 +32,7 @@ module.exports = {
           parseInt(process.env.CRAWLER_STAKING_POLLING_TIME_MS) ||
           5 * 60 * 1000,
         historySize: 84,
+        erasPerDay: 4,
       },
     },
   ],

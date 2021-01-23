@@ -87,8 +87,6 @@ module.exports = {
     // api.disconnect()
     const dataCollectionEndTime = new Date().getTime();
     const dataCollectionTime = dataCollectionEndTime - startTime;
-    
-    logger.info(loggerOptions, `data collection time: ${(dataCollectionTime / 1000).toFixed(3)}s`);
 
     //
     // data processing
@@ -249,7 +247,7 @@ module.exports = {
           }
           payoutHistory.push(eraPayoutState);
         })
-        const payoutRating = getPayoutRating(payoutHistory);
+        const payoutRating = getPayoutRating(payoutHistory, config);
 
         // stake
         const selfStake = active
@@ -431,7 +429,7 @@ function getCommissionRating(commission, commissionHistory) {
   }
 }
 
-function getPayoutRating(payoutHistory) {
+function getPayoutRating(payoutHistory, config) {
   const pendingEras = payoutHistory.filter((era) => era === 'pending').length
   if (pendingEras <= config.erasPerDay) {
     return 3
