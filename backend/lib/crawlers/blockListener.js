@@ -11,7 +11,7 @@ const loggerOptions = {
 module.exports = {
   start: async function (pool, config) {
     logger.info(loggerOptions, `Starting block listener...`);
-    const wsProvider = new WsProvider(config.nodeWs);
+    const wsProvider = new WsProvider(config.wsProviderUrl);
     const api = await ApiPromise.create({ provider: wsProvider });
     // Subscribe to new blocks
     await api.rpc.chain.subscribeNewHeads(async (header) => {

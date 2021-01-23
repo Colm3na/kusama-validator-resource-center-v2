@@ -12,7 +12,7 @@ module.exports = {
   start: async function(pool, config) {
     logger.info(loggerOptions, `Starting block harvester...`);
     const startTime = new Date().getTime();
-    const wsProvider = new WsProvider(config.nodeWs);
+    const wsProvider = new WsProvider(config.wsProviderUrl);
     const api = await ApiPromise.create({ provider: wsProvider });
     let addedBlocks = 0;
 
@@ -53,7 +53,7 @@ module.exports = {
     // Log execution time
     const endTime = new Date().getTime();
     logger.info(loggerOptions, `Added ${addedBlocks} blocks in ${((endTime - startTime) / 1000).toFixed(0)}s`);
-    
+
     logger.info(loggerOptions, `Next execution in ${(config.pollingTime / 60000).toFixed(0)}m...`);
     setTimeout(
       () => module.exports.start(pool, config),

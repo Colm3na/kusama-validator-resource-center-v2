@@ -16,7 +16,7 @@ module.exports = {
     //
     // data collection
     //
-    const wsProvider = new WsProvider(config.nodeWs);
+    const wsProvider = new WsProvider(config.wsProviderUrl);
     const api = await ApiPromise.create({ provider: wsProvider });
     const withActive = false;
     const erasHistoric = await api.derive.staking.erasHistoric(withActive);
