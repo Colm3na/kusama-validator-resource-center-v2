@@ -15,10 +15,8 @@ module.exports = {
     const api = await ApiPromise.create({ provider: wsProvider });
     // Subscribe to new blocks
     await api.rpc.chain.subscribeNewHeads(async (blockHeader) => {
-      // Get block number
-      const blockNumber = blockHeader.number.toNumber();
-
       // Get block hash
+      const blockNumber = blockHeader.number.toNumber();
       const blockHash = await api.rpc.chain.getBlockHash(blockNumber);
 
       // Parallelize
@@ -36,7 +34,7 @@ module.exports = {
         api.derive.chain.getHeader(blockHash),
       ]);
 
-      const activeEra = ChainActiveEra.toJSON().['index'];
+      const activeEra = ChainActiveEra.toJSON()['index'];
       const sessionIndex = ChainCurrentIndex.toString();
       const { parentHash, extrinsicsRoot, stateRoot } = blockHeader;
 
@@ -61,30 +59,25 @@ module.exports = {
         const blockAuthorIdentity = await api.derive.accounts.info(blockAuthor);
         const blockAuthorName = blockAuthorIdentity.identity.display || ``;
 
-        sql =
-          `UPDATE block SET block_author = '${blockAuthor}', block_author_name = '${blockAuthorName}', block_hash = '${blockHash}', state_root = '${stateRoot}' WHERE block_number = '${blockNumber}'`;
+        sql = `UPDATE block SET block_author = '${blockAuthor}', block_author_name = '${blockAuthorName}', block_hash = '${blockHash}', state_root = '${stateRoot}' WHERE block_number = '${blockNumber}'`;
         res = await pool.query(sql);
-
       } else {
-
         // Get block events
         const blockEvents = await api.query.system.events.at(blockHash);
 
         // Get election status
-        const isElection = electionStatus.toString() === `Close` ? false : true
-        
+        const isElection = electionStatus.toString() === 'Close';
+
         // Totals
         const totalEvents = blockEvents.length || 0;
         const totalExtrinsics = block.extrinsics.length;
 
         // Store new block
         logger.info(loggerOptions, `Adding block #${blockNumber} (${shortHash(blockHash.toString())})`);
-        
         const timestampMs = await api.query.timestamp.now.at(blockHash);
-        const timestamp = Math.floor(parseInt(timestampMs.toString()) / 1000);
+        const timestamp = Math.floor(parseInt(timestampMs.toString(), 10) / 1000);
 
-        sql =
-          `INSERT INTO block (
+        sql = `INSERT INTO block (
             block_number,
             block_author,
             block_author_name,
@@ -124,7 +117,14 @@ module.exports = {
         }
 
         // Store block extrinsics
-        await storeExtrinsics(pool, blockNumber, block.extrinsics, blockEvents, timestamp, loggerOptions);
+        await storeExtrinsics(
+          pool,
+          blockNumber,
+          block.extrinsics,
+          blockEvents,
+          timestamp,
+          loggerOptions,
+        );
 
         // Loop through the Vec<EventRecord>
         await blockEvents.forEach( async (record, index) => {
@@ -135,9 +135,7 @@ module.exports = {
           let res = await pool.query(sql);
 
           if (res.rows.length === 0) {
-        
-            sql = 
-              `INSERT INTO event (
+            sql = `INSERT INTO event (
                 block_number,
                 event_index,
                 section,
@@ -167,5 +165,5 @@ module.exports = {
         });
       }
     });
-  }
-}
+  },
+};
