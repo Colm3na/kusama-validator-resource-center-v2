@@ -318,7 +318,7 @@ module.exports = {
     // console.log(JSON.parse(JSON.stringify(ranking)))
 
     // store in db
-    logger.info(loggerOptions, `Storing ${ranking.length} validators in ${((dataCollectionTime + dataProcessingTime) / 1000).toFixed(3)}s`);
+    logger.info(loggerOptions, `Storing ${ranking.length} validators in db...`);
     for(const validator of ranking) {
       const sql = `
         INSERT INTO validator (
