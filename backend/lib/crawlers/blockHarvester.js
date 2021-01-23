@@ -1,23 +1,22 @@
 // @ts-check
 const { ApiPromise, WsProvider } = require('@polkadot/api');
-const { shortHash, storeExtrinsics, getDisplayName } = require('../utils.js');
 const pino = require('pino');
-const logger = pino();
+const { shortHash, storeExtrinsics, getDisplayName } = require('../utils.js');
 
+const logger = pino();
 const loggerOptions = {
-  crawler: `blockHarvester`
+  crawler: 'blockHarvester',
 };
 
 module.exports = {
-  start: async function(wsProviderUrl, pool, config) {
-    logger.info(loggerOptions, `Starting block harvester...`);
+  start: async (wsProviderUrl, pool, config) => {
+    logger.info(loggerOptions, 'Starting block harvester...');
     const startTime = new Date().getTime();
     const wsProvider = new WsProvider(wsProviderUrl);
     const api = await ApiPromise.create({ provider: wsProvider });
-    let addedBlocks = 0;
 
     // Get gaps from block table
-    let sqlSelect = `
+    const sqlSelect = `
       SELECT
         gap_start, gap_end FROM (
           SELECT block_number + 1 AS gap_start,
@@ -42,17 +41,22 @@ module.exports = {
         gap_end DESC
     `;
     const res = await pool.query(sqlSelect);
-    for (let i = 0; i < res.rows.length; i++) {
+
+    res.rows.forEach(async (row) => {
       // Quick fix for gap 0-0 error
-      if (!(res.rows[i].gap_start == 0 && res.rows[i].gap_end == 0)) {
-        logger.info(loggerOptions, `Detected gap! Harvesting blocks from #${res.rows[i].gap_end} to #${res.rows[i].gap_start}`);
-        await module.exports.harvestBlocks(api, pool, parseInt(res.rows[i].gap_start), parseInt(res.rows[i].gap_end));
+      if (!(row.gap_start === 0 && row.gap_end === 0)) {
+        logger.info(loggerOptions, `Detected gap! Harvesting blocks from #${row.gap_end} to #${row.gap_start}`);
+        await module.exports.harvestBlocks(
+          api,
+          pool,
+          parseInt(row.gap_start, 10),
+          parseInt(row.gap_end, 10),
+        );
       }
-    }
-  
+    });
     // Log execution time
     const endTime = new Date().getTime();
-    logger.info(loggerOptions, `Added ${addedBlocks} blocks in ${((endTime - startTime) / 1000).toFixed(0)}s`);
+    logger.info(loggerOptions, `Executed in ${((endTime - startTime) / 1000).toFixed(0)}s`);
 
     logger.info(loggerOptions, `Next execution in ${(config.pollingTime / 60000).toFixed(0)}m...`);
     setTimeout(
@@ -60,7 +64,9 @@ module.exports = {
       config.pollingTime,
     );
   },
-  harvestBlocks: async function(api, pool, startBlock, endBlock) {
+  harvestBlocks: async (api, pool, startBlock, _endBlock) => {
+    let endBlock = _endBlock;
+    /* eslint-disable no-await-in-loop */
     while (endBlock >= startBlock) {
       const startTime = new Date().getTime();
       try {
@@ -83,24 +89,22 @@ module.exports = {
           api.query.staking.eraElectionStatus.at(blockHash),
         ]);
 
-        const activeEra = ChainActiveEra.toJSON()['index'];
+        const activeEra = ChainActiveEra.toJSON().index;
         const sessionIndex = ChainCurrentIndex.toString();
         const blockAuthorIdentity = await api.derive.accounts.info(blockHeader.author);
         const blockAuthorName = getDisplayName(blockAuthorIdentity.identity);
         const timestamp = Math.floor(timestampMs / 1000);
-        const parentHash = blockHeader.parentHash;
-        const extrinsicsRoot = blockHeader.extrinsicsRoot;
-        const stateRoot = blockHeader.stateRoot;
-    
+        const { parentHash, extrinsicsRoot, stateRoot } = blockHeader;
+
         // Get election status
-        const isElection = electionStatus.toString() === `Close` ? false : true
+        const isElection = electionStatus.toString() !== 'Close';
 
         // Store block events
         try {
-          blockEvents.forEach( async (record, index) => {
+          // eslint-disable-next-line no-loop-func
+          blockEvents.forEach(async (record, index) => {
             const { event, phase } = record;
-            const sql = 
-              `INSERT INTO event (
+            const sql = `INSERT INTO event (
                 block_number,
                 event_index,
                 section,
@@ -129,41 +133,37 @@ module.exports = {
           });
         } catch (error) {
           logger.error(loggerOptions, `Error getting events for block ${endBlock} (${blockHash}): ${error}`);
-          try {
-            const timestamp = new Date().getTime();
-            const errorString = error.toString().replace(/'/g, "''");
-            const sql = `INSERT INTO harvester_error (block_number, error, timestamp)
+          const errorString = error.toString().replace(/'/g, "''");
+          const sql = `INSERT INTO harvester_error (block_number, error, timestamp)
               VALUES ('${endBlock}', '${errorString}', '${timestamp}');
-            `;
-            await pool.query(sql);
-          } catch (error) {
-            logger.error(loggerOptions, `Error inserting error for block #${endBlock} in harvester_error table :-/ : ${error}`);
-          }
+          `;
+          await pool.query(sql);
         }
-        
+
         // Store block extrinsics
         try {
-          await storeExtrinsics(pool, endBlock, block.extrinsics, blockEvents, timestamp, loggerOptions);
+          await storeExtrinsics(
+            pool,
+            endBlock,
+            block.extrinsics,
+            blockEvents,
+            timestamp,
+            loggerOptions,
+          );
         } catch (error) {
           logger.error(loggerOptions, `Error getting extrinsics for block ${endBlock} (${blockHash}): ${error}`);
-          try {
-            const timestamp = new Date().getTime();
-            const errorString = error.toString().replace(/'/g, "''");
-            const sql = `INSERT INTO harvester_error (block_number, error, timestamp)
-              VALUES ('${endBlock}', '${errorString}', '${timestamp}');
-            `;
-            await pool.query(sql);
-          } catch (error) {
-            logger.error(loggerOptions, `Error inserting error for block #${endBlock} in harvester_error table :-/ : ${error}`);
-          }
+          const errorString = error.toString().replace(/'/g, "''");
+          const sql = `INSERT INTO harvester_error (block_number, error, timestamp)
+            VALUES ('${endBlock}', '${errorString}', '${timestamp}');
+          `;
+          await pool.query(sql);
         }
-              
+
         // Totals
         const totalEvents = blockEvents.length;
         const totalExtrinsics = block.extrinsics.length;
 
-        const sqlInsert =
-          `INSERT INTO block (
+        const sqlInsert = `INSERT INTO block (
             block_number,
             block_author,
             block_author_name,
@@ -202,21 +202,17 @@ module.exports = {
         } catch (error) {
           logger.error(loggerOptions, `Error adding block #${endBlock}: ${error}`);
         }
-        endBlock--;
+        endBlock -= 1;
       } catch (error) {
         logger.error(loggerOptions, `Error adding block #${endBlock}: ${error}`);
-        try {
-          const timestamp = new Date().getTime();
-          const errorString = error.toString().replace(/'/g, "''");
-          const sql = `INSERT INTO harvester_error (block_number, error, timestamp)
-            VALUES ('${endBlock}', '${errorString}', '${timestamp}');
-          `;
-          await pool.query(sql);
-        } catch (error) {
-          logger.error(loggerOptions, `Error inserting block #${endBlock} in harvester_error table :-/ : ${error}`);
-        }
-        endBlock--;
+        const timestamp = new Date().getTime();
+        const errorString = error.toString().replace(/'/g, "''");
+        const sql = `INSERT INTO harvester_error (block_number, error, timestamp)
+          VALUES ('${endBlock}', '${errorString}', '${timestamp}');
+        `;
+        await pool.query(sql);
+        endBlock -= 1;
       }
     }
-  }
-}
+  },
+};
