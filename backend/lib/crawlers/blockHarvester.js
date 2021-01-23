@@ -53,10 +53,10 @@ module.exports = {
     // Log execution time
     const endTime = new Date().getTime();
     logger.info(loggerOptions, `Added ${addedBlocks} blocks in ${((endTime - startTime) / 1000).toFixed(0)}s`);
-    logger.info(loggerOptions, `Next execution in 60m...`);
-
+    
+    logger.info(loggerOptions, `Next execution in ${(config.pollingTime / 60000).toFixed(0)}m...`);
     setTimeout(
-      () => module.exports.start(api, pool, config),
+      () => module.exports.start(pool, config),
       config.pollingTime,
     );
   },

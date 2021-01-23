@@ -320,10 +320,13 @@ module.exports = {
     // console.log(JSON.parse(JSON.stringify(ranking)))
     const endTime = new Date().getTime();
     const dataProcessingTime = endTime - dataCollectionEndTime;
-    
-    logger.info(loggerOptions, `data processing time: ${(dataProcessingTime / 1000).toFixed(3)}s`);
-    logger.info(loggerOptions, `total processing time: ${((dataCollectionTime + dataProcessingTime) / 1000).toFixed(3)}s`);
-    
+    logger.info(loggerOptions, `Added ${validators.length} validators in ${((dataCollectionTime + dataProcessingTime) / 1000).toFixed(3)}s`);
+
+    logger.info(loggerOptions, `Next execution in ${(config.pollingTime / 60000).toFixed(0)}m...`);
+    setTimeout(
+      () => module.exports.start(pool, config),
+      config.pollingTime,
+    );
   },
 }
 

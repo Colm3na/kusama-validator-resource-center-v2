@@ -25,5 +25,14 @@ module.exports = {
           60 * 60 * 1000,
       },
     },
+    {
+      enabled: !process.env.CRAWLER_STAKING_DISABLE,
+      module: require('./lib/crawlers/staking'),
+      config: {
+        pollingTime:
+          parseInt(process.env.CRAWLER_STAKING_POLLING_TIME_MS) ||
+          5 * 60 * 1000,
+      },
+    },
   ],
 };
