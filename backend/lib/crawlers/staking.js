@@ -2,15 +2,15 @@
 const { BigNumber } = require('bignumber.js');
 const { ApiPromise, WsProvider } = require('@polkadot/api');
 const pino = require('pino');
-const logger = pino();
 
+const logger = pino();
 const loggerOptions = {
-  crawler: `staking`
+  crawler: 'staking',
 };
 
 module.exports = {
-  start: async function (wsProviderUrl, pool, config) {
-    logger.info(loggerOptions, `Starting staking crawler...`);
+  start: async (wsProviderUrl, pool, config) => {
+    logger.info(loggerOptions, 'Starting staking crawler...');
     const startTime = new Date().getTime();
 
     //
@@ -21,9 +21,9 @@ module.exports = {
     const withActive = false;
     const erasHistoric = await api.derive.staking.erasHistoric(withActive);
     const eraIndexes = erasHistoric.slice(
-      Math.max(erasHistoric.length - config.historySize, 0)
+      Math.max(erasHistoric.length - config.historySize, 0),
     );
-    const maxNominatorRewardedPerValidator = api.consts.staking.maxNominatorRewardedPerValidator;
+    const { maxNominatorRewardedPerValidator } = api.consts.staking;
 
     let validators = [];
     let intentions = [];
@@ -45,23 +45,26 @@ module.exports = {
       api.derive.staking.waitingInfo(),
       api.query.staking.nominators.entries(),
       api.derive.council.votes(),
+      // eslint-disable-next-line no-underscore-dangle
       api.derive.staking._erasPoints(eraIndexes, withActive),
+      // eslint-disable-next-line no-underscore-dangle
       api.derive.staking._erasPrefs(eraIndexes, withActive),
+      // eslint-disable-next-line no-underscore-dangle
       api.derive.staking._erasSlashes(eraIndexes, withActive),
       api.derive.democracy.proposals(),
       api.derive.democracy.referendums(),
     ]);
     validators = await Promise.all(
-      validatorAddresses.map((authorityId) =>
-        api.derive.staking.query(authorityId, {
+      validatorAddresses.map(
+        (authorityId) => api.derive.staking.query(authorityId, {
           withDestination: false,
           withExposure: true,
           withLedger: true,
           withNominations: false,
           withPrefs: true,
-        })
-      )
-    )
+        }),
+      ),
+    );
     validators = await Promise.all(
       validators.map((validator) =>
         api.derive.accounts.info(validator.accountId).then(({ identity }) => {
@@ -70,9 +73,9 @@ module.exports = {
             identity,
             active: true,
           }
-        })
-      )
-    )
+        }),
+      ),
+    );
     intentions = await Promise.all(
       JSON.parse(JSON.stringify(waitingInfo.info)).map((intention) =>
         api.derive.accounts.info(intention.accountId).then(({ identity }) => {
@@ -81,9 +84,9 @@ module.exports = {
             identity,
             active: false,
           }
-        })
-      )
-    )
+        }),
+      ),
+    );
     // api.disconnect()
     const dataCollectionEndTime = new Date().getTime();
     const dataCollectionTime = dataCollectionEndTime - startTime;
@@ -91,15 +94,15 @@ module.exports = {
     //
     // data processing
     //
-    const blockHeight = parseInt(block.header.number.toString());
+    const blockHeight = parseInt(block.header.number.toString(), 10);
     const numActiveValidators = validatorAddresses.length;
     const eraPointsHistoryTotals = [];
     erasPoints.forEach(({ eraPoints }) => {
-      eraPointsHistoryTotals.push(parseInt(eraPoints.toString()));
-    })
+      eraPointsHistoryTotals.push(parseInt(eraPoints.toString(), 10));
+    });
     const eraPointsHistoryTotalsSum = eraPointsHistoryTotals.reduce(
       (total, num) => total + num,
-      0
+      0,
     );
     const erasPointsJSON = JSON.parse(JSON.stringify(erasPoints));
     const eraPointsAverage = eraPointsHistoryTotalsSum / numActiveValidators;
@@ -109,25 +112,21 @@ module.exports = {
       return {
         nominator,
         targets,
-      }
-    })
-    const participateInGovernance = []
+      };
+    });
+    const participateInGovernance = [];
     proposals.forEach(({ seconds, proposer }) => {
       participateInGovernance.push(proposer.toString());
-      seconds.forEach((accountId) =>
-        participateInGovernance.push(accountId.toString())
-      );
+      seconds.forEach((accountId) => participateInGovernance.push(accountId.toString()));
     });
     referendums.forEach(({ votes }) => {
-      votes.forEach(({ accountId }) =>
-        participateInGovernance.push(accountId.toString())
-      );
+      votes.forEach(({ accountId }) => participateInGovernance.push(accountId.toString()));
     });
     validators = validators.concat(intentions);
     const ranking = validators
       .map((validator) => {
         // active
-        const active = validator.active;
+        const { active } = validator;
         const activeRating = active ? 2 : 0;
 
         // stash
@@ -149,7 +148,7 @@ module.exports = {
         const clusterMembers = getClusterMembers(
           hasSubIdentity,
           validators,
-          validator.identity
+          validator.identity,
         );
         const partOfCluster = clusterMembers > 1;
         const clusterName = getClusterName(validator.identity);
@@ -160,8 +159,8 @@ module.exports = {
           ? validator.exposure.others.length
           : nominations.filter((nomination) =>
               nomination.targets.some(
-                (target) => target === validator.accountId.toString()
-              )
+                (target) => target === validator.accountId.toString(),
+              ),
             ).length;
         const nominatorsRating =
           nominators > 0 && nominators <= maxNominatorRewardedPerValidator.toNumber()
@@ -171,7 +170,7 @@ module.exports = {
         // slashes
         const slashes =
           erasSlashes.filter(
-            ({ validators }) => validators[validator.accountId.toString()]
+            ({ validators }) => validators[validator.accountId.toString()],
           ) || [];
         const slashed = slashes.length > 0;
         const slashRating = slashed ? 0 : 2;
@@ -180,29 +179,29 @@ module.exports = {
         const commission = parseInt(validator.validatorPrefs.commission.toString()) / 10000000;
         const commissionHistory = getCommissionHistory(
           validator.accountId,
-          erasPreferences
+          erasPreferences,
         );
         const commissionRating = getCommissionRating(
           commission,
-          commissionHistory
+          commissionHistory,
         );
 
         // governance
         const councilBacking = validator.identity?.parent
           ? councilVotes.some(
-              (vote) => vote[0].toString() === validator.accountId.toString()
+              (vote) => vote[0].toString() === validator.accountId.toString(),
             ) ||
             councilVotes.some(
               (vote) =>
-                vote[0].toString() === validator.identity.parent.toString()
+                vote[0].toString() === validator.identity.parent.toString(),
             )
           : councilVotes.some(
-              (vote) => vote[0].toString() === validator.accountId.toString()
+              (vote) => vote[0].toString() === validator.accountId.toString(),
             );
         const activeInGovernance = validator.identity?.parent
           ? participateInGovernance.includes(validator.accountId.toString()) ||
             participateInGovernance.includes(
-              validator.identity.parent.toString()
+              validator.identity.parent.toString(),
             )
           : participateInGovernance.includes(validator.accountId.toString());
         const governanceRating =
@@ -223,7 +222,7 @@ module.exports = {
         })
         const eraPointsHistoryValidator = eraPointsHistory.reduce(
           (total, num) => total + num,
-          0
+          0,
         )
         const eraPointsPercent =
           (eraPointsHistoryValidator * 100) / eraPointsHistoryTotalsSum;
@@ -232,7 +231,7 @@ module.exports = {
 
         // frecuency of payouts
         const claimedRewards = JSON.parse(
-          JSON.stringify(validator.stakingLedger.claimedRewards)
+          JSON.stringify(validator.stakingLedger.claimedRewards),
         );
         const payoutHistory = [];
         erasPointsJSON.forEach((eraPoints) => {
@@ -485,7 +484,7 @@ function getCommissionHistory(accountId, erasPreferences) {
   erasPreferences.forEach(({ validators }) => {
     if (validators[accountId]) {
       commissionHistory.push(
-        (validators[accountId].commission / 10000000).toFixed(2)
+        (validators[accountId].commission / 10000000).toFixed(2),
       )
     } else {
       commissionHistory.push(null)
@@ -529,7 +528,7 @@ function getClusterMembers(hasSubIdentity, validators, validatorIdentity) {
     return 0
   }
   return validators.filter(
-    ({ identity }) => identity.displayParent === validatorIdentity.displayParent
+    ({ identity }) => identity.displayParent === validatorIdentity.displayParent,
   ).length
 }
   
