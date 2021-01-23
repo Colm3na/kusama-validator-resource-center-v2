@@ -1,3 +1,4 @@
+// @ts-check
 const pino = require('pino');
 const { ApiPromise, WsProvider } = require('@polkadot/api');
 const { Pool } = require('pg');
@@ -19,15 +20,23 @@ class Backend {
 
     let api = await this.getPolkadotAPI();
     while (!api) {
+      // eslint-disable-next-line no-await-in-loop
       await wait(10000);
+      // eslint-disable-next-line no-await-in-loop
       api = await this.getPolkadotAPI();
     }
 
     logger.info('Running crawlers');
 
     this.config.crawlers
-      .filter(crawler => crawler.enabled)
-      .forEach(crawler => crawler.module.start(this.config.wsProviderUrl, pool, crawler.config, this.config.substrateNetwork));
+      .filter((crawler) => crawler.enabled)
+      .forEach(
+        (crawler) => crawler.module.start(
+          this.config.wsProviderUrl,
+          pool,
+          crawler.config,
+          this.config.substrateNetwork,
+        ));
   }
 
   async getPolkadotAPI() {
@@ -57,11 +66,11 @@ class Backend {
       logger.info('Node is synced!');
       this.nodeisSyncing = false;
       return api;
-    } else {
-      logger.warn('Node is not synced! Waiting 10s...');
-      api.disconnect();
-      await wait(10000);
     }
+    logger.warn('Node is not synced! Waiting 10s...');
+    api.disconnect();
+    await wait(10000);
+
     return false;
   }
 

@@ -1,23 +1,22 @@
 // @ts-check
 const { ApiPromise, WsProvider } = require('@polkadot/api');
-const { shortHash, storeExtrinsics, getDisplayName } = require('../utils.js');
 const pino = require('pino');
-const logger = pino();
+const { shortHash, storeExtrinsics, getDisplayName } = require('../utils.js');
 
+const logger = pino();
 const loggerOptions = {
-  crawler: `blockListener`
+  crawler: 'blockListener',
 };
 
 module.exports = {
-  start: async function (wsProviderUrl, pool, config) {
-    logger.info(loggerOptions, `Starting block listener...`);
+  start: async (wsProviderUrl, pool) => {
+    logger.info(loggerOptions, 'Starting block listener...');
     const wsProvider = new WsProvider(wsProviderUrl);
     const api = await ApiPromise.create({ provider: wsProvider });
     // Subscribe to new blocks
-    await api.rpc.chain.subscribeNewHeads(async (header) => {
-
+    await api.rpc.chain.subscribeNewHeads(async (blockHeader) => {
       // Get block number
-      const blockNumber = header.number.toNumber();
+      const blockNumber = blockHeader.number.toNumber();
 
       // Get block hash
       const blockHash = await api.rpc.chain.getBlockHash(blockNumber);
@@ -28,27 +27,18 @@ module.exports = {
         ChainActiveEra,
         electionStatus,
         { block },
-        extendedHeader,     
+        extendedHeader,
       ] = await Promise.all([
         api.query.session.currentIndex.at(blockHash),
         api.query.staking.activeEra.at(blockHash),
         api.query.staking.eraElectionStatus.at(blockHash),
         api.rpc.chain.getBlock(blockHash),
         api.derive.chain.getHeader(blockHash),
-
       ]);
 
-      const activeEra = ChainActiveEra.toJSON()['index'];
+      const activeEra = ChainActiveEra.toJSON().['index'];
       const sessionIndex = ChainCurrentIndex.toString();
-
-      // Get block parent hash
-      const parentHash = header.parentHash;
-      
-      // Get block extrinsics root
-      const extrinsicsRoot = header.extrinsicsRoot;
-
-      // Get block state root
-      const stateRoot = header.stateRoot;
+      const { parentHash, extrinsicsRoot, stateRoot } = blockHeader;
 
       // Get block author
       const blockAuthor = extendedHeader.author;
@@ -91,7 +81,7 @@ module.exports = {
         logger.info(loggerOptions, `Adding block #${blockNumber} (${shortHash(blockHash.toString())})`);
         
         const timestampMs = await api.query.timestamp.now.at(blockHash);
-        const timestamp = Math.floor(timestampMs / 1000);
+        const timestamp = Math.floor(parseInt(timestampMs.toString()) / 1000);
 
         sql =
           `INSERT INTO block (
