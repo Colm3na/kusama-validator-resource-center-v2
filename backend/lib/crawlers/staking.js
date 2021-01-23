@@ -324,7 +324,7 @@ module.exports = {
 
     logger.info(loggerOptions, `Next execution in ${(config.pollingTime / 60000).toFixed(0)}m...`);
     setTimeout(
-      () => module.exports.start(pool, config),
+      () => module.exports.start(wsProviderUrl, pool, config),
       config.pollingTime,
     );
   },

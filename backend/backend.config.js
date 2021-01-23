@@ -3,7 +3,6 @@ require('dotenv').config();
 module.exports = {
   substrateNetwork: process.env.SUBSTRATE_NETWORK || 'kusama',
   wsProviderUrl: process.env.WS_PROVIDER_URL || 'ws://substrate-node:9944',
-  historySize: 84,
   postgresConnParams: {
     user: process.env.POSTGRES_USER || 'vrc',
     host: process.env.POSTGRES_HOST || 'postgres',
@@ -32,6 +31,7 @@ module.exports = {
         pollingTime:
           parseInt(process.env.CRAWLER_STAKING_POLLING_TIME_MS) ||
           5 * 60 * 1000,
+        historySize: 84,
       },
     },
   ],
