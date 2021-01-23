@@ -391,7 +391,8 @@ module.exports = {
           '${validator.selfStake}',
           '${validator.otherStake}',
           '${validator.totalStake}',
-          '${validator.totalRating}'
+          '${validator.totalRating}',
+          '${startTime}'
         )`;
       try {
         await pool.query(sql);
