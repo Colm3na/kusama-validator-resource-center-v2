@@ -316,10 +316,91 @@ module.exports = {
         }
       })
     // console.log(JSON.parse(JSON.stringify(ranking)))
+
+    // store in db
+    logger.info(loggerOptions, `Storing ${ranking.length} validators in ${((dataCollectionTime + dataProcessingTime) / 1000).toFixed(3)}s`);
+    for(const validator of ranking) {
+      const sql = `
+        INSERT INTO validator (
+          block_height,
+          active,
+          activeRating,
+          name,
+          identity,
+          hasSubIdentity,
+          subAccountsRating,
+          verifiedIdentity,
+          identityRating,
+          stashAddress,
+          controllerAddress,
+          partOfCluster,
+          clusterName,
+          clusterMembers,
+          nominators,
+          nominatorsRating,
+          commission,
+          commissionHistory,
+          commissionRating,
+          eraPointsHistory,
+          eraPointsPercent,
+          eraPointsRating,
+          slashed,
+          slashRating,
+          slashes,
+          councilBacking,
+          activeInGovernance,
+          governanceRating,
+          payoutHistory,
+          payoutRating,
+          selfStake,
+          otherStake,
+          totalStake,
+          totalRating,
+          timestamp
+        ) VALUES (
+          '${validator.active}',
+          '${validator.activeRating}',
+          '${validator.name}',
+          '${validator.identity}',
+          '${validator.hasSubIdentity}',
+          '${validator.subAccountsRating}',
+          '${validator.verifiedIdentity}',
+          '${validator.identityRating}',
+          '${validator.stashAddress}',
+          '${validator.controllerAddress}',
+          '${validator.partOfCluster}',
+          '${validator.clusterName}',
+          '${validator.clusterMembers}',
+          '${validator.nominators}',
+          '${validator.nominatorsRating}',
+          '${validator.commission}',
+          '${validator.commissionHistory}',
+          '${validator.commissionRating}',
+          '${validator.eraPointsHistory}',
+          '${validator.eraPointsPercent}',
+          '${validator.eraPointsRating}',
+          '${validator.slashed}',
+          '${validator.slashRating}',
+          '${validator.slashes}',
+          '${validator.councilBacking}',
+          '${validator.activeInGovernance}',
+          '${validator.governanceRating}',
+          '${validator.payoutHistory}',
+          '${validator.payoutRating}',
+          '${validator.selfStake}',
+          '${validator.otherStake}',
+          '${validator.totalStake}',
+          '${validator.totalRating}'
+        )`;
+      try {
+        await pool.query(sql);
+      } catch (error) {
+        logger.error(loggerOptions, `Error inserting data in validator table: ${JSON.stringify(error)}`);
+      }
+    }
     const endTime = new Date().getTime();
     const dataProcessingTime = endTime - dataCollectionEndTime;
-    logger.info(loggerOptions, `Added ${validators.length} validators in ${((dataCollectionTime + dataProcessingTime) / 1000).toFixed(3)}s`);
-
+    logger.info(loggerOptions, `Added ${ranking.length} validators in ${((dataCollectionTime + dataProcessingTime) / 1000).toFixed(3)}s`);
     logger.info(loggerOptions, `Next execution in ${(config.pollingTime / 60000).toFixed(0)}m...`);
     setTimeout(
       () => module.exports.start(wsProviderUrl, pool, config),
