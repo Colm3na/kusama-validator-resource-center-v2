@@ -177,7 +177,7 @@ module.exports = {
         const slashRating = slashed ? 0 : 2;
 
         // commission
-        const commission = validator.validatorPrefs.commission.toNumber() / 10000000;
+        const commission = parseInt(validator.validatorPrefs.commission.toString()) / 10000000;
         const commissionHistory = getCommissionHistory(
           validator.accountId,
           erasPreferences
