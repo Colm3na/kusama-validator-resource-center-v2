@@ -9,10 +9,10 @@ const loggerOptions = {
 };
 
 module.exports = {
-  start: async function(pool, config) {
+  start: async function(wsProviderUrl, pool, config) {
     logger.info(loggerOptions, `Starting block harvester...`);
     const startTime = new Date().getTime();
-    const wsProvider = new WsProvider(config.wsProviderUrl);
+    const wsProvider = new WsProvider(wsProviderUrl);
     const api = await ApiPromise.create({ provider: wsProvider });
     let addedBlocks = 0;
 

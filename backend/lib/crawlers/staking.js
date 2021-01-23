@@ -9,14 +9,14 @@ const loggerOptions = {
 };
 
 module.exports = {
-  start: async function (pool, config) {
+  start: async function (wsProviderUrl, pool, config) {
     logger.info(loggerOptions, `Starting staking crawler...`);
     const startTime = new Date().getTime();
 
     //
     // data collection
     //
-    const wsProvider = new WsProvider(config.wsProviderUrl);
+    const wsProvider = new WsProvider(wsProviderUrl);
     const api = await ApiPromise.create({ provider: wsProvider });
     const withActive = false;
     const erasHistoric = await api.derive.staking.erasHistoric(withActive);
