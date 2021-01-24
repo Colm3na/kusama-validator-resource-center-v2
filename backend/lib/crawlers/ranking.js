@@ -11,15 +11,14 @@ const loggerOptions = {
 };
 
 async function getThousandValidatorProgramStats() {
-  return axios.get('https://kusama.w3f.community/candidates')
-    .then((response) => {
-      logger.info('Thousand Validator Program stats:', JSON.stringify(response, null, 2));
-      return response;
-    })
-    .catch((error) => {
-      logger.error('Error fetching Thousand Validator Program stats', error);
-      return false;
-    });
+  try {
+    const response = await axios.get('https://kusama.w3f.community/candidates');
+    logger.info('Thousand Validator Program stats:', JSON.stringify(response, null, 2));
+    return response;
+  } catch (error) {
+    logger.error('Error fetching Thousand Validator Program stats', error);
+    return false;
+  }
 }
 
 function isVerifiedIdentity(identity) {
