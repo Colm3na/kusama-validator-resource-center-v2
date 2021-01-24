@@ -233,9 +233,9 @@ module.exports = {
       ),
     );
     intentions = await Promise.all(
-      validators.map(
-        (validator) => api.derive.accounts.info(validator.accountId).then(({ identity }) => ({
-          ...validator,
+      intentions.map(
+        (intention) => api.derive.accounts.info(intention.accountId).then(({ identity }) => ({
+          ...intention,
           identity,
           active: false,
         })),
