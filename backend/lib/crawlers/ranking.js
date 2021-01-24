@@ -225,7 +225,7 @@ module.exports = {
       intentionAddresses.map(
         (authorityId) => api.derive.staking.query(authorityId, {
           withDestination: false,
-          withExposure: true,
+          withExposure: false,
           withLedger: true,
           withNominations: false,
           withPrefs: true,
