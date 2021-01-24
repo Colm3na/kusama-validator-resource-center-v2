@@ -372,16 +372,25 @@ module.exports = {
           const { era } = eraPoints;
           let eraPayoutState = 'inactive';
           if (eraPoints.validators[validator.accountId]) {
-            eraPointsHistory.push(parseInt(eraPoints.validators[validator.accountId], 10));
+            eraPointsHistory.push({
+              era: parseInt(era.toString(), 10),
+              points: parseInt(eraPoints.validators[validator.accountId], 10),
+            });
             if (validator.stakingLedger.claimedRewards.includes(era)) {
               eraPayoutState = 'paid';
             } else {
               eraPayoutState = 'pending';
             }
           } else {
-            eraPointsHistory.push(0);
+            eraPointsHistory.push({
+              era: parseInt(era.toString(), 10),
+              points: 0,
+            });
           }
-          payoutHistory.push(eraPayoutState);
+          payoutHistory.push({
+            era: parseInt(era.toString(), 10),
+            status: eraPayoutState,
+          });
         });
         const eraPointsHistoryValidator = eraPointsHistory.reduce(
           (total, num) => total + num,
