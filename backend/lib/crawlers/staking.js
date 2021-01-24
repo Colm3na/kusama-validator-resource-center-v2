@@ -225,8 +225,10 @@ module.exports = {
     );
     const erasPointsJSON = JSON.parse(JSON.stringify(erasPoints));
     const eraPointsAverage = eraPointsHistoryTotalsSum / numActiveValidators;
+    // eslint-disable-next-line
     const nominations = nominators.map(([key, nominations]) => {
       const nominator = key.toHuman()[0];
+      // eslint-disable-next-line
       const targets = nominations.toJSON()['targets'];
       return {
         nominator,
@@ -274,6 +276,7 @@ module.exports = {
         const subAccountsRating = hasSubIdentity ? 2 : 0;
 
         // nominators
+        // eslint-disable-next-line
         const nominators = active
           ? validator.exposure.others.length
           : nominations.filter((nomination) => nomination.targets.some(
@@ -286,6 +289,7 @@ module.exports = {
 
         // slashes
         const slashes = erasSlashes.filter(
+          // eslint-disable-next-line
           ({ validators }) => validators[validator.accountId.toString()],
         ) || [];
         const slashed = slashes.length > 0;
@@ -328,6 +332,7 @@ module.exports = {
 
         // era points
         const eraPointsHistory = [];
+        // eslint-disable-next-line
         erasPoints.forEach(({ validators }) => {
           if (validators[validator.accountId.toString()]) {
             eraPointsHistory.push(parseInt(validators[validator.accountId], 10));
@@ -363,10 +368,10 @@ module.exports = {
 
         // stake
         const selfStake = active
-          ? new BigNumber(validator.exposure.own)
-          : new BigNumber(validator.stakingLedger.total);
+          ? new BigNumber(validator.exposure.own.toNumber())
+          : new BigNumber(validator.stakingLedger.total.toNumber());
         const totalStake = active
-          ? new BigNumber(validator.exposure.total)
+          ? new BigNumber(validator.exposure.total.toNumber())
           : selfStake;
         const otherStake = active
           ? totalStake.minus(selfStake)
