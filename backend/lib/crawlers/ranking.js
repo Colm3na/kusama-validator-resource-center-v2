@@ -89,13 +89,17 @@ function parseIdentity(identity) {
 
 function getCommissionHistory(accountId, erasPreferences) {
   const commissionHistory = [];
-  erasPreferences.forEach(({ validators }) => {
+  erasPreferences.forEach(({ era, validators }) => {
     if (validators[accountId]) {
-      commissionHistory.push(
-        (validators[accountId].commission / 10000000).toFixed(2),
-      );
+      commissionHistory.push({
+        era: parseInt(era.toString(), 10),
+        commission: (validators[accountId].commission / 10000000).toFixed(2),
+      });
     } else {
-      commissionHistory.push(null);
+      commissionHistory.push({
+        era,
+        commission: null,
+      });
     }
   });
   return commissionHistory;
