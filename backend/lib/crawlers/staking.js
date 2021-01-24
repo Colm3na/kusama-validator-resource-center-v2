@@ -333,9 +333,9 @@ module.exports = {
         // era points
         const eraPointsHistory = [];
         // eslint-disable-next-line
-        erasPointsJSON.forEach(({ validators }) => {
-          if (validators[validator.accountId.toString()]) {
-            eraPointsHistory.push(parseInt(validators[validator.accountId.toString()], 10));
+        erasPoints.forEach(({ validators }) => {
+          if (validators[validator.accountId]) {
+            eraPointsHistory.push(parseInt(validators[validator.accountId], 10));
           } else {
             eraPointsHistory.push(0);
           }
