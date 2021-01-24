@@ -479,7 +479,7 @@ module.exports = {
           '${validator.active}',
           '${validator.activeRating}',
           '${validator.name}',
-          '${validator.identity}',
+          '${JSON.stringify(validator.identity)}',
           '${validator.hasSubIdentity}',
           '${validator.subAccountsRating}',
           '${validator.verifiedIdentity}',
