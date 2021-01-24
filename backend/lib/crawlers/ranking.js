@@ -12,11 +12,9 @@ const loggerOptions = {
 
 async function getThousandValidatorProgramStats() {
   try {
-    const response = await axios.get('https://kusama.w3f.community/candidates');
-    logger.info('Thousand Validator Program stats:', JSON.stringify(response, null, 2));
-    return response;
+    return await axios.get('https://kusama.w3f.community/candidates');
   } catch (error) {
-    logger.error('Error fetching Thousand Validator Program stats', error);
+    logger.error(loggerOptions, `Error fetching Thousand Validator Program stats: ${JSON.stringify(error)}`);
     return false;
   }
 }
@@ -153,6 +151,9 @@ module.exports = {
     //
     // data collection
     //
+    const thousandValidatorProgramStats = await getThousandValidatorProgramStats();
+    logger.info(loggerOptions, `Thousand Validator Program stats: ${JSON.stringify(thousandValidatorProgramStats, null, 2)}`);
+
     const wsProvider = new WsProvider(wsProviderUrl);
     const api = await ApiPromise.create({ provider: wsProvider });
     const withActive = false;
@@ -221,7 +222,6 @@ module.exports = {
       }))),
     );
     // api.disconnect()
-    const thousandValidatorProgramStats = await getThousandValidatorProgramStats();
     const dataCollectionEndTime = new Date().getTime();
     const dataCollectionTime = dataCollectionEndTime - startTime;
 
