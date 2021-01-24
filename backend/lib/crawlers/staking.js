@@ -333,9 +333,9 @@ module.exports = {
         // era points
         const eraPointsHistory = [];
         // eslint-disable-next-line
-        erasPoints.forEach(({ validators }) => {
+        erasPointsJSON.forEach(({ validators }) => {
           if (validators[validator.accountId.toString()]) {
-            eraPointsHistory.push(parseInt(validators[validator.accountId], 10));
+            eraPointsHistory.push(parseInt(validators[validator.accountId.toString()], 10));
           } else {
             eraPointsHistory.push(0);
           }
@@ -438,6 +438,7 @@ module.exports = {
       const sql = `
         INSERT INTO validator (
           block_height,
+          rank,
           active,
           activeRating,
           name,
@@ -474,6 +475,7 @@ module.exports = {
           timestamp
         ) VALUES (
           '${blockHeight}',
+          '${validator.rank}',
           '${validator.active}',
           '${validator.activeRating}',
           '${validator.name}',

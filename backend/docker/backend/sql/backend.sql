@@ -51,6 +51,7 @@ CREATE TABLE IF NOT EXISTS extrinsic (
 
 CREATE TABLE IF NOT EXISTS validator (
   block_height BIGINT NOT NULL,
+  rank INT NOT NULL,
   active BOOLEAN NOT NULL,
   activeRating INT NOT NULL,
   name TEXT NOT NULL,
