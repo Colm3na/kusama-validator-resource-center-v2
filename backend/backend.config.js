@@ -28,13 +28,13 @@ module.exports = {
       },
     },
     {
-      enabled: !process.env.CRAWLER_STAKING_DISABLE,
+      enabled: !process.env.CRAWLER_RANKING_DISABLE,
       // eslint-disable-next-line global-require
-      module: require('./lib/crawlers/staking'),
+      module: require('./lib/crawlers/ranking'),
       config: {
         startDelay: 60 * 1000,
         pollingTime:
-          parseInt(process.env.CRAWLER_STAKING_POLLING_TIME_MS, 10)
+          parseInt(process.env.CRAWLER_RANKING_POLLING_TIME_MS, 10)
           || 5 * 60 * 1000,
         historySize: 84,
         erasPerDay: 4,
