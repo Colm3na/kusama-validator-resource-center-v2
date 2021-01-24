@@ -10,7 +10,7 @@ const loggerOptions = {
   crawler: 'ranking',
 };
 
-async function getThousandValidatorProgramStats() {
+async function getThousandValidators() {
   try {
     const response = await axios.get('https://kusama.w3f.community/candidates');
     return response.data;
@@ -152,9 +152,7 @@ module.exports = {
     //
     // data collection
     //
-    const thousandValidatorProgramStats = await getThousandValidatorProgramStats();
-    logger.info(loggerOptions, `Thousand Validator Program stats: ${JSON.stringify(thousandValidatorProgramStats, null, 2)}`);
-
+    const thousandValidators = await getThousandValidators();
     const wsProvider = new WsProvider(wsProviderUrl);
     const api = await ApiPromise.create({ provider: wsProvider });
     const withActive = false;
@@ -267,6 +265,14 @@ module.exports = {
 
         // stash
         const stashAddress = validator.stashId.toString();
+
+        // thousand validators program
+        const includedThousandValidator = thousandValidators.some(
+          ({ stash }) => stash === stashAddress,
+        );
+        const thousandValidator = includedThousandValidator ? thousandValidators.find(
+          ({ stash }) => stash === stashAddress,
+        ) : '';
 
         // controller
         const controllerAddress = validator.controllerId.toString();
@@ -405,6 +411,7 @@ module.exports = {
           identityRating,
           stashAddress,
           controllerAddress,
+          thousandValidator,
           partOfCluster,
           clusterName,
           clusterMembers,
@@ -446,38 +453,40 @@ module.exports = {
           block_height,
           rank,
           active,
-          activeRating,
+          active_rating,
           name,
           identity,
-          hasSubIdentity,
-          subAccountsRating,
-          verifiedIdentity,
-          identityRating,
-          stashAddress,
-          controllerAddress,
-          partOfCluster,
-          clusterName,
-          clusterMembers,
+          has_sub_identity,
+          sub_accounts_rating,
+          verified_identity,
+          identity_rating,
+          stash_address,
+          controller_address,
+          included_thousand_validator,
+          thousand_validator,
+          part_cf_cluster,
+          cluster_name,
+          cluster_members,
           nominators,
-          nominatorsRating,
+          nominators_rating,
           commission,
-          commissionHistory,
-          commissionRating,
-          eraPointsHistory,
-          eraPointsPercent,
-          eraPointsRating,
+          commission_history,
+          commission_rating,
+          era_points_history,
+          era_points_percent,
+          era_points_rating,
           slashed,
-          slashRating,
+          slash_rating,
           slashes,
-          councilBacking,
-          activeInGovernance,
-          governanceRating,
-          payoutHistory,
-          payoutRating,
-          selfStake,
-          otherStake,
-          totalStake,
-          totalRating,
+          council_backing,
+          active_in_governance,
+          governance_rating,
+          payout_history,
+          payout_rating,
+          self_stake,
+          other_stake,
+          total_stake,
+          total_rating,
           timestamp
         ) VALUES (
           '${blockHeight}',
@@ -492,6 +501,8 @@ module.exports = {
           '${validator.identityRating}',
           '${validator.stashAddress}',
           '${validator.controllerAddress}',
+          '${validator.includedThousandValidator}',
+          '${JSON.stringify(validator.thousandValidator)}',
           '${validator.partOfCluster}',
           '${validator.clusterName}',
           '${validator.clusterMembers}',
