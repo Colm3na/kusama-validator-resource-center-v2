@@ -223,7 +223,6 @@ module.exports = {
       (total, num) => total + num,
       0,
     );
-    const erasPointsJSON = JSON.parse(JSON.stringify(erasPoints));
     const eraPointsAverage = eraPointsHistoryTotalsSum / numActiveValidators;
     // eslint-disable-next-line
     const nominations = nominators.map(([key, nominations]) => {
@@ -330,15 +329,27 @@ module.exports = {
             ? 2
             : 0;
 
-        // era points
+        // era points and frecuency of payouts
+        const claimedRewards = JSON.parse(
+          JSON.stringify(validator.stakingLedger.claimedRewards),
+        );
         const eraPointsHistory = [];
+        const payoutHistory = [];
         // eslint-disable-next-line
-        erasPoints.forEach(({ validators }) => {
-          if (validators[validator.accountId]) {
-            eraPointsHistory.push(parseInt(validators[validator.accountId], 10));
+        erasPoints.forEach((eraPoints) => {
+          const { era } = eraPoints;
+          let eraPayoutState = 'inactive';
+          if (eraPoints.validators[validator.accountId]) {
+            eraPointsHistory.push(parseInt(eraPoints.validators[validator.accountId], 10));
+            if (claimedRewards.includes(era)) {
+              eraPayoutState = 'paid';
+            } else {
+              eraPayoutState = 'pending';
+            }
           } else {
             eraPointsHistory.push(0);
           }
+          payoutHistory.push(eraPayoutState);
         });
         const eraPointsHistoryValidator = eraPointsHistory.reduce(
           (total, num) => total + num,
@@ -346,24 +357,6 @@ module.exports = {
         );
         const eraPointsPercent = (eraPointsHistoryValidator * 100) / eraPointsHistoryTotalsSum;
         const eraPointsRating = eraPointsHistoryValidator > eraPointsAverage ? 2 : 0;
-
-        // frecuency of payouts
-        const claimedRewards = JSON.parse(
-          JSON.stringify(validator.stakingLedger.claimedRewards),
-        );
-        const payoutHistory = [];
-        erasPointsJSON.forEach((eraPoints) => {
-          const eraIndex = parseInt(eraPoints.era, 10);
-          let eraPayoutState = 'inactive';
-          if (Object.keys(eraPoints.validators).includes(stashAddress)) {
-            if (claimedRewards.includes(eraIndex)) {
-              eraPayoutState = 'paid';
-            } else {
-              eraPayoutState = 'pending';
-            }
-          }
-          payoutHistory.push(eraPayoutState);
-        });
         const payoutRating = getPayoutRating(payoutHistory, config);
 
         // stake
