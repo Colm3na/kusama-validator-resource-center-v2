@@ -168,6 +168,14 @@ module.exports = {
     );
     const { maxNominatorRewardedPerValidator } = api.consts.staking;
 
+    const stakingQueryFlags = {
+      withDestination: false,
+      withExposure: true,
+      withLedger: true,
+      withNominations: false,
+      withPrefs: true,
+    };
+
     let validators = [];
     let intentions = [];
 
@@ -185,7 +193,7 @@ module.exports = {
     ] = await Promise.all([
       api.rpc.chain.getBlock(),
       api.query.session.validators(),
-      api.derive.staking.waitingInfo(),
+      api.derive.staking.waitingInfo(stakingQueryFlags),
       api.query.staking.nominators.entries(),
       api.derive.council.votes(),
       // eslint-disable-next-line no-underscore-dangle
@@ -199,13 +207,7 @@ module.exports = {
     ]);
     validators = await Promise.all(
       validatorAddresses.map(
-        (authorityId) => api.derive.staking.query(authorityId, {
-          withDestination: false,
-          withExposure: true,
-          withLedger: true,
-          withNominations: false,
-          withPrefs: true,
-        }),
+        (authorityId) => api.derive.staking.query(authorityId, stakingQueryFlags),
       ),
     );
     validators = await Promise.all(
@@ -217,23 +219,8 @@ module.exports = {
         })),
       ),
     );
-    const intentionAddresses = JSON.parse(
-      JSON.stringify(waitingInfo.info),
-    ).map((intention) => intention.accountId);
-
     intentions = await Promise.all(
-      intentionAddresses.map(
-        (authorityId) => api.derive.staking.query(authorityId, {
-          withDestination: false,
-          withExposure: false,
-          withLedger: true,
-          withNominations: false,
-          withPrefs: true,
-        }),
-      ),
-    );
-    intentions = await Promise.all(
-      intentions.map(
+      waitingInfo.info.map(
         (intention) => api.derive.accounts.info(intention.accountId).then(({ identity }) => ({
           ...intention,
           identity,
@@ -366,12 +353,12 @@ module.exports = {
               validator.identity.parent.toString(),
             )
           : participateInGovernance.includes(validator.accountId.toString());
-        // eslint-disable-next-line no-nested-ternary
-        const governanceRating = councilBacking && activeInGovernance
-          ? 3
-          : councilBacking || activeInGovernance
-            ? 2
-            : 0;
+        let governanceRating = 0;
+        if (councilBacking && activeInGovernance) {
+          governanceRating = 3;
+        } else if (councilBacking || activeInGovernance) {
+          governanceRating = 2;
+        }
 
         // era points and frecuency of payouts
         const eraPointsHistory = [];
