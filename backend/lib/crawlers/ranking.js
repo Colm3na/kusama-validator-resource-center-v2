@@ -7,7 +7,7 @@ const { wait } = require('../utils.js');
 
 const logger = pino();
 const loggerOptions = {
-  crawler: 'staking',
+  crawler: 'ranking',
 };
 
 async function getThousandValidatorProgramStats() {
