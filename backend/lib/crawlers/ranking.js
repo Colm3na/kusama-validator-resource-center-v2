@@ -152,7 +152,13 @@ module.exports = {
     //
     // data collection
     //
+
+    // thousand validators program data
+    logger.info(loggerOptions, 'Fetching thousand validator program validators...');
     const thousandValidators = await getThousandValidators();
+    logger.info(loggerOptions, `Got ${thousandValidators.length} validators!`);
+
+    // chain data
     const wsProvider = new WsProvider(wsProviderUrl);
     const api = await ApiPromise.create({ provider: wsProvider });
     const withActive = false;
