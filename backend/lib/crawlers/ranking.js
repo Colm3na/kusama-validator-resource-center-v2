@@ -471,7 +471,7 @@ module.exports = {
           controller_address,
           included_thousand_validators,
           thousand_validator,
-          part_cf_cluster,
+          part_of_cluster,
           cluster_name,
           cluster_members,
           nominators,
