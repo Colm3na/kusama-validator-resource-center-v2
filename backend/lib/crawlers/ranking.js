@@ -217,15 +217,31 @@ module.exports = {
         })),
       ),
     );
+    const intentionAddresses = JSON.parse(
+      JSON.stringify(waitingInfo.info),
+    ).map((intention) => intention.accountId);
+
     intentions = await Promise.all(
-      JSON.parse(
-        JSON.stringify(waitingInfo.info),
-      ).map((intention) => api.derive.accounts.info(intention.accountId).then(({ identity }) => ({
-        ...intention,
-        identity,
-        active: false,
-      }))),
+      intentionAddresses.map(
+        (authorityId) => api.derive.staking.query(authorityId, {
+          withDestination: false,
+          withExposure: true,
+          withLedger: true,
+          withNominations: false,
+          withPrefs: true,
+        }),
+      ),
     );
+    intentions = await Promise.all(
+      validators.map(
+        (validator) => api.derive.accounts.info(validator.accountId).then(({ identity }) => ({
+          ...validator,
+          identity,
+          active: false,
+        })),
+      ),
+    );
+
     // api.disconnect()
     const dataCollectionEndTime = new Date().getTime();
     const dataCollectionTime = dataCollectionEndTime - startTime;
@@ -388,7 +404,7 @@ module.exports = {
         const selfStake = active
           ? new BigNumber(validator.exposure.own.toString())
           // @ts-ignore
-          : new BigNumber(validator.stakingLedger.total); // intention is already JSON
+          : new BigNumber(validator.stakingLedger.total.toString());
         const totalStake = active
           ? new BigNumber(validator.exposure.total.toString())
           : selfStake;
