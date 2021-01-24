@@ -30,7 +30,7 @@ function getName(identity) {
 }
 
 function getClusterName(identity) {
-  return identity.displayParent || null;
+  return identity.displayParent || '';
 }
 
 function subIdentity(identity) {
@@ -489,7 +489,7 @@ module.exports = {
           '${validator.eraPointsRating}',
           '${validator.slashed}',
           '${validator.slashRating}',
-          '${validator.slashes}',
+          '${JSON.stringify(validator.slashes)}',
           '${validator.councilBacking}',
           '${validator.activeInGovernance}',
           '${validator.governanceRating}',
