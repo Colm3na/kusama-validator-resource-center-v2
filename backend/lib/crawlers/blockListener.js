@@ -67,7 +67,7 @@ module.exports = {
         const blockEvents = await api.query.system.events.at(blockHash);
 
         // Get election status
-        const isElection = electionStatus.toString() === 'Close';
+        const isElection = electionStatus.toString() !== 'Close';
 
         // Totals
         const totalEvents = blockEvents.length || 0;
