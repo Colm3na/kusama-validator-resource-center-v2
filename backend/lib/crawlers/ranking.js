@@ -387,7 +387,8 @@ module.exports = {
         // stake
         const selfStake = active
           ? new BigNumber(validator.exposure.own.toString())
-          : new BigNumber(validator.stakingLedger.total.toString());
+          // @ts-ignore
+          : new BigNumber(validator.stakingLedger.total); // intention is already JSON
         const totalStake = active
           ? new BigNumber(validator.exposure.total.toString())
           : selfStake;
