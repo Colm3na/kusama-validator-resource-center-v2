@@ -2,12 +2,25 @@
 const { BigNumber } = require('bignumber.js');
 const { ApiPromise, WsProvider } = require('@polkadot/api');
 const pino = require('pino');
+const axios = require('axios').default;
 const { wait } = require('../utils.js');
 
 const logger = pino();
 const loggerOptions = {
   crawler: 'staking',
 };
+
+async function getThousandValidatorProgramStats() {
+  return axios.get('https://kusama.w3f.community/candidates')
+    .then((response) => {
+      logger.info('Thousand Validator Program stats:', JSON.stringify(response, null, 2));
+      return response;
+    })
+    .catch((error) => {
+      logger.error('Error fetching Thousand Validator Program stats', error);
+      return false;
+    });
+}
 
 function isVerifiedIdentity(identity) {
   if (identity.judgements.length === 0) {
@@ -135,7 +148,7 @@ function getClusterMembers(hasSubIdentity, validators, validatorIdentity) {
 module.exports = {
   start: async (wsProviderUrl, pool, config) => {
     await wait(config.startDelay);
-    logger.info(loggerOptions, 'Starting staking crawler...');
+    logger.info(loggerOptions, 'Starting ranking crawler...');
     const startTime = new Date().getTime();
 
     //
@@ -209,6 +222,7 @@ module.exports = {
       }))),
     );
     // api.disconnect()
+    const thousandValidatorProgramStats = await getThousandValidatorProgramStats();
     const dataCollectionEndTime = new Date().getTime();
     const dataCollectionTime = dataCollectionEndTime - startTime;
 
@@ -428,7 +442,7 @@ module.exports = {
     // eslint-disable-next-line no-restricted-syntax
     for (const validator of ranking) {
       const sql = `
-        INSERT INTO validator (
+        INSERT INTO ranking (
           block_height,
           rank,
           active,
@@ -507,7 +521,7 @@ module.exports = {
         // eslint-disable-next-line no-await-in-loop
         await pool.query(sql);
       } catch (error) {
-        logger.error(loggerOptions, `Error inserting data in validator table: ${JSON.stringify(error)}`);
+        logger.error(loggerOptions, `Error inserting data in ranking table: ${JSON.stringify(error)}`);
       }
     }
     const endTime = new Date().getTime();

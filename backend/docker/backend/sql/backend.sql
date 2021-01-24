@@ -49,7 +49,7 @@ CREATE TABLE IF NOT EXISTS extrinsic (
   PRIMARY KEY ( block_number, extrinsic_index ) 
 );
 
-CREATE TABLE IF NOT EXISTS validator (
+CREATE TABLE IF NOT EXISTS ranking (
   block_height BIGINT NOT NULL,
   rank INT NOT NULL,
   active BOOLEAN NOT NULL,
@@ -97,4 +97,4 @@ GRANT ALL PRIVILEGES ON TABLE block TO vrc;
 GRANT ALL PRIVILEGES ON TABLE harvester_error TO vrc;
 GRANT ALL PRIVILEGES ON TABLE event TO vrc;
 GRANT ALL PRIVILEGES ON TABLE extrinsic TO vrc;
-GRANT ALL PRIVILEGES ON TABLE validator TO vrc;
+GRANT ALL PRIVILEGES ON TABLE ranking TO vrc;
