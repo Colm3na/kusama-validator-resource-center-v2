@@ -403,7 +403,6 @@ module.exports = {
         // stake
         const selfStake = active
           ? new BigNumber(validator.exposure.own.toString())
-          // @ts-ignore
           : new BigNumber(validator.stakingLedger.total.toString());
         const totalStake = active
           ? new BigNumber(validator.exposure.total.toString())
