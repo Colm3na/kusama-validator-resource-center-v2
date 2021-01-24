@@ -273,10 +273,10 @@ module.exports = {
         const stashAddress = validator.stashId.toString();
 
         // thousand validators program
-        const includedThousandValidator = thousandValidators.some(
+        const includedThousandValidators = thousandValidators.some(
           ({ stash }) => stash === stashAddress,
         );
-        const thousandValidator = includedThousandValidator ? thousandValidators.find(
+        const thousandValidator = includedThousandValidators ? thousandValidators.find(
           ({ stash }) => stash === stashAddress,
         ) : '';
 
@@ -417,6 +417,7 @@ module.exports = {
           identityRating,
           stashAddress,
           controllerAddress,
+          includedThousandValidators,
           thousandValidator,
           partOfCluster,
           clusterName,
@@ -468,7 +469,7 @@ module.exports = {
           identity_rating,
           stash_address,
           controller_address,
-          included_thousand_validator,
+          included_thousand_validators,
           thousand_validator,
           part_cf_cluster,
           cluster_name,
@@ -507,7 +508,7 @@ module.exports = {
           '${validator.identityRating}',
           '${validator.stashAddress}',
           '${validator.controllerAddress}',
-          '${validator.includedThousandValidator}',
+          '${validator.includedThousandValidators}',
           '${JSON.stringify(validator.thousandValidator)}',
           '${validator.partOfCluster}',
           '${validator.clusterName}',
