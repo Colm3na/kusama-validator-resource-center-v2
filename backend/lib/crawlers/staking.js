@@ -368,10 +368,10 @@ module.exports = {
 
         // stake
         const selfStake = active
-          ? new BigNumber(validator.exposure.own.toNumber())
-          : new BigNumber(validator.stakingLedger.total.toNumber());
+          ? new BigNumber(validator.exposure.own.toString())
+          : new BigNumber(validator.stakingLedger.total.toString());
         const totalStake = active
-          ? new BigNumber(validator.exposure.total.toNumber())
+          ? new BigNumber(validator.exposure.total.toString())
           : selfStake;
         const otherStake = active
           ? totalStake.minus(selfStake)
