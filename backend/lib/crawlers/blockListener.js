@@ -34,6 +34,7 @@ module.exports = {
         api.derive.chain.getHeader(blockHash),
       ]);
 
+      // eslint-disable-next-line
       const activeEra = ChainActiveEra.toJSON()['index'];
       const sessionIndex = ChainCurrentIndex.toString();
       const { parentHash, extrinsicsRoot, stateRoot } = blockHeader;
@@ -52,12 +53,12 @@ module.exports = {
         // Chain reorganization detected! We need to update block_author, block_hash and state_root
         logger.info(loggerOptions, `Detected chain reorganization at block #${blockNumber}, updating author, author name, hash and state root`);
 
-        // Get block author
+        // eslint-disable-next-line
         const blockAuthor = extendedHeader.author;
-
-        // Get block author identity display name
+        // eslint-disable-next-line
         const blockAuthorIdentity = await api.derive.accounts.info(blockAuthor);
-        const blockAuthorName = blockAuthorIdentity.identity.display || ``;
+        // eslint-disable-next-line
+        const blockAuthorName = blockAuthorIdentity.identity.display || '';
 
         sql = `UPDATE block SET block_author = '${blockAuthor}', block_author_name = '${blockAuthorName}', block_hash = '${blockHash}', state_root = '${stateRoot}' WHERE block_number = '${blockNumber}'`;
         res = await pool.query(sql);
@@ -127,11 +128,12 @@ module.exports = {
         );
 
         // Loop through the Vec<EventRecord>
-        await blockEvents.forEach( async (record, index) => {
+        await blockEvents.forEach(async (record, index) => {
           // Extract the phase and event
           const { event, phase } = record;
-
+          // eslint-disable-next-line
           let sql = `SELECT FROM event WHERE block_number = '${blockNumber}' AND event_index = '${index}';`;
+          // eslint-disable-next-line
           let res = await pool.query(sql);
 
           if (res.rows.length === 0) {
