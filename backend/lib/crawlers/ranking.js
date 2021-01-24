@@ -560,7 +560,7 @@ module.exports = {
         `${validator.nominators}`,
         `${validator.nominatorsRating}`,
         `${validator.commission}`,
-        `${validator.commissionHistory}`,
+        `${JSON.stringify(validator.commissionHistory)}`,
         `${validator.commissionRating}`,
         `${validator.eraPointsHistory}`,
         `${validator.eraPointsPercent}`,
