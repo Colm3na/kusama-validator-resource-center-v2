@@ -330,9 +330,6 @@ module.exports = {
             : 0;
 
         // era points and frecuency of payouts
-        const claimedRewards = JSON.parse(
-          JSON.stringify(validator.stakingLedger.claimedRewards),
-        );
         const eraPointsHistory = [];
         const payoutHistory = [];
         // eslint-disable-next-line
@@ -341,7 +338,7 @@ module.exports = {
           let eraPayoutState = 'inactive';
           if (eraPoints.validators[validator.accountId]) {
             eraPointsHistory.push(parseInt(eraPoints.validators[validator.accountId], 10));
-            if (claimedRewards.includes(era)) {
+            if (validator.stakingLedger.claimedRewards.includes(era)) {
               eraPayoutState = 'paid';
             } else {
               eraPayoutState = 'pending';
