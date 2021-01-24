@@ -12,7 +12,8 @@ const loggerOptions = {
 
 async function getThousandValidatorProgramStats() {
   try {
-    return await axios.get('https://kusama.w3f.community/candidates');
+    const response = await axios.get('https://kusama.w3f.community/candidates');
+    return response.data;
   } catch (error) {
     logger.error(loggerOptions, `Error fetching Thousand Validator Program stats: ${JSON.stringify(error)}`);
     return false;
