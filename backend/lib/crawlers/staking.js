@@ -2,7 +2,6 @@
 const { BigNumber } = require('bignumber.js');
 const { ApiPromise, WsProvider } = require('@polkadot/api');
 const pino = require('pino');
-const { wait } = require('../utils.js');
 
 const logger = pino();
 const loggerOptions = {
@@ -134,7 +133,6 @@ function getClusterMembers(hasSubIdentity, validators, validatorIdentity) {
 
 module.exports = {
   start: async (wsProviderUrl, pool, config) => {
-    await wait(config.startDelay);
     logger.info(loggerOptions, 'Starting staking crawler...');
     const startTime = new Date().getTime();
 

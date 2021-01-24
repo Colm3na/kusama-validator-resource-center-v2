@@ -1,7 +1,7 @@
 // @ts-check
 const { ApiPromise, WsProvider } = require('@polkadot/api');
 const pino = require('pino');
-const { shortHash, storeExtrinsics, getDisplayName } = require('../utils.js');
+const { shortHash, storeExtrinsics, getDisplayName, wait } = require('../utils.js');
 
 const logger = pino();
 const loggerOptions = {
@@ -10,6 +10,7 @@ const loggerOptions = {
 
 module.exports = {
   start: async (wsProviderUrl, pool, config) => {
+    await wait(config.startDelay);
     logger.info(loggerOptions, 'Starting block harvester...');
     const startTime = new Date().getTime();
     const wsProvider = new WsProvider(wsProviderUrl);
