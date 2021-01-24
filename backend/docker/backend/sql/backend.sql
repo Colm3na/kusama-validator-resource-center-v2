@@ -62,7 +62,7 @@ CREATE TABLE IF NOT EXISTS ranking (
   identity_rating INT NOT NULL,
   stash_address TEXT NOT NULL,
   controller_address TEXT NOT NULL,
-  included_thousand_validator BOOLEAN NOT NULL,
+  included_thousand_validators BOOLEAN NOT NULL,
   thousand_validator TEXT NOT NULL,
   part_of_cluster BOOLEAN NOT NULL,
   cluster_name TEXT NOT NULL,
