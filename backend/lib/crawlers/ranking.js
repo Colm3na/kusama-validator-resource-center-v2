@@ -413,7 +413,7 @@ module.exports = {
 
         // performance
         // convert to view token: .div(new BigNumber(10).pow(config.tokenDecimals))
-        const performance = (eraPointsAverage * (1 - commission)) / totalStake;
+        const performance = (eraPointsAverage * (1 - (commission / 100))) / totalStake.div(new BigNumber(10).pow(config.tokenDecimals).toNumber(10));
 
         // total rating
         const totalRating = activeRating
