@@ -127,7 +127,7 @@ function getCommissionRating(commission, commissionHistory) {
 }
 
 function getPayoutRating(payoutHistory, config) {
-  const pendingEras = payoutHistory.filter((era) => era === 'pending').length;
+  const pendingEras = payoutHistory.filter((era) => era.status === 'pending').length;
   if (pendingEras <= config.erasPerDay) {
     return 3;
   } if (pendingEras <= 3 * config.erasPerDay) {
@@ -393,7 +393,7 @@ module.exports = {
           });
         });
         const eraPointsHistoryValidator = eraPointsHistory.reduce(
-          (total, num) => total + num,
+          (total, era) => total + era.points,
           0,
         );
         const eraPointsPercent = (eraPointsHistoryValidator * 100) / eraPointsHistoryTotalsSum;
