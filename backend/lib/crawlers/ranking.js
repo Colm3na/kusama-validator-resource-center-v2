@@ -411,6 +411,10 @@ module.exports = {
           ? totalStake.minus(selfStake)
           : new BigNumber(0);
 
+        // performance
+        // convert to view token: .div(new BigNumber(10).pow(config.tokenDecimals))
+        const performance = (eraPointsAverage * (1 - commission)) / totalStake;
+
         // total rating
         const totalRating = activeRating
           + identityRating
@@ -446,6 +450,7 @@ module.exports = {
           eraPointsHistory,
           eraPointsPercent,
           eraPointsRating,
+          performance,
           slashed,
           slashRating,
           slashes,
@@ -495,6 +500,7 @@ module.exports = {
         era_points_history,
         era_points_percent,
         era_points_rating,
+        performance,
         slashed,
         slash_rating,
         slashes,
@@ -546,7 +552,8 @@ module.exports = {
         $35,
         $36,
         $37,
-        $38
+        $38,
+        $39
       )`;
       const data = [
         `${blockHeight}`,
@@ -574,6 +581,7 @@ module.exports = {
         `${JSON.stringify(validator.eraPointsHistory)}`,
         `${validator.eraPointsPercent}`,
         `${validator.eraPointsRating}`,
+        `${validator.performance}`,
         `${validator.slashed}`,
         `${validator.slashRating}`,
         `${JSON.stringify(validator.slashes)}`,

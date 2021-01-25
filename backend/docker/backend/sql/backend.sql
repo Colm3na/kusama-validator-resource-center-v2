@@ -75,6 +75,8 @@ CREATE TABLE IF NOT EXISTS ranking (
   era_points_history TEXT NOT NULL,
   era_points_percent TEXT NOT NULL,
   era_points_rating INT NOT NULL,
+  performance TEXT NOT NULL,
+  -- relative_performance TEXT NOT NULL,
   slashed BOOLEAN NOT NULL,
   slash_rating INT NOT NULL,
   slashes TEXT NOT NULL,

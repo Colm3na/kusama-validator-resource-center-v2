@@ -38,6 +38,7 @@ module.exports = {
           || 5 * 60 * 1000,
         historySize: 84,
         erasPerDay: 4,
+        tokenDecimals: 12,
       },
     },
   ],
