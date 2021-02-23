@@ -128,7 +128,7 @@ module.exports = {
         );
 
         // Loop through the Vec<EventRecord>
-        await blockEvents.forEach(async (record, index) => {
+        blockEvents.forEach(async (record, index) => {
           // Extract the phase and event
           const { event, phase } = record;
           // eslint-disable-next-line
