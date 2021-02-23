@@ -93,6 +93,7 @@ module.exports = {
           api.query.staking.activeEra.at(blockHash),
           api.query.staking.eraElectionStatus.at(blockHash),
         ]);
+        logger.info(loggerOptions, 'After api queries');
 
         const activeEra = ChainActiveEra.toJSON().index;
         const sessionIndex = ChainCurrentIndex.toString();
