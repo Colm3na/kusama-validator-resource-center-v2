@@ -101,6 +101,9 @@ module.exports = {
         // Get election status
         const isElection = electionStatus.toString() !== 'Close';
 
+        logger.info(loggerOptions, `Before storing events for block #${endBlock}`);
+        logger.info(loggerOptions, `Election is ${isElection}`);
+
         // Store block events
         try {
           logger.info(loggerOptions, `Storing events for block #${endBlock}`);
