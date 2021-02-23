@@ -1,7 +1,9 @@
 // @ts-check
 const { ApiPromise, WsProvider } = require('@polkadot/api');
 const pino = require('pino');
-const { shortHash, storeExtrinsics, getDisplayName } = require('../utils.js');
+const {
+  shortHash, storeExtrinsics, getDisplayName, updateTotals,
+} = require('../utils.js');
 
 const logger = pino();
 const loggerOptions = {
@@ -21,26 +23,22 @@ module.exports = {
 
       // Parallelize
       const [
-        ChainCurrentIndex,
-        ChainActiveEra,
-        electionStatus,
         { block },
         extendedHeader,
+        finalizedBlockHash,
       ] = await Promise.all([
-        api.query.session.currentIndex.at(blockHash),
-        api.query.staking.activeEra.at(blockHash),
-        api.query.staking.eraElectionStatus.at(blockHash),
         api.rpc.chain.getBlock(blockHash),
         api.derive.chain.getHeader(blockHash),
+        api.rpc.chain.getFinalizedHead(),
       ]);
 
-      // eslint-disable-next-line
-      const activeEra = ChainActiveEra.toJSON()['index'];
-      const sessionIndex = ChainCurrentIndex.toString();
+      const finalizedBlockHeader = await api.rpc.chain.getHeader(finalizedBlockHash);
+      const finalizedBlock = finalizedBlockHeader.number.toNumber();
+
       const { parentHash, extrinsicsRoot, stateRoot } = blockHeader;
 
       // Get block author
-      const blockAuthor = extendedHeader.author;
+      const blockAuthor = extendedHeader.author || '';
 
       // Get block author identity display name
       const blockAuthorIdentity = await api.derive.accounts.info(blockAuthor);
@@ -66,9 +64,6 @@ module.exports = {
         // Get block events
         const blockEvents = await api.query.system.events.at(blockHash);
 
-        // Get election status
-        const isElection = electionStatus.toString() !== 'Close';
-
         // Totals
         const totalEvents = blockEvents.length || 0;
         const totalExtrinsics = block.extrinsics.length;
@@ -80,29 +75,25 @@ module.exports = {
 
         sql = `INSERT INTO block (
             block_number,
+            finalized,
             block_author,
             block_author_name,
             block_hash,
             parent_hash,
             extrinsics_root,
             state_root,
-            active_era,
-            session_index,
-            is_election,
             total_events,
             total_extrinsics,
             timestamp
           ) VALUES (
             '${blockNumber}',
+            false,
             '${blockAuthor}',
             '${blockAuthorName}',
             '${blockHash}',
             '${parentHash}',
             '${extrinsicsRoot}',
             '${stateRoot}',
-            '${activeEra}',
-            '${sessionIndex}',
-            '${isElection}',
             '${totalEvents}',
             '${totalExtrinsics}',
             '${timestamp}'
@@ -128,7 +119,7 @@ module.exports = {
         );
 
         // Loop through the Vec<EventRecord>
-        blockEvents.forEach(async (record, index) => {
+        await blockEvents.forEach(async (record, index) => {
           // Extract the phase and event
           const { event, phase } = record;
           // eslint-disable-next-line
@@ -165,6 +156,18 @@ module.exports = {
             }
           }
         });
+
+        // update finalized blocks
+        sql = `UPDATE block SET finalized = true WHERE finalized = false AND block_number <= ${finalizedBlock}`;
+        try {
+          await pool.query(sql);
+          logger.info(loggerOptions, `Last finalized block updated to #${finalizedBlock}`);
+        } catch (error) {
+          logger.error(loggerOptions, `Error updating finalized block: ${error}, sql: ${sql}`);
+        }
+
+        // update totals
+        updateTotals(pool, loggerOptions);
       }
     });
   },

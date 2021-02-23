@@ -89,4 +89,17 @@ module.exports = {
     }
     return identity.display || '';
   },
+  updateTotals: async (pool, loggerOptions) => {
+    const sql = `
+        UPDATE total SET count = (SELECT count(*) FROM block) WHERE name = 'blocks';
+        UPDATE total SET count = (SELECT count(*) FROM extrinsic) WHERE name = 'extrinsics';
+        UPDATE total SET count = (SELECT count(*) FROM extrinsic WHERE section = 'balances' and method = 'transfer' ) WHERE name = 'transfers';
+        UPDATE total SET count = (SELECT count(*) FROM event) WHERE name = 'events';
+      `;
+    try {
+      await pool.query(sql);
+    } catch (error) {
+      logger.error(loggerOptions, `Error updating total harvested blocks, extrinsics and events: ${error}`);
+    }
+  }
 };

@@ -71,47 +71,29 @@ module.exports = {
     let endBlock = _endBlock;
     /* eslint-disable no-await-in-loop */
     while (endBlock >= startBlock) {
-      logger.info(loggerOptions, `Harvesting block #${endBlock}`);
       const startTime = new Date().getTime();
       try {
-        logger.info(loggerOptions, 'Inside first try');
         const blockHash = await api.rpc.chain.getBlockHash(endBlock);
-        logger.info(loggerOptions, `blockHash is ${blockHash}`);
         const [
           { block },
           blockEvents,
           blockHeader,
           timestampMs,
-          ChainCurrentIndex,
-          ChainActiveEra,
-          electionStatus,
         ] = await Promise.all([
           api.rpc.chain.getBlock(blockHash),
           api.query.system.events.at(blockHash),
           api.derive.chain.getHeader(blockHash),
           api.query.timestamp.now.at(blockHash),
-          api.query.session.currentIndex.at(blockHash),
-          api.query.staking.activeEra.at(blockHash),
-          api.query.staking.eraElectionStatus.at(blockHash),
         ]);
-        logger.info(loggerOptions, 'After api queries');
 
-        const activeEra = ChainActiveEra.toJSON().index;
-        const sessionIndex = ChainCurrentIndex.toString();
+        const blockAuthor = blockHeader.author || '';
         const blockAuthorIdentity = await api.derive.accounts.info(blockHeader.author);
         const blockAuthorName = getDisplayName(blockAuthorIdentity.identity);
         const timestamp = Math.floor(timestampMs / 1000);
         const { parentHash, extrinsicsRoot, stateRoot } = blockHeader;
 
-        // Get election status
-        const isElection = electionStatus.toString() !== 'Close';
-
-        logger.info(loggerOptions, `Before storing events for block #${endBlock}`);
-        logger.info(loggerOptions, `Election is ${isElection}`);
-
         // Store block events
         try {
-          logger.info(loggerOptions, `Storing events for block #${endBlock}`);
           // eslint-disable-next-line no-loop-func
           blockEvents.forEach(async (record, index) => {
             const { event, phase } = record;
@@ -176,29 +158,25 @@ module.exports = {
 
         const sqlInsert = `INSERT INTO block (
             block_number,
+            finalized,
             block_author,
             block_author_name,
             block_hash,
             parent_hash,
             extrinsics_root,
             state_root,
-            active_era,
-            session_index,
-            is_election,
             total_events,
             total_extrinsics,
             timestamp
           ) VALUES (
             '${endBlock}',
-            '${blockHeader.author}',
+            false,
+            '${blockAuthor}',
             '${blockAuthorName}',
             '${blockHash}',
             '${parentHash}',
             '${extrinsicsRoot}',
             '${stateRoot}',
-            '${activeEra}',
-            '${sessionIndex}',
-            '${isElection}',
             '${totalEvents}',
             '${totalExtrinsics}',
             '${timestamp}'
