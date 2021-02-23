@@ -76,6 +76,7 @@ module.exports = {
       try {
         logger.info(loggerOptions, 'Inside first try');
         const blockHash = await api.rpc.chain.getBlockHash(endBlock);
+        logger.info(loggerOptions, `blockHash is ${blockHash}`);
         const [
           { block },
           blockEvents,
