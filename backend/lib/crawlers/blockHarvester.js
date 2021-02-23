@@ -69,6 +69,7 @@ module.exports = {
     let endBlock = _endBlock;
     /* eslint-disable no-await-in-loop */
     while (endBlock >= startBlock) {
+      logger.info(loggerOptions, `Harvesting block #${endBlock}`);
       const startTime = new Date().getTime();
       try {
         const blockHash = await api.rpc.chain.getBlockHash(endBlock);
