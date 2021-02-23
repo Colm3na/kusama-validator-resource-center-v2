@@ -103,6 +103,7 @@ module.exports = {
 
         // Store block events
         try {
+          logger.info(loggerOptions, `Storing events for block #${endBlock}`);
           // eslint-disable-next-line no-loop-func
           blockEvents.forEach(async (record, index) => {
             const { event, phase } = record;
