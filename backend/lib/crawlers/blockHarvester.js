@@ -1,7 +1,9 @@
 // @ts-check
 const { ApiPromise, WsProvider } = require('@polkadot/api');
 const pino = require('pino');
-const { shortHash, storeExtrinsics, getDisplayName, wait } = require('../utils.js');
+const {
+  shortHash, storeExtrinsics, getDisplayName, wait,
+} = require('../utils.js');
 
 const logger = pino();
 const loggerOptions = {
@@ -72,6 +74,7 @@ module.exports = {
       logger.info(loggerOptions, `Harvesting block #${endBlock}`);
       const startTime = new Date().getTime();
       try {
+        logger.info(loggerOptions, 'Inside first try');
         const blockHash = await api.rpc.chain.getBlockHash(endBlock);
         const [
           { block },
