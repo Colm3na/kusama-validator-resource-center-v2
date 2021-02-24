@@ -45,7 +45,7 @@ module.exports = {
     `;
     const res = await pool.query(sqlSelect);
 
-    res.rows.forEach(async (row) => {
+    for (const row of res.rows) {
       // Quick fix for gap 0-0 error
       if (!(row.gap_start === 0 && row.gap_end === 0)) {
         logger.info(loggerOptions, `Detected gap! Harvesting blocks from #${row.gap_end} to #${row.gap_start}`);
@@ -56,7 +56,7 @@ module.exports = {
           parseInt(row.gap_end, 10),
         );
       }
-    });
+    }
     // Log execution time
     const endTime = new Date().getTime();
     logger.info(loggerOptions, `Executed in ${((endTime - startTime) / 1000).toFixed(0)}s`);
