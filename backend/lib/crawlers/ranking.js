@@ -270,6 +270,23 @@ module.exports = {
       votes.forEach(({ accountId }) => participateInGovernance.push(accountId.toString()));
     });
     validators = validators.concat(intentions);
+
+    // stash account creation
+    const stashAddressesCreation = []
+    for (const validator of validators) {
+      const stashAddress = validator.stashId.toString();
+      const sqlSelect = `SELECT block_number FROM event WHERE section = 'balances' AND method = 'Endowed' AND data LIKE '%${stashAddress}%'`;
+      const res = await pool.query(sqlSelect);
+      if (res.rows) {
+        if (res.rows[0].block_number) {
+          stashAddressesCreation[stashAddress] = res.rows[0].block_number;
+        }
+      } else {
+        // if not found we assume that it's included in genesis
+        stashAddressesCreation[stashAddress] = 0;
+      }
+    }
+
     const ranking = validators
       .map((validator) => {
         // active

@@ -60,6 +60,7 @@ CREATE TABLE IF NOT EXISTS ranking (
   verified_identity BOOLEAN NOT NULL,
   identity_rating INT NOT NULL,
   stash_address TEXT NOT NULL,
+  stash_address_creation BIGINT NOT NULL,
   controller_address TEXT NOT NULL,
   included_thousand_validators BOOLEAN NOT NULL,
   thousand_validator TEXT NOT NULL,
@@ -103,6 +104,9 @@ INSERT INTO total (name, count) VALUES ('blocks', 0),('extrinsics', 0),('transfe
 CREATE INDEX IF NOT EXISTS extrinsic_section_idx ON extrinsic (section);
 CREATE INDEX IF NOT EXISTS extrinsic_method_idx ON extrinsic (method);
 CREATE INDEX IF NOT EXISTS extrinsic_signer_idx ON extrinsic (signer);
+
+CREATE INDEX IF NOT EXISTS event_section_idx ON event (section);
+CREATE INDEX IF NOT EXISTS event_method_idx ON event (method);
 
 GRANT ALL PRIVILEGES ON TABLE block TO vrc;
 GRANT ALL PRIVILEGES ON TABLE harvester_error TO vrc;
