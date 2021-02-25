@@ -160,7 +160,7 @@ module.exports = {
     // thousand validators program data
     logger.info(loggerOptions, 'Fetching thousand validator program validators...');
     const thousandValidators = await getThousandValidators();
-    logger.info(loggerOptions, `Got ${thousandValidators.length} validators!`);
+    logger.info(loggerOptions, `Got info from ${thousandValidators.length} validators of thousand validator program!`);
 
     // chain data
     const wsProvider = new WsProvider(wsProviderUrl);
@@ -675,7 +675,7 @@ module.exports = {
         logger.error(loggerOptions, `Error inserting data in ranking table: ${JSON.stringify(error)}`);
       }
     }
-    // delete old data
+    logger.info(loggerOptions, `Cleaning old data...`);
     const sql = `DELETE FROM ranking WHERE block_height != '${blockHeight}';`;
     try {
       await pool.query(sql);
