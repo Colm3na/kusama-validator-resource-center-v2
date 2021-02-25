@@ -271,11 +271,12 @@ module.exports = {
     });
     validators = validators.concat(intentions);
 
-    // stash account creation
+    // stash address creation block
     const stashAddressesCreation = []
     for (const validator of validators) {
+      // check stash
       const stashAddress = validator.stashId.toString();
-      const sqlSelect = `SELECT block_number FROM event WHERE section = 'balances' AND method = 'Endowed' AND data LIKE '%${stashAddress}%'`;
+      const sqlSelect = `SELECT block_number FROM event WHERE section = 'system' AND method = 'NewAccount' AND data LIKE '%${stashAddress}%'`;
       const res = await pool.query(sqlSelect);
       if (res.rows.length > 0) {
         if (res.rows[0].block_number) {
@@ -284,6 +285,20 @@ module.exports = {
       } else {
         // if not found we assume that it's included in genesis
         stashAddressesCreation[stashAddress] = 0;
+      }
+      // check stash identity parent address
+      if (validator.identity.parent) {
+        const stashParentAddress = validator.identity.parent.toString();
+        const sqlSelect = `SELECT block_number FROM event WHERE section = 'system' AND method = 'NewAccount' AND data LIKE '%${stashParentAddress}%'`;
+        const res = await pool.query(sqlSelect);
+        if (res.rows.length > 0) {
+          if (res.rows[0].block_number) {
+            stashAddressesCreation[stashParentAddress] = res.rows[0].block_number;
+          }
+        } else {
+          // if not found we assume that it's included in genesis
+          stashAddressesCreation[stashParentAddress] = 0;
+        }
       }
     }
 
@@ -295,6 +310,33 @@ module.exports = {
 
         // stash
         const stashAddress = validator.stashId.toString();
+
+        // address creation
+        let addressCreationRating = 0;
+        const stashCreatedAtBlock = parseInt(stashAddressesCreation[stashAddress], 10);
+        let stashParentCreatedAtBlock = null;
+        if (validator.identity.parent) {
+          stashParentCreatedAtBlock = parseInt(stashAddressesCreation[validator.identity.parent.toString()], 10);
+          const best =
+            stashParentCreatedAtBlock > stashCreatedAtBlock
+              ? stashCreatedAtBlock
+              : stashParentCreatedAtBlock
+          if (best <= blockHeight / 4) {
+            addressCreationRating = 3
+          } else if (best <= (blockHeight / 4) * 2) {
+            addressCreationRating = 2
+          } else if (best <= (blockHeight / 4) * 3) {
+            addressCreationRating = 1
+          }
+        } else {
+          if (stashCreatedAtBlock <= blockHeight / 4) {
+            addressCreationRating = 3
+          } else if (stashCreatedAtBlock <= (blockHeight / 4) * 2) {
+            addressCreationRating = 2
+          } else if (stashCreatedAtBlock <= (blockHeight / 4) * 3) {
+            addressCreationRating = 1
+          }
+        }
 
         // thousand validators program
         const includedThousandValidators = thousandValidators.some(
@@ -434,6 +476,7 @@ module.exports = {
 
         // total rating
         const totalRating = activeRating
+          + addressCreationRating
           + identityRating
           + subAccountsRating
           + nominatorsRating
@@ -453,6 +496,9 @@ module.exports = {
           verifiedIdentity,
           identityRating,
           stashAddress,
+          stashCreatedAtBlock,
+          stashParentCreatedAtBlock,
+          addressCreationRating,
           controllerAddress,
           includedThousandValidators,
           thousandValidator,
@@ -503,7 +549,9 @@ module.exports = {
         verified_identity,
         identity_rating,
         stash_address,
-        stash_address_creation,
+        stash_address_creation_block,
+        stash_parent_address_creation_block,
+        address_creation_rating,
         controller_address,
         included_thousand_validators,
         thousand_validator,
@@ -572,7 +620,9 @@ module.exports = {
         $37,
         $38,
         $39,
-        $40
+        $40,
+        $41,
+        $42
       )`;
       const data = [
         `${blockHeight}`,
@@ -586,7 +636,9 @@ module.exports = {
         `${validator.verifiedIdentity}`,
         `${validator.identityRating}`,
         `${validator.stashAddress}`,
-        `${stashAddressesCreation[validator.stashAddress]}`,
+        `${validator.stashCreatedAtBlock}`,
+        `${validator.stashParentCreatedAtBlock}`,
+        `${validator.addressCreationRating}`,
         `${validator.controllerAddress}`,
         `${validator.includedThousandValidators}`,
         `${JSON.stringify(validator.thousandValidator)}`,
