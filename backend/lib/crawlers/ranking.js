@@ -503,6 +503,7 @@ module.exports = {
         verified_identity,
         identity_rating,
         stash_address,
+        stash_address_creation,
         controller_address,
         included_thousand_validators,
         thousand_validator,
@@ -570,7 +571,8 @@ module.exports = {
         $36,
         $37,
         $38,
-        $39
+        $39,
+        $40
       )`;
       const data = [
         `${blockHeight}`,
@@ -584,6 +586,7 @@ module.exports = {
         `${validator.verifiedIdentity}`,
         `${validator.identityRating}`,
         `${validator.stashAddress}`,
+        `${stashAddressesCreation[validator.stashAddress]}`,
         `${validator.controllerAddress}`,
         `${validator.includedThousandValidators}`,
         `${JSON.stringify(validator.thousandValidator)}`,
