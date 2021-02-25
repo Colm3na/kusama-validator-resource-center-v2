@@ -277,7 +277,7 @@ module.exports = {
       const stashAddress = validator.stashId.toString();
       const sqlSelect = `SELECT block_number FROM event WHERE section = 'balances' AND method = 'Endowed' AND data LIKE '%${stashAddress}%'`;
       const res = await pool.query(sqlSelect);
-      if (res.rows) {
+      if (res.rows.length > 0) {
         if (res.rows[0].block_number) {
           stashAddressesCreation[stashAddress] = res.rows[0].block_number;
         }
