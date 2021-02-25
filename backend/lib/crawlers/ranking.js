@@ -675,6 +675,13 @@ module.exports = {
         logger.error(loggerOptions, `Error inserting data in ranking table: ${JSON.stringify(error)}`);
       }
     }
+    // delete old data
+    const sql = `DELETE FROM ranking WHERE block_height != '${blockHeight}';`;
+    try {
+      await pool.query(sql);
+    } catch (error) {
+      logger.error(loggerOptions, `Error deleting old data ranking table: ${JSON.stringify(error)}`);
+    }
     const endTime = new Date().getTime();
     const dataProcessingTime = endTime - dataCollectionEndTime;
     logger.info(loggerOptions, `Added ${ranking.length} validators in ${((dataCollectionTime + dataProcessingTime) / 1000).toFixed(3)}s`);
