@@ -314,7 +314,7 @@ module.exports = {
         // address creation
         let addressCreationRating = 0;
         const stashCreatedAtBlock = parseInt(stashAddressesCreation[stashAddress], 10);
-        let stashParentCreatedAtBlock = null;
+        let stashParentCreatedAtBlock = 0;
         if (validator.identity.parent) {
           stashParentCreatedAtBlock = parseInt(stashAddressesCreation[validator.identity.parent.toString()], 10);
           const best =
