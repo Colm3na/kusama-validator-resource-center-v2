@@ -208,7 +208,14 @@ module.exports = {
       api.derive.democracy.proposals(),
       api.derive.democracy.referendums(),
     ]);
-    const erasExposure = await api.derive.staking._erasExposure(eraIndexes, withActive);
+
+    // get total stake by era
+    // const erasExposure = await api.derive.staking._erasExposure(eraIndexes, withActive);
+    let erasExposure = []
+    for (const eraIndex of eraIndexes) {
+      const eraExposure = await api.derive.staking.eraExposure(eraIndex);
+      erasExposure = erasExposure.concat(eraExposure);
+    }      
     logger.info(loggerOptions, `erasExposure: ${JSON.stringify(erasExposure, null, 2)}`);
         
     validators = await Promise.all(
