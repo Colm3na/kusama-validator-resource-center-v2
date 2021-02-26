@@ -194,20 +194,18 @@ module.exports = {
       erasPoints,
       erasPreferences,
       erasSlashes,
+      erasExposure,
       proposals,
-      referendums,
     ] = await Promise.all([
       api.rpc.chain.getBlock(),
       api.query.session.validators(),
       api.derive.staking.waitingInfo(stakingQueryFlags),
       api.query.staking.nominators.entries(),
       api.derive.council.votes(),
-      // eslint-disable-next-line no-underscore-dangle
       api.derive.staking._erasPoints(eraIndexes, withActive),
-      // eslint-disable-next-line no-underscore-dangle
       api.derive.staking._erasPrefs(eraIndexes, withActive),
-      // eslint-disable-next-line no-underscore-dangle
       api.derive.staking._erasSlashes(eraIndexes, withActive),
+      api.derive.staking._erasExposure(eraIndexes, withActive),
       api.derive.democracy.proposals(),
       api.derive.democracy.referendums(),
     ]);
@@ -429,22 +427,30 @@ module.exports = {
         const eraPointsHistory = [];
         const payoutHistory = [];
         let activeEras = 0;
+        let performance = 0;
         // eslint-disable-next-line
         erasPoints.forEach((eraPoints) => {
           const { era } = eraPoints;
           let eraPayoutState = 'inactive';
+          let eraPerformance = 0;
           if (eraPoints.validators[validator.accountId]) {
             activeEras++;
+            const points = parseInt(eraPoints.validators[validator.accountId], 10);
             eraPointsHistory.push({
               era: new BigNumber(era.toString()).toString(10),
-              points: parseInt(eraPoints.validators[validator.accountId], 10),
+              points,
             });
             if (validator.stakingLedger.claimedRewards.includes(era)) {
               eraPayoutState = 'paid';
             } else {
               eraPayoutState = 'pending';
             }
+            // era performance
+            const eraTotalStake = new BigNumber(erasExposure.find(eraExposure => eraExposure.era === era).validators[validator.accountId].total)
+            eraPerformance = (points * (1 - (commission / 100))) / (eraTotalStake.div(new BigNumber(10).pow(config.tokenDecimals)).toNumber());
+
           } else {
+            // validator was not active in that era
             eraPointsHistory.push({
               era: new BigNumber(era.toString()).toString(10),
               points: 0,
@@ -454,6 +460,8 @@ module.exports = {
             era: new BigNumber(era.toString()).toString(10),
             status: eraPayoutState,
           });
+          // total performance
+          performance += eraPerformance;
         });
         const eraPointsHistoryValidator = eraPointsHistory.reduce(
           (total, era) => total + era.points,
@@ -473,11 +481,8 @@ module.exports = {
         const otherStake = active
           ? totalStake.minus(selfStake)
           : new BigNumber(0);
-
+        
         // performance
-        const validatorAverageEraPoints = eraPointsHistoryValidator / activeEras;
-        const performance = (validatorAverageEraPoints * (1 - (commission / 100))) / (totalStake.div(new BigNumber(10).pow(config.tokenDecimals)).toNumber());
-        // const performance = ((eraPointsPercent * (1 - (commission / 100))) / totalStake.toNumber());
         logger.info(loggerOptions, `Validator ${stashAddress} performance ${performance.toFixed(6)}, validatorAverageEraPoints: ${validatorAverageEraPoints}, commission: ${commission} totalStake: ${totalStake.div(new BigNumber(10).pow(config.tokenDecimals)).toNumber()}`);
         if (performance > maxPerformance) {
           maxPerformance = performance
