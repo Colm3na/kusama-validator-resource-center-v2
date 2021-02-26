@@ -475,7 +475,8 @@ module.exports = {
           : new BigNumber(0);
 
         // performance
-        const performance = (eraPointsAverage * (1 - (commission / 100))) / totalStake.div(new BigNumber(10).pow(config.tokenDecimals).toNumber(10));
+        const performance = (eraPointsAverage * (1 - (commission / 100))) / (totalStake.div(new BigNumber(10).pow(config.tokenDecimals)).toNumber());
+        // const performance = ((eraPointsAverage * (1 - (commission / 100))) / totalStake.toNumber());
         if (performance > maxPerformance) {
           maxPerformance = performance
         }
