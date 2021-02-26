@@ -92,7 +92,7 @@ function getCommissionHistory(accountId, erasPreferences) {
   erasPreferences.forEach(({ era, validators }) => {
     if (validators[accountId]) {
       commissionHistory.push({
-        era: parseInt(era.toString(), 10),
+        era: new BigNumber(era.toString()).toString(10),
         commission: (validators[accountId].commission / 10000000).toFixed(2),
       });
     } else {
@@ -436,7 +436,7 @@ module.exports = {
           if (eraPoints.validators[validator.accountId]) {
             activeEras++;
             eraPointsHistory.push({
-              era: parseInt(era.toString(), 10),
+              era: new BigNumber(era.toString()).toString(10),
               points: parseInt(eraPoints.validators[validator.accountId], 10),
             });
             if (validator.stakingLedger.claimedRewards.includes(era)) {
