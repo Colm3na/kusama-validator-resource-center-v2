@@ -477,6 +477,7 @@ module.exports = {
         // performance
         const performance = (eraPointsAverage * (1 - (commission / 100))) / (totalStake.div(new BigNumber(10).pow(config.tokenDecimals)).toNumber());
         // const performance = ((eraPointsAverage * (1 - (commission / 100))) / totalStake.toNumber());
+        logger.info(loggerOptions, `Validator ${stashAddress} performance ${performance.toFixed(6)}, eraPointsAverage: ${eraPointsAverage}, commission: ${commission} totalStake: ${totalStake}`);
         if (performance > maxPerformance) {
           maxPerformance = performance
         }
