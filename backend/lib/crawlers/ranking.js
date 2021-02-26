@@ -475,9 +475,10 @@ module.exports = {
           : new BigNumber(0);
 
         // performance
-        const performance = (eraPointsPercent * (1 - (commission / 100))) / (totalStake.div(new BigNumber(10).pow(config.tokenDecimals)).toNumber());
+        const validatorAverageEraPoints = eraPointsHistoryValidator / activeEras;
+        const performance = (validatorAverageEraPoints * (1 - (commission / 100))) / (totalStake.div(new BigNumber(10).pow(config.tokenDecimals)).toNumber());
         // const performance = ((eraPointsPercent * (1 - (commission / 100))) / totalStake.toNumber());
-        logger.info(loggerOptions, `Validator ${stashAddress} performance ${performance.toFixed(6)}, eraPointsPercent: ${eraPointsPercent}, commission: ${commission} totalStake: ${totalStake.div(new BigNumber(10).pow(config.tokenDecimals)).toNumber()}`);
+        logger.info(loggerOptions, `Validator ${stashAddress} performance ${performance.toFixed(6)}, validatorAverageEraPoints: ${validatorAverageEraPoints}, commission: ${commission} totalStake: ${totalStake.div(new BigNumber(10).pow(config.tokenDecimals)).toNumber()}`);
         if (performance > maxPerformance) {
           maxPerformance = performance
         }
