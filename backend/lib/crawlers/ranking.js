@@ -209,6 +209,8 @@ module.exports = {
       api.derive.democracy.referendums(),
     ]);
     const erasExposure = await api.derive.staking._erasExposure(eraIndexes, withActive);
+    logger.info(loggerOptions, `erasExposure: ${JSON.stringify(erasExposure, null, 2)}`);
+        
     validators = await Promise.all(
       validatorAddresses.map(
         (authorityId) => api.derive.staking.query(authorityId, stakingQueryFlags),
@@ -446,8 +448,8 @@ module.exports = {
               eraPayoutState = 'pending';
             }
             // era performance
-            const eraTotalStake = new BigNumber(erasExposure.find(eraExposure => eraExposure.era === era).validators[validator.accountId].total)
-            eraPerformance = (points * (1 - (commission / 100))) / (eraTotalStake.div(new BigNumber(10).pow(config.tokenDecimals)).toNumber());
+            // const eraTotalStake = new BigNumber(erasExposure.find(eraExposure => eraExposure.era === era).validators[validator.accountId].total)
+            // eraPerformance = (points * (1 - (commission / 100))) / (eraTotalStake.div(new BigNumber(10).pow(config.tokenDecimals)).toNumber());
 
           } else {
             // validator was not active in that era
