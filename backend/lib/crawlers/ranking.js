@@ -97,7 +97,7 @@ function getCommissionHistory(accountId, erasPreferences) {
       });
     } else {
       commissionHistory.push({
-        era,
+        era: new BigNumber(era.toString()).toString(10),
         commission: null,
       });
     }
@@ -446,12 +446,12 @@ module.exports = {
             }
           } else {
             eraPointsHistory.push({
-              era: parseInt(era.toString(), 10),
+              era: new BigNumber(era.toString()).toString(10),
               points: 0,
             });
           }
           payoutHistory.push({
-            era: parseInt(era.toString(), 10),
+            era: new BigNumber(era.toString()).toString(10),
             status: eraPayoutState,
           });
         });
@@ -475,9 +475,7 @@ module.exports = {
           : new BigNumber(0);
 
         // performance
-        const performance = eraPointsAverage > 0
-          ? (eraPointsAverage * (1 - (commission / 100))) / (totalStake.div(new BigNumber(10).pow(config.tokenDecimals)).toNumber())
-          : 0;
+        const performance = (eraPointsAverage * (1 - (commission / 100))) / (totalStake.div(new BigNumber(10).pow(config.tokenDecimals)).toNumber());
         // const performance = ((eraPointsAverage * (1 - (commission / 100))) / totalStake.toNumber());
         if (performance > maxPerformance) {
           maxPerformance = performance
