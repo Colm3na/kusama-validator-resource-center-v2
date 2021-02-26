@@ -182,6 +182,8 @@ module.exports = {
 
     let validators = [];
     let intentions = [];
+    let maxPerformance = 0;
+    let minPerformance = 0;
 
     const [
       { block },
@@ -426,11 +428,13 @@ module.exports = {
         // era points and frecuency of payouts
         const eraPointsHistory = [];
         const payoutHistory = [];
+        let activeEras = 0;
         // eslint-disable-next-line
         erasPoints.forEach((eraPoints) => {
           const { era } = eraPoints;
           let eraPayoutState = 'inactive';
           if (eraPoints.validators[validator.accountId]) {
+            activeEras++;
             eraPointsHistory.push({
               era: parseInt(era.toString(), 10),
               points: parseInt(eraPoints.validators[validator.accountId], 10),
@@ -471,8 +475,13 @@ module.exports = {
           : new BigNumber(0);
 
         // performance
-        // convert to view token: .div(new BigNumber(10).pow(config.tokenDecimals))
         const performance = (eraPointsAverage * (1 - (commission / 100))) / totalStake.div(new BigNumber(10).pow(config.tokenDecimals).toNumber(10));
+        if (performance > maxPerformance) {
+          maxPerformance = performance
+        }
+        if (performance < minPerformance) {
+          minPerformance = performance
+        }
 
         // total rating
         const totalRating = activeRating
@@ -510,6 +519,7 @@ module.exports = {
           commission,
           commissionHistory,
           commissionRating,
+          activeEras,
           eraPointsHistory,
           eraPointsPercent,
           eraPointsRating,
@@ -529,10 +539,15 @@ module.exports = {
         };
       })
       .sort((a, b) => (a.totalRating < b.totalRating ? 1 : -1))
-      .map((validator, rank) => ({
-        rank: rank + 1,
-        ...validator,
-      }));
+      .map((validator, rank) => {
+        // relative performance = performance − min(performance) / max(performance) − min(performance)
+        const relativePerformance = (validator.performance - minPerformance) / (maxPerformance - minPerformance)
+        return {
+          rank: rank + 1,
+          relativePerformance,
+          ...validator,
+        }
+      });
 
     logger.info(loggerOptions, `Storing ${ranking.length} validators in db...`);
     // eslint-disable-next-line no-restricted-syntax
@@ -563,10 +578,12 @@ module.exports = {
         commission,
         commission_history,
         commission_rating,
+        active_eras,
         era_points_history,
         era_points_percent,
         era_points_rating,
         performance,
+        relative_performance,
         slashed,
         slash_rating,
         slashes,
@@ -622,7 +639,9 @@ module.exports = {
         $39,
         $40,
         $41,
-        $42
+        $42,
+        $43,
+        $44
       )`;
       const data = [
         `${blockHeight}`,
@@ -650,10 +669,12 @@ module.exports = {
         `${validator.commission}`,
         `${JSON.stringify(validator.commissionHistory)}`,
         `${validator.commissionRating}`,
+        `${validator.activeEras}`,
         `${JSON.stringify(validator.eraPointsHistory)}`,
         `${validator.eraPointsPercent}`,
         `${validator.eraPointsRating}`,
         `${validator.performance}`,
+        `${validator.relativePerformance}`,
         `${validator.slashed}`,
         `${validator.slashRating}`,
         `${JSON.stringify(validator.slashes)}`,
