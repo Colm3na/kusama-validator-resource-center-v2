@@ -195,6 +195,7 @@ module.exports = {
       erasPreferences,
       erasSlashes,
       proposals,
+      referendums,
     ] = await Promise.all([
       api.rpc.chain.getBlock(),
       api.query.session.validators(),
