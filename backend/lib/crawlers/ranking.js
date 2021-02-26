@@ -541,15 +541,15 @@ module.exports = {
       .sort((a, b) => (a.totalRating < b.totalRating ? 1 : -1))
       .map((validator, rank) => {
         // relative performance = performance − min(performance) / max(performance) − min(performance)
-        const relativePerformance = (validator.performance - minPerformance) / (maxPerformance - minPerformance)
+        const relativePerformance = ((validator.performance - minPerformance) / (maxPerformance - minPerformance)).toFixed(6)
         return {
           rank: rank + 1,
           relativePerformance,
           ...validator,
         }
       });
-    logger.info(loggerOptions, `Max. performance is ${maxPerformance}`);
-    logger.info(loggerOptions, `Min. performance is ${minPerformance}`);
+    logger.info(loggerOptions, `Max. performance is ${maxPerformance.toFixed(6)}`);
+    logger.info(loggerOptions, `Min. performance is ${minPerformance.toFixed(6)}`);
     logger.info(loggerOptions, `Storing ${ranking.length} validators in db...`);
     // eslint-disable-next-line no-restricted-syntax
     for (const validator of ranking) {
