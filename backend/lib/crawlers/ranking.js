@@ -194,7 +194,6 @@ module.exports = {
       erasPoints,
       erasPreferences,
       erasSlashes,
-      erasExposure,
       proposals,
     ] = await Promise.all([
       api.rpc.chain.getBlock(),
@@ -205,10 +204,10 @@ module.exports = {
       api.derive.staking._erasPoints(eraIndexes, withActive),
       api.derive.staking._erasPrefs(eraIndexes, withActive),
       api.derive.staking._erasSlashes(eraIndexes, withActive),
-      api.derive.staking._erasExposure(eraIndexes, withActive),
       api.derive.democracy.proposals(),
       api.derive.democracy.referendums(),
     ]);
+    const erasExposure = await api.derive.staking._erasExposure(eraIndexes, withActive);
     validators = await Promise.all(
       validatorAddresses.map(
         (authorityId) => api.derive.staking.query(authorityId, stakingQueryFlags),
