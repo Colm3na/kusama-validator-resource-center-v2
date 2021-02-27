@@ -67,6 +67,8 @@ export default {
     'nuxt-clipboard2',
     // https://www.npmjs.com/package/vue-scrollto
     'vue-scrollto/nuxt',
+    // https://github.com/nuxt-community/apollo-module
+    '@nuxtjs/apollo',
   ],
   bootstrapVue: {
     bootstrapCSS: false,
@@ -76,6 +78,15 @@ export default {
     icons: {
       solid: true,
       regular: true,
+    },
+  },
+  apollo: {
+    clientConfigs: {
+      default: {
+        httpEndpoint: config.backendHttp,
+        wsEndpoint: config.backendWs,
+        websocketsOnly: true,
+      },
     },
   },
 
