@@ -1,63 +1,63 @@
 <template>
-  <div class="container">
+  <div class="page container pt-3">
     <div>
-      <Logo />
-      <h1 class="title">frontend</h1>
-      <div class="links">
-        <a
-          href="https://nuxtjs.org/"
-          target="_blank"
-          rel="noopener noreferrer"
-          class="button--green"
-        >
-          Documentation
-        </a>
-        <a
-          href="https://github.com/nuxt/nuxt.js"
-          target="_blank"
-          rel="noopener noreferrer"
-          class="button--grey"
-        >
-          GitHub
-        </a>
-      </div>
+      <b-alert show dismissible variant="info" class="text-center py-3 glitch">
+        <p>
+          The {{ config.title }} for {{ capitalize(config.name) }} aims to
+          provide quantitative and qualitative data about validators performance
+          and help nominators to choose their best nomination set.
+        </p>
+        <p>
+          In order to fetch on-chain data in a reasonable amount of time the
+          size of the
+          <strong
+            >history is limited to
+            {{ config.historySize / config.erasPerDay }} days</strong
+          >
+        </p>
+      </b-alert>
+      <b-alert
+        show
+        dismissible
+        variant="warning"
+        class="text-center py-3 glitch"
+      >
+        <p>
+          This platform is currently under development and the metrics are
+          subject to change. Please do your own research before nominating your
+          validator set.
+        </p>
+      </b-alert>
+      <Ranking />
     </div>
   </div>
 </template>
 
 <script>
-export default {}
+import Ranking from '@/components/Ranking.vue'
+import { config } from '@/config.js'
+import commonMixin from '@/mixins/commonMixin.js'
+export default {
+  components: {
+    Ranking,
+  },
+  mixins: [commonMixin],
+  data() {
+    return {
+      config,
+    }
+  },
+  head() {
+    return {
+      title: `${config.title} for ${this.capitalize(config.name)}`,
+      meta: [
+        {
+          hid: 'description',
+          name: 'description',
+          content: `${config.title} for ${this.capitalize(config.name)}`,
+        },
+      ],
+    }
+  },
+}
 </script>
-
-<style>
-.container {
-  margin: 0 auto;
-  min-height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
-}
-
-.title {
-  font-family: 'Quicksand', 'Source Sans Pro', -apple-system, BlinkMacSystemFont,
-    'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-  display: block;
-  font-weight: 300;
-  font-size: 100px;
-  color: #35495e;
-  letter-spacing: 1px;
-}
-
-.subtitle {
-  font-weight: 300;
-  font-size: 42px;
-  color: #526488;
-  word-spacing: 5px;
-  padding-bottom: 15px;
-}
-
-.links {
-  padding-top: 15px;
-}
-</style>
