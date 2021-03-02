@@ -289,7 +289,7 @@ module.exports = {
     for (const validator of validators) {
       // check stash
       const stashAddress = validator.stashId.toString();
-      let sql = `SELECT block_number FROM event WHERE section = 'system' AND method = 'NewAccount' AND data LIKE '%${stashAddress}%'`;
+      let sql = `SELECT block_number FROM event WHERE method = 'NewAccount' AND data LIKE '%${stashAddress}%'`;
       // eslint-disable-next-line no-await-in-loop
       let res = await pool.query(sql);
       if (res.rows.length > 0) {
@@ -303,7 +303,7 @@ module.exports = {
       // check stash identity parent address
       if (validator.identity.parent) {
         const stashParentAddress = validator.identity.parent.toString();
-        sql = `SELECT block_number FROM event WHERE section = 'system' AND method = 'NewAccount' AND data LIKE '%${stashParentAddress}%'`;
+        sql = `SELECT block_number FROM event WHERE method = 'NewAccount' AND data LIKE '%${stashParentAddress}%'`;
         // eslint-disable-next-line no-await-in-loop
         res = await pool.query(sql);
         if (res.rows.length > 0) {
