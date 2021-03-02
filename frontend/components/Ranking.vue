@@ -306,6 +306,12 @@ export default {
           class: 'd-none d-sm-none d-md-none d-lg-table-cell d-xl-table-cell',
         },
         {
+          key: 'relativePerformance',
+          label: 'R. Performance',
+          sortable: true,
+          class: 'd-none d-sm-none d-md-none d-lg-table-cell d-xl-table-cell',
+        },
+        {
           key: 'selected',
           label: 'Select',
           sortable: true,
@@ -368,13 +374,20 @@ export default {
           verified_identity: validator.verifiedIdentity ? 'yes' : 'no',
           identity_rating: validator.identityRating,
           commission: validator.commission,
-          commission_history: validator.commissionHistory,
+          commission_history: validator.commissionHistory
+            .map(({ era, commission }) => `${era}=${commission}`)
+            .join(','),
           commission_rating: validator.commissionRating,
           nominators: validator.nominators,
           nominators_rating: validator.nominatorsRating,
-          era_points_history: validator.eraPointsHistory,
+          active_eras: validator.activeEras,
+          era_points_history: validator.eraPointsHistory
+            .map(({ era, points }) => `${era}=${points}`)
+            .join(','),
           era_points_percentage: validator.eraPointsPercent,
           era_points_rating: validator.eraPointsRating,
+          performance: validator.performance,
+          relative_performance: validator.relativePerformance,
           slashed: validator.slashed ? 'yes' : 'no',
           slashes: validator.slashes,
           slash_rating: validator.slashRating,
@@ -384,7 +397,9 @@ export default {
           council_backing: validator.councilBacking ? 'yes' : 'no',
           active_in_governance: validator.activeInGovernance ? 'yes' : 'no',
           governance_rating: validator.governanceRating,
-          payout_history: validator.payoutHistory,
+          payout_history: validator.payoutHistory
+            .map(({ era, status }) => `${era}=${status}`)
+            .join(','),
           payout_rating: validator.payoutRating,
           total_rating: validator.totalRating,
           selected: this.isSelected(validator.stashAddress) ? 'yes' : 'no',
