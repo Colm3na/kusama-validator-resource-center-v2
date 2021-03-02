@@ -23,7 +23,7 @@
     </div>
     <div class="description">
       Stash address was created at block #{{ formatNumber(createdAtBlock) }}
-      <span v-if="typeof parentCreatedAtBlock === 'number'">
+      <span v-if="identity.parent">
         and parent identity address was created at block #{{
           formatNumber(parentCreatedAtBlock)
         }}
