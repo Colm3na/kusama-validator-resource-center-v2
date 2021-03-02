@@ -45,10 +45,12 @@ module.exports = {
     `;
     const res = await pool.query(sqlSelect);
 
+    // eslint-disable-next-line no-restricted-syntax
     for (const row of res.rows) {
       // Quick fix for gap 0-0 error
       if (!(row.gap_start === 0 && row.gap_end === 0)) {
         logger.info(loggerOptions, `Detected gap! Harvesting blocks from #${row.gap_end} to #${row.gap_start}`);
+        // eslint-disable-next-line no-await-in-loop
         await module.exports.harvestBlocks(
           api,
           pool,
@@ -63,7 +65,7 @@ module.exports = {
 
     logger.info(loggerOptions, `Next execution in ${(config.pollingTime / 60000).toFixed(0)}m...`);
     setTimeout(
-      () => module.exports.start(pool, config),
+      () => module.exports.start(wsProviderUrl, pool, config),
       config.pollingTime,
     );
   },
