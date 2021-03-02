@@ -13,9 +13,11 @@ export const state = () => ({
 })
 
 export const mutations = {
-  update(state, { ranking, loading }) {
+  update(state, { ranking, blockHeight, eraPointsAverage, loading }) {
     state.list = ranking
-    state.loading = false
+    state.blockHeight = blockHeight
+    state.eraPointsAverage = eraPointsAverage
+    state.loading = loading
   },
   loadSelected(state) {
     const selectedAddresses =
@@ -80,15 +82,25 @@ export const actions = {
   async update(context) {
     const startTime = new Date().getTime()
     const client = this.app.apolloProvider.defaultClient
-    const query = gql`
+
+    // get last block height
+    let query = gql`
+      query blockHeight {
+        ranking(order_by: { block_height: asc }, limit: 1) {
+          block_height
+        }
+      }
+    `
+    const response = await client.query({ query })
+    const blockHeight = response.data.ranking[0].block_height
+    query = gql`
       query ranking {
-        ranking {
+        ranking (where: {block_height: {_eq: "${blockHeight}"}}) {
           active
           active_eras
           active_in_governance
           active_rating
           address_creation_rating
-          block_height
           cluster_members
           cluster_name
           commission
@@ -123,7 +135,6 @@ export const actions = {
           stash_parent_address_creation_block
           sub_accounts_rating
           thousand_validator
-          timestamp
           total_rating
           total_stake
           verified_identity
@@ -138,7 +149,6 @@ export const actions = {
         activeInGovernance: validator.active_in_governance,
         activeRating: validator.active_rating,
         addressCreationRating: validator.address_creation_rating,
-        blockHeight: validator.block_height,
         clusterMembers: parseInt(validator.cluster_members),
         clusterName: validator.cluster_name,
         commission: parseFloat(validator.commission),
@@ -174,13 +184,27 @@ export const actions = {
           validator.stash_parent_address_creation_block,
         subAccountsRating: validator.sub_accounts_rating,
         thousandValidator: JSON.parse(validator.thousand_validator),
-        timestamp: validator.timestamp,
         totalRating: validator.total_rating,
         totalStake: validator.total_stake,
         verifiedIdentity: validator.verified_identity,
       }
     })
-    context.commit('update', { ranking, loading: false })
+    const eraPointsAverage =
+      ranking.reduce(
+        (accumulator, { eraPointsPercent }) =>
+          accumulator + parseFloat(eraPointsPercent),
+        0
+      ) / ranking.filter(({ active }) => active === true).length
+    // eslint-disable-next-line
+    console.log(
+      `eraPointsAverage: ${eraPointsAverage.toFixed(6)}`
+    )
+    context.commit('update', {
+      ranking,
+      blockHeight,
+      eraPointsAverage,
+      loading: false,
+    })
     const dataCollectionEndTime = new Date().getTime()
     const dataCollectionTime = dataCollectionEndTime - startTime
     // eslint-disable-next-line

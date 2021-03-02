@@ -231,16 +231,7 @@ export default {
       return this.$store.state.ranking.selectedAddresses
     },
     eraPointsAveragePercent() {
-      if (
-        this.$store.state.ranking.eraPointsAverage &&
-        this.$store.state.ranking.eraPointsHistoryTotalsSum
-      ) {
-        return (
-          (this.$store.state.ranking.eraPointsAverage * 100) /
-          this.$store.state.ranking.eraPointsHistoryTotalsSum
-        )
-      }
-      return 0
+      return this.$store.state.ranking.eraPointsAverage
     },
   },
   async created() {
