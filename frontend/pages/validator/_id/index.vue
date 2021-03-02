@@ -79,6 +79,11 @@
               <Address
                 :account-id="validator.stashAddress"
                 :identity="validator.identity"
+                :rating="validator.addressCreationRating"
+                :created-at-block="validator.stashAddressCreationBlock"
+                :parent-created-at-block="
+                  validator.stashParentAddressCreationBlock
+                "
               />
             </div>
           </div>

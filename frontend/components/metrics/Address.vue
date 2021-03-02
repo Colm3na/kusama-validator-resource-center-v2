@@ -22,25 +22,19 @@
       </div>
     </div>
     <div class="description">
-      <p v-if="loading">Fetching address creation block from PolkaScan...</p>
-      <p v-else-if="typeof createdAtBlock === 'number'">
-        Stash address was created at block #{{ formatNumber(createdAtBlock) }}
-        <span v-if="typeof parentCreatedAtBlock === 'number'">
-          and parent identity address was created at block #{{
-            formatNumber(parentCreatedAtBlock)
-          }}
-        </span>
-      </p>
-      <p v-else>Address creation metric is not available for this network</p>
+      Stash address was created at block #{{ formatNumber(createdAtBlock) }}
+      <span v-if="typeof parentCreatedAtBlock === 'number'">
+        and parent identity address was created at block #{{
+          formatNumber(parentCreatedAtBlock)
+        }}
+      </span>
     </div>
   </div>
 </template>
 
 <script>
-import axios from 'axios'
 import Rating from '@/components/Rating.vue'
 import commonMixin from '@/mixins/commonMixin.js'
-import { config } from '@/config.js'
 export default {
   components: {
     Rating,
@@ -55,71 +49,17 @@ export default {
       type: Object,
       default: () => {},
     },
-  },
-  data() {
-    return {
-      createdAtBlock: undefined,
-      parentCreatedAtBlock: undefined,
-      rating: -1,
-      loading: true,
-    }
-  },
-  computed: {
-    blockHeight() {
-      return this.$store.state.ranking.blockHeight
+    rating: {
+      type: Number,
+      default: () => 0,
     },
-  },
-  created() {
-    this.getAddressCreationMetricData()
-  },
-  methods: {
-    getAddressCreationMetricData() {
-      const vm = this
-      if (this.identity.parent) {
-        axios
-          .all([
-            axios.get(`${config.polkascanAPI}/account/${vm.identity.parent}`),
-            axios.get(`${config.polkascanAPI}/account/${vm.accountId}`),
-          ])
-          .then(
-            axios.spread((...responses) => {
-              vm.parentCreatedAtBlock = parseInt(
-                responses[0].data.data.attributes.created_at_block
-              )
-              vm.createdAtBlock = parseInt(
-                responses[1].data.data.attributes.created_at_block
-              )
-              const best =
-                vm.parentCreatedAtBlock > vm.createdAtBlock
-                  ? vm.createdAtBlock
-                  : vm.parentCreatedAtBlock
-              if (best <= vm.blockHeight / 4) {
-                vm.rating = 3
-              } else if (best <= (vm.blockHeight / 4) * 2) {
-                vm.rating = 2
-              } else if (best <= (vm.blockHeight / 4) * 3) {
-                vm.rating = 1
-              } else {
-                vm.rating = 0
-              }
-              vm.loading = false
-            })
-          )
-      } else {
-        axios
-          .get(`${config.polkascanAPI}/account/${vm.accountId}`)
-          .then(function ({ data }) {
-            vm.createdAtBlock = parseInt(data.data.attributes.created_at_block)
-            if (vm.createdAtBlock <= vm.blockHeight / 4) {
-              vm.rating = 3
-            } else if (vm.createdAtBlock <= (vm.blockHeight / 4) * 2) {
-              vm.rating = 2
-            } else if (vm.createdAtBlock <= (vm.blockHeight / 4) * 3) {
-              vm.rating = 1
-            }
-            vm.loading = false
-          })
-      }
+    createdAtBlock: {
+      type: Number,
+      default: () => 0,
+    },
+    parentCreatedAtBlock: {
+      type: Number,
+      default: () => 0,
     },
   },
 }

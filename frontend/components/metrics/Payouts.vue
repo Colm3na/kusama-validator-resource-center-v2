@@ -59,7 +59,8 @@ export default {
   },
   computed: {
     pending() {
-      return this.payoutHistory.filter((era) => era === 'pending').length
+      return this.payoutHistory.filter((payout) => payout.status === 'pending')
+        .length
     },
   },
 }

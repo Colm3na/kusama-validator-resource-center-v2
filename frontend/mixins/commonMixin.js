@@ -19,7 +19,7 @@ export default {
       }
     },
     formatAmount(amount) {
-      return `${amount
+      return `${new BigNumber(amount)
         .div(new BigNumber(10).pow(config.tokenDecimals))
         .toFixed(1)
         .replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,')} ${config.denom}`
