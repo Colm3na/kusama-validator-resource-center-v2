@@ -202,22 +202,25 @@ module.exports = {
       api.derive.staking.waitingInfo(stakingQueryFlags),
       api.query.staking.nominators.entries(),
       api.derive.council.votes(),
+      // eslint-disable-next-line no-underscore-dangle
       api.derive.staking._erasPoints(eraIndexes, withActive),
+      // eslint-disable-next-line no-underscore-dangle
       api.derive.staking._erasPrefs(eraIndexes, withActive),
+      // eslint-disable-next-line no-underscore-dangle
       api.derive.staking._erasSlashes(eraIndexes, withActive),
       api.derive.democracy.proposals(),
       api.derive.democracy.referendums(),
     ]);
 
     // get total stake by era
-    // const erasExposure = await api.derive.staking._erasExposure(eraIndexes, withActive);
-    let erasExposure = []
+    let erasExposure = [];
+    // eslint-disable-next-line no-restricted-syntax
     for (const eraIndex of eraIndexes) {
+      // eslint-disable-next-line no-await-in-loop
       const eraExposure = await api.derive.staking.eraExposure(eraIndex);
       erasExposure = erasExposure.concat(eraExposure);
-    }      
-    // logger.info(loggerOptions, `erasExposure: ${JSON.stringify(erasExposure, null, 2)}`);
-        
+    }
+
     validators = await Promise.all(
       validatorAddresses.map(
         (authorityId) => api.derive.staking.query(authorityId, stakingQueryFlags),
@@ -281,12 +284,14 @@ module.exports = {
     validators = validators.concat(intentions);
 
     // stash address creation block
-    const stashAddressesCreation = []
+    const stashAddressesCreation = [];
+    // eslint-disable-next-line no-restricted-syntax
     for (const validator of validators) {
       // check stash
       const stashAddress = validator.stashId.toString();
-      const sqlSelect = `SELECT block_number FROM event WHERE section = 'system' AND method = 'NewAccount' AND data LIKE '%${stashAddress}%'`;
-      const res = await pool.query(sqlSelect);
+      let sql = `SELECT block_number FROM event WHERE section = 'system' AND method = 'NewAccount' AND data LIKE '%${stashAddress}%'`;
+      // eslint-disable-next-line no-await-in-loop
+      let res = await pool.query(sql);
       if (res.rows.length > 0) {
         if (res.rows[0].block_number) {
           stashAddressesCreation[stashAddress] = res.rows[0].block_number;
@@ -298,8 +303,9 @@ module.exports = {
       // check stash identity parent address
       if (validator.identity.parent) {
         const stashParentAddress = validator.identity.parent.toString();
-        const sqlSelect = `SELECT block_number FROM event WHERE section = 'system' AND method = 'NewAccount' AND data LIKE '%${stashParentAddress}%'`;
-        const res = await pool.query(sqlSelect);
+        sql = `SELECT block_number FROM event WHERE section = 'system' AND method = 'NewAccount' AND data LIKE '%${stashParentAddress}%'`;
+        // eslint-disable-next-line no-await-in-loop
+        res = await pool.query(sql);
         if (res.rows.length > 0) {
           if (res.rows[0].block_number) {
             stashAddressesCreation[stashParentAddress] = res.rows[0].block_number;
@@ -325,26 +331,25 @@ module.exports = {
         const stashCreatedAtBlock = parseInt(stashAddressesCreation[stashAddress], 10);
         let stashParentCreatedAtBlock = 0;
         if (validator.identity.parent) {
-          stashParentCreatedAtBlock = parseInt(stashAddressesCreation[validator.identity.parent.toString()], 10);
-          const best =
-            stashParentCreatedAtBlock > stashCreatedAtBlock
-              ? stashCreatedAtBlock
-              : stashParentCreatedAtBlock
+          stashParentCreatedAtBlock = parseInt(
+            stashAddressesCreation[validator.identity.parent.toString()], 10,
+          );
+          const best = stashParentCreatedAtBlock > stashCreatedAtBlock
+            ? stashCreatedAtBlock
+            : stashParentCreatedAtBlock;
           if (best <= blockHeight / 4) {
-            addressCreationRating = 3
+            addressCreationRating = 3;
           } else if (best <= (blockHeight / 4) * 2) {
-            addressCreationRating = 2
+            addressCreationRating = 2;
           } else if (best <= (blockHeight / 4) * 3) {
-            addressCreationRating = 1
+            addressCreationRating = 1;
           }
-        } else {
-          if (stashCreatedAtBlock <= blockHeight / 4) {
-            addressCreationRating = 3
-          } else if (stashCreatedAtBlock <= (blockHeight / 4) * 2) {
-            addressCreationRating = 2
-          } else if (stashCreatedAtBlock <= (blockHeight / 4) * 3) {
-            addressCreationRating = 1
-          }
+        } else if (stashCreatedAtBlock <= blockHeight / 4) {
+          addressCreationRating = 3;
+        } else if (stashCreatedAtBlock <= (blockHeight / 4) * 2) {
+          addressCreationRating = 2;
+        } else if (stashCreatedAtBlock <= (blockHeight / 4) * 3) {
+          addressCreationRating = 1;
         }
 
         // thousand validators program
@@ -443,7 +448,7 @@ module.exports = {
           let eraPayoutState = 'inactive';
           let eraPerformance = 0;
           if (eraPoints.validators[validator.accountId]) {
-            activeEras++;
+            activeEras += 1;
             const points = parseInt(eraPoints.validators[validator.accountId], 10);
             eraPointsHistory.push({
               era: new BigNumber(era.toString()).toString(10),
@@ -455,9 +460,13 @@ module.exports = {
               eraPayoutState = 'pending';
             }
             // era performance
-            const eraTotalStake = new BigNumber(erasExposure.find(eraExposure => eraExposure.era === era).validators[validator.accountId].total)
-            eraPerformance = (points * (1 - (commission / 100))) / (eraTotalStake.div(new BigNumber(10).pow(config.tokenDecimals)).toNumber());
-
+            const eraTotalStake = new BigNumber(
+              erasExposure.find(
+                (eraExposure) => eraExposure.era === era,
+              ).validators[validator.accountId].total,
+            );
+            eraPerformance = (points * (1 - (commission / 100)))
+              / (eraTotalStake.div(new BigNumber(10).pow(config.tokenDecimals)).toNumber());
           } else {
             // validator was not active in that era
             eraPointsHistory.push({
@@ -490,14 +499,14 @@ module.exports = {
         const otherStake = active
           ? totalStake.minus(selfStake)
           : new BigNumber(0);
-        
+
         // performance
         logger.info(loggerOptions, `Validator ${stashAddress} performance ${performance.toFixed(6)}, eraPointsPercent: ${eraPointsPercent}, commission: ${commission}, current totalStake: ${totalStake.div(new BigNumber(10).pow(config.tokenDecimals)).toNumber()}`);
         if (performance > maxPerformance) {
-          maxPerformance = performance
+          maxPerformance = performance;
         }
         if (performance < minPerformance) {
-          minPerformance = performance
+          minPerformance = performance;
         }
 
         // total rating
@@ -557,13 +566,13 @@ module.exports = {
       })
       .sort((a, b) => (a.totalRating < b.totalRating ? 1 : -1))
       .map((validator, rank) => {
-        // relative performance = performance − min(performance) / max(performance) − min(performance)
-        const relativePerformance = ((validator.performance - minPerformance) / (maxPerformance - minPerformance)).toFixed(6)
+        const relativePerformance = ((validator.performance - minPerformance)
+          / (maxPerformance - minPerformance)).toFixed(6);
         return {
           rank: rank + 1,
           relativePerformance,
           ...validator,
-        }
+        };
       });
     logger.info(loggerOptions, `Max. performance is ${maxPerformance.toFixed(6)}`);
     logger.info(loggerOptions, `Min. performance is ${minPerformance.toFixed(6)}`);
@@ -714,7 +723,7 @@ module.exports = {
         logger.error(loggerOptions, `Error inserting data in ranking table: ${JSON.stringify(error)}`);
       }
     }
-    logger.info(loggerOptions, `Cleaning old data...`);
+    logger.info(loggerOptions, 'Cleaning old data...');
     const sql = `DELETE FROM ranking WHERE block_height != '${blockHeight}';`;
     try {
       await pool.query(sql);
