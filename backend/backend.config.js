@@ -32,7 +32,7 @@ module.exports = {
       // eslint-disable-next-line global-require
       module: require('./lib/crawlers/ranking'),
       config: {
-        startDelay: 30 * 100,
+        startDelay: 30 * 1000,
         pollingTime:
           parseInt(process.env.CRAWLER_RANKING_POLLING_TIME_MS, 10)
           || 5 * 60 * 1000,
