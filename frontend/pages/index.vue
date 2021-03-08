@@ -1,5 +1,5 @@
 <template>
-  <div class="page container pt-3">
+  <div class="page container-fluid pt-3">
     <div>
       <b-alert show dismissible variant="info" class="text-center py-3 glitch">
         <p>
