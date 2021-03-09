@@ -26,7 +26,7 @@
       </b-row>
       <div class="row">
         <div class="col-10">
-          <h1 class="mt-3 mb-4">
+          <h1 class="mt-3">
             <Identicon :address="accountId" :size="64" />
             <span v-if="validator.name">
               {{ validator.name }}
@@ -36,6 +36,15 @@
               {{ shortAddress(accountId) }}
             </span>
           </h1>
+          <h4 v-if="validator.includedThousandValidators">
+            <a
+              :href="`https://thousand-validators.kusama.network/#/leaderboard/${accountId}`"
+              target="_blank"
+              class="badge badge-pill badge-info"
+              >Thousand Validators Program</a
+            >
+          </h4>
+          <span class="py-2">&nbsp;</span>
         </div>
         <div class="col-2 text-right mt-4">
           <a
@@ -140,7 +149,13 @@
                 :rating="validator.governanceRating"
               />
             </div>
-            <div class="col-md-6 mb-5"></div>
+            <div class="col-md-6 mb-5">
+              <Thousand
+                v-if="validator.includedThousandValidators"
+                :account-id="validator.stashAddress"
+                :thousand="validator.thousandValidator"
+              />
+            </div>
           </div>
         </b-tab>
       </b-tabs>
@@ -161,6 +176,7 @@ import EraPoints from '@/components/metrics/EraPoints.vue'
 import Commission from '@/components/metrics/Commission.vue'
 import Payouts from '@/components/metrics/Payouts.vue'
 import Governance from '@/components/metrics/Governance.vue'
+import Thousand from '@/components/metrics/Thousand.vue'
 import SelectedValidators from '@/components/SelectedValidators.vue'
 import commonMixin from '@/mixins/commonMixin.js'
 import { config } from '@/config.js'
@@ -179,6 +195,7 @@ export default {
     Commission,
     Payouts,
     Governance,
+    Thousand,
     SelectedValidators,
   },
   mixins: [commonMixin],
