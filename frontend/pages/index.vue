@@ -2,6 +2,9 @@
   <div class="page container-fluid pt-3">
     <div>
       <h1 class="mb-4">Dashboard</h1>
+      <b-alert variant="warning" show dismissible>
+        <p class="text-center mb-2 mt-2"><strong>WARNING!</strong> mocked data</p>
+      </b-alert>
       <div class="row text-center dashboard-global-stats">
         <div class="col-md-6 col-lg-3 mb-4">
           <div class="box">
