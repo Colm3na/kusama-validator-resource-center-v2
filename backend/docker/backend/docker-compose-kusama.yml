@@ -33,6 +33,9 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
+    #
+    # Optimized for hexacore CPU and 64Gb RAM
+    # 
     # https://pgtune.leopard.in.ua/#/
     command:
       - "postgres"
