@@ -89,12 +89,23 @@ export default {
         labels: [...Array(84).keys()].map((n) => n + 1),
         datasets: [
           {
-            labels: 'vrc score',
+            labels: 'current set',
             data: [...Array(84)].map(
               (n) => Math.floor(Math.random() * (1000 - 0)) + 0
             ),
             backgroundColor: 'rgba(255, 255, 255, 0.8)',
             borderColor: 'rgba(230, 0, 122, 0.8)',
+            hoverBackgroundColor: 'rgba(255, 255, 255, 0.8)',
+            fill: false,
+            showLine: true,
+          },
+          {
+            labels: 'selected set',
+            data: [...Array(84)].map(
+              (n) => Math.floor(Math.random() * (1000 - 0)) + 0
+            ),
+            backgroundColor: 'rgba(255, 255, 255, 0.8)',
+            borderColor: 'rgba(23, 162, 184, 0.8)',
             hoverBackgroundColor: 'rgba(255, 255, 255, 0.8)',
             fill: false,
             showLine: true,
