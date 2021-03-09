@@ -1,6 +1,6 @@
 <template>
   <div class="page validator-page container-fluid pt-3">
-    <div v-if="loading">
+    <div v-if="loading || !validator">
       <Loading />
     </div>
     <div v-else>
@@ -164,6 +164,7 @@
 </template>
 
 <script>
+import gql from 'graphql-tag'
 import Identicon from '@/components/Identicon.vue'
 import Loading from '@/components/Loading.vue'
 import VerifiedIcon from '@/components/VerifiedIcon.vue'
@@ -204,6 +205,8 @@ export default {
       config,
       accountId: this.$route.params.id,
       polling: null,
+      validator: null,
+      blockHeight: null,
     }
   },
   head() {
@@ -224,15 +227,6 @@ export default {
     loading() {
       return this.$store.state.ranking.loading
     },
-    validator() {
-      const validator = this.$store.state.ranking.list.find(
-        (validator) => validator.stashAddress === this.accountId
-      )
-      return {
-        ...validator,
-        selected: this.isSelected(validator.stashAddress),
-      }
-    },
     selectedValidatorAddresses() {
       return this.$store.state.ranking.selectedAddresses
     },
@@ -241,15 +235,15 @@ export default {
     },
   },
   async created() {
-    if (this.$store.state.ranking.list.length === 0) {
-      await this.$store.dispatch('ranking/update')
-    }
-    // update ranking every 30 min
-    this.polling = setInterval(async () => {
-      // eslint-disable-next-line
-      console.log('refreshing...')
-      await this.$store.dispatch('ranking/update')
-    }, 1800 * 1000)
+    // if (this.$store.state.ranking.list.length === 0) {
+    //   await this.$store.dispatch('ranking/update')
+    // }
+    // // update ranking every 30 min
+    // this.polling = setInterval(async () => {
+    //   // eslint-disable-next-line
+    //   console.log('refreshing...')
+    //   await this.$store.dispatch('ranking/update')
+    // }, 1800 * 1000)
   },
   beforeDestroy() {
     clearInterval(this.polling)
@@ -260,6 +254,123 @@ export default {
     },
     toggleSelected(accountId) {
       this.$store.dispatch('ranking/toggleSelected', { accountId })
+    },
+  },
+  apollo: {
+    $subscribe: {
+      validator: {
+        query: gql`
+          subscription validator($stashAddress: String) {
+            ranking(
+              where: { stash_address: { _eq: $stashAddress } }
+              order_by: { block_height: asc }
+              limit: 1
+            ) {
+              active
+              active_eras
+              active_in_governance
+              active_rating
+              address_creation_rating
+              cluster_members
+              cluster_name
+              commission
+              commission_history
+              commission_rating
+              controller_address
+              council_backing
+              era_points_history
+              era_points_percent
+              era_points_rating
+              governance_rating
+              has_sub_identity
+              identity
+              identity_rating
+              included_thousand_validators
+              name
+              nominators
+              nominators_rating
+              other_stake
+              part_of_cluster
+              payout_history
+              payout_rating
+              performance
+              rank
+              relative_performance
+              self_stake
+              slash_rating
+              slashed
+              slashes
+              stash_address
+              stash_address_creation_block
+              stash_parent_address_creation_block
+              sub_accounts_rating
+              thousand_validator
+              total_rating
+              total_stake
+              verified_identity
+            }
+          }
+        `,
+        variables() {
+          return {
+            stashAddress: this.accountId,
+          }
+        },
+        skip() {
+          return !this.accountId
+        },
+        result({ data }) {
+          const validator = data.ranking[0]
+          this.validator = {
+            active: validator.active,
+            activeEras: validator.active_eras,
+            activeInGovernance: validator.active_in_governance,
+            activeRating: validator.active_rating,
+            addressCreationRating: validator.address_creation_rating,
+            clusterMembers: parseInt(validator.cluster_members),
+            clusterName: validator.cluster_name,
+            commission: parseFloat(validator.commission),
+            commissionHistory: JSON.parse(validator.commission_history),
+            commissionRating: validator.commission_rating,
+            controllerAddress: validator.controller_address,
+            councilBacking: validator.council_backing,
+            eraPointsHistory: JSON.parse(validator.era_points_history),
+            eraPointsPercent: parseFloat(validator.era_points_percent),
+            eraPointsRating: validator.era_points_rating,
+            governanceRating: validator.governance_rating,
+            hasSubIdentity: validator.has_sub_identity,
+            identity: JSON.parse(validator.identity),
+            identityRating: validator.identity_rating,
+            includedThousandValidators: validator.included_thousand_validators,
+            name: validator.name,
+            nominators: validator.nominators,
+            nominatorsRating: validator.nominators_rating,
+            otherStake: validator.other_stake,
+            partOfCluster: validator.part_of_cluster,
+            payoutHistory: JSON.parse(validator.payout_history),
+            payoutRating: validator.payout_rating,
+            performance: parseFloat(validator.performance),
+            rank: validator.rank,
+            relativePerformance: parseFloat(validator.relative_performance),
+            selfStake: validator.self_stake,
+            slashRating: validator.slash_rating,
+            slashed: validator.slashed,
+            slashes: JSON.parse(validator.slashes),
+            stashAddress: validator.stash_address,
+            stashAddressCreationBlock: validator.stash_address_creation_block,
+            stashParentAddressCreationBlock:
+              validator.stash_parent_address_creation_block,
+            subAccountsRating: validator.sub_accounts_rating,
+            thousandValidator: JSON.parse(validator.thousand_validator),
+            totalRating: validator.total_rating,
+            totalStake: validator.total_stake,
+            verifiedIdentity: validator.verified_identity,
+            selected: this.isSelected(validator.stashAddress),
+          }
+          // eslint-disable-next-line no-console
+          console.log(this.validator)
+        },
+      },
     },
   },
 }
