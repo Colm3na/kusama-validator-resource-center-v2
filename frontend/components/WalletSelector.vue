@@ -24,11 +24,7 @@
 </template>
 
 <script>
-import {
-  web3Accounts,
-  web3Enable,
-  web3FromAddress,
-} from '@polkadot/extension-dapp'
+import { web3Accounts, web3Enable } from '@polkadot/extension-dapp'
 import { ApiPromise, WsProvider } from '@polkadot/api'
 import { encodeAddress } from '@polkadot/keyring'
 import Identicon from '@/components/Identicon.vue'
