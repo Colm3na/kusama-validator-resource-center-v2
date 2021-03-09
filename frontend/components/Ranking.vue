@@ -189,7 +189,18 @@
         <template #cell(totalRating)="data">
           <span
             v-b-tooltip.hover
-            :title="`Active: ${data.item.activeRating}, Subaccounts: ${data.item.subAccountsRating}, Identity: ${data.item.identityRating}, Address: ${data.item.addressCreationRating}, Nominators: ${data.item.nominatorsRating}, Commission: ${data.item.commissionRating}, EraPoints: ${data.item.eraPointsRating}, Slash: ${data.item.slashRating}, Governance: ${data.item.governanceRating}, Payouts: ${data.item.payoutRating}`"
+            :title="`
+              Active: ${data.item.activeRating}, 
+              Subaccounts: ${data.item.subAccountsRating}, 
+              Identity: ${data.item.identityRating}, 
+              Address: ${data.item.addressCreationRating}, 
+              Nominators: ${data.item.nominatorsRating}, 
+              Commission: ${data.item.commissionRating}, 
+              EraPoints: ${data.item.eraPointsRating}, 
+              Slash: ${data.item.slashRating}, 
+              Governance: ${data.item.governanceRating}, 
+              Payouts: ${data.item.payoutRating}
+            `"
             >{{ data.item.totalRating }}</span
           >
         </template>
