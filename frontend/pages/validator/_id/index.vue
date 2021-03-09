@@ -235,15 +235,15 @@ export default {
     },
   },
   async created() {
-    // if (this.$store.state.ranking.list.length === 0) {
-    //   await this.$store.dispatch('ranking/update')
-    // }
-    // // update ranking every 30 min
-    // this.polling = setInterval(async () => {
-    //   // eslint-disable-next-line
-    //   console.log('refreshing...')
-    //   await this.$store.dispatch('ranking/update')
-    // }, 1800 * 1000)
+    if (this.$store.state.ranking.list.length === 0) {
+      await this.$store.dispatch('ranking/update')
+    }
+    // update ranking every 30 min
+    this.polling = setInterval(async () => {
+      // eslint-disable-next-line
+      console.log('refreshing...')
+      await this.$store.dispatch('ranking/update')
+    }, 1800 * 1000)
   },
   beforeDestroy() {
     clearInterval(this.polling)
