@@ -1,11 +1,9 @@
 <template>
   <b-navbar type="dark" variant="dark" sticky>
-    <b-container fluid class="px-sm-3">
-      <b-navbar-brand>
-        <nuxt-link to="/" class="navbar-brand" :title="config.title">
-          <img class="logo mb-1" :src="config.logo" />
-        </nuxt-link>
-      </b-navbar-brand>
+    <b-container fluid>
+      <button id="menu-toggle" class="btn btn-primary" @click="toggleSidebar()">
+        <font-awesome-icon icon="bars" />
+      </button>
       <b-navbar-nav>
         <button type="button" class="btn btn-outline-info mr-4">
           Connect wallet
@@ -58,6 +56,11 @@ export default {
   },
   created() {
     this.$store.dispatch('ranking/loadSelected')
+  },
+  methods: {
+    toggleSidebar() {
+      this.$emit('toggle')
+    },
   },
 }
 </script>

@@ -1,5 +1,5 @@
 <template>
-  <div class="page validator-page container pt-3">
+  <div class="page validator-page container-fluid pt-3">
     <div v-if="loading">
       <Loading />
     </div>

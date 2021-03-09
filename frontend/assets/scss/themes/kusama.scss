@@ -112,10 +112,7 @@ body::-webkit-scrollbar-thumb {
   outline: none;
 }
 .logo {
-  height: 1.65rem;
-}
-.navbar-dark {
-  border-bottom: 1px solid rgba(255, 255, 255, 0.25);
+  height: 2.2rem;
 }
 .identicon {
   display: inline-block;
@@ -168,6 +165,44 @@ pre {
 @media (max-width: 576px) {
   .selected-validators .dropdown-menu {
     width: 350px;
+  }
+}
+
+// sidebar
+#wrapper {
+  overflow-x: hidden;
+}
+#sidebar-wrapper {
+  min-height: 100vh;
+  margin-left: -15rem;
+  -webkit-transition: margin 0.25s ease-out;
+  -moz-transition: margin 0.25s ease-out;
+  -o-transition: margin 0.25s ease-out;
+  transition: margin 0.25s ease-out;
+}
+#sidebar-wrapper .sidebar-heading {
+  padding: 0.875rem 1.25rem;
+  font-size: 1.2rem;
+}
+#sidebar-wrapper .list-group {
+  width: 15rem;
+}
+#page-content-wrapper {
+  min-width: 100vw;
+}
+#wrapper.toggled #sidebar-wrapper {
+  margin-left: 0;
+}
+@media (min-width: 768px) {
+  #sidebar-wrapper {
+    margin-left: 0;
+  }
+  #page-content-wrapper {
+    min-width: 0;
+    width: 100%;
+  }
+  #wrapper.toggled #sidebar-wrapper {
+    margin-left: -15rem;
   }
 }
 
