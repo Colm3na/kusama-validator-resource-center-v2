@@ -447,9 +447,9 @@ module.exports = {
           const { era } = eraPoints;
           let eraPayoutState = 'inactive';
           let eraPerformance = 0;
-          if (eraPoints.validators[validator.accountId]) {
+          if (eraPoints.validators[stashAddress]) {
             activeEras += 1;
-            const points = parseInt(eraPoints.validators[validator.accountId], 10);
+            const points = parseInt(eraPoints.validators[stashAddress].toString(), 10);
             eraPointsHistory.push({
               era: new BigNumber(era.toString()).toString(10),
               points,
@@ -463,7 +463,7 @@ module.exports = {
             const eraTotalStake = new BigNumber(
               erasExposure.find(
                 (eraExposure) => eraExposure.era === era,
-              ).validators[validator.accountId].total,
+              ).validators[stashAddress].total,
             );
             eraPerformance = (points * (1 - (commission / 100)))
               / (eraTotalStake.div(new BigNumber(10).pow(config.tokenDecimals)).toNumber());
