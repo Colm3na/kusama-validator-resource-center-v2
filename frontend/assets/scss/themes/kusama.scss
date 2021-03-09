@@ -206,6 +206,14 @@ pre {
   }
 }
 
+// wallet modal
+#wallet-modal .modal-footer {
+  display: none;
+}
+#wallet-modal .modal-header {
+  display: none;
+}
+
 // additional component
 .additional-info p {
   color: $light;
@@ -258,6 +266,9 @@ pre {
 }
 .selected-per-page {
   color: $primary;
+}
+.progress-bar {
+  color: $gray-900;
 }
 
 // rating component

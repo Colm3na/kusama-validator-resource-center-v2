@@ -10,7 +10,11 @@
           type="button"
           class="btn btn-outline-info mr-4"
         >
-          Connect wallet
+          <span v-if="selectedAddress">
+            <Identicon :address="selectedAddress" :size="24" />
+            {{ shortAddress(selectedAddress) }}
+          </span>
+          <span v-else>Connect wallet</span>
         </button>
         <b-nav-item-dropdown
           id="selected-validators"
@@ -30,14 +34,22 @@
         </b-nav-item-dropdown>
       </b-navbar-nav>
     </b-container>
-    <b-modal id="wallet-modal">
-      <WalletSelector />
+    <b-modal id="wallet-modal" size="lg">
+      <template #modal-header></template>
+      <template #default="{ hide }">
+        <WalletSelector @close="hide()" />
+        <p class="text-right mt-4 mb-0">
+          <b-button class="btn-sm" @click="hide()">Close</b-button>
+        </p>
+      </template>
+      <template #modal-footer></template>
     </b-modal>
   </b-navbar>
 </template>
 
 <script>
 import { config } from '@/config.js'
+import commonMixin from '@/mixins/commonMixin.js'
 import SelectedValidators from '@/components/SelectedValidators.vue'
 import WalletSelector from '@/components/WalletSelector.vue'
 export default {
@@ -45,6 +57,7 @@ export default {
     SelectedValidators,
     WalletSelector,
   },
+  mixins: [commonMixin],
   data() {
     return {
       config,
@@ -56,6 +69,9 @@ export default {
     },
     selectedValidatorAddresses() {
       return this.$store.state.ranking.selectedAddresses
+    },
+    selectedAddress() {
+      return this.$store.state.ranking.selectedAddress
     },
   },
   watch: {

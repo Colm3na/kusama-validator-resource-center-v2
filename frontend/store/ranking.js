@@ -9,7 +9,8 @@ export const state = () => ({
   eraPointsHistoryTotalsSum: 0,
   eraPointsAverage: 0,
   loading: true,
-  selectedAddresses: [],
+  selectedAddresses: [], // validators
+  selectedAddress: undefined, // staking address
 })
 
 export const mutations = {
@@ -18,6 +19,11 @@ export const mutations = {
     state.blockHeight = blockHeight
     state.eraPointsAverage = eraPointsAverage
     state.loading = loading
+  },
+  updateSelectedAddress(state, selectedAddress) {
+    state.selectedAddress = selectedAddress
+    // eslint-disable-next-line no-console
+    console.log('selected address:', state.selectedAddress)
   },
   loadSelected(state) {
     const selectedAddresses =
@@ -217,5 +223,8 @@ export const actions = {
   },
   toggleSelected(context, accountId) {
     context.commit('toggleSelected', accountId)
+  },
+  updateSelectedAddress(context, accountId) {
+    context.commit('updateSelectedAddress', accountId)
   },
 }
