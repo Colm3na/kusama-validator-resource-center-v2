@@ -186,6 +186,13 @@
             ></b-progress-bar>
           </b-progress>
         </template>
+        <template #cell(totalRating)="data">
+          <span
+            v-b-tooltip.hover
+            :title="`Active: ${data.item.activeRating}, Subaccounts: ${data.item.subAccountsRating}, Identity: ${data.item.identityRating}, Address: ${data.item.addressCreationRating}, Nominators: ${data.item.nominatorsRating}, Commission: ${data.item.commissionRating}, EraPoints: ${data.item.eraPointsRating}, Slash: ${data.item.slashRating}, Governance: ${data.item.governanceRating}, Payouts: ${data.item.payoutRating}`"
+            >{{ data.item.totalRating }}</span
+          >
+        </template>
         <template #cell(selected)="data">
           <p class="text-center mb-0">
             <a
@@ -301,11 +308,11 @@ export default {
             'text-center d-none d-sm-none d-md-none d-lg-table-cell d-xl-table-cell',
         },
         { key: 'name', sortable: true },
-        {
-          key: 'nominators',
-          sortable: true,
-          class: 'd-none d-sm-none d-md-none d-lg-table-cell d-xl-table-cell',
-        },
+        // {
+        //   key: 'nominators',
+        //   sortable: true,
+        //   class: 'd-none d-sm-none d-md-none d-lg-table-cell d-xl-table-cell',
+        // },
         {
           key: 'commission',
           sortable: true,
@@ -324,6 +331,12 @@ export default {
         {
           key: 'relativePerformance',
           label: 'R. Performance',
+          sortable: true,
+          class: 'd-none d-sm-none d-md-none d-lg-table-cell d-xl-table-cell',
+        },
+        {
+          key: 'totalRating',
+          label: 'VRC score',
           sortable: true,
           class: 'd-none d-sm-none d-md-none d-lg-table-cell d-xl-table-cell',
         },
