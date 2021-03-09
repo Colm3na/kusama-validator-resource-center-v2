@@ -5,7 +5,11 @@
         <font-awesome-icon icon="bars" />
       </button>
       <b-navbar-nav>
-        <button type="button" class="btn btn-outline-info mr-4">
+        <button
+          v-b-modal.wallet-modal
+          type="button"
+          class="btn btn-outline-info mr-4"
+        >
           Connect wallet
         </button>
         <b-nav-item-dropdown
@@ -26,15 +30,20 @@
         </b-nav-item-dropdown>
       </b-navbar-nav>
     </b-container>
+    <b-modal id="wallet-modal">
+      <WalletSelector />
+    </b-modal>
   </b-navbar>
 </template>
 
 <script>
 import { config } from '@/config.js'
 import SelectedValidators from '@/components/SelectedValidators.vue'
+import WalletSelector from '@/components/WalletSelector.vue'
 export default {
   components: {
     SelectedValidators,
+    WalletSelector,
   },
   data() {
     return {

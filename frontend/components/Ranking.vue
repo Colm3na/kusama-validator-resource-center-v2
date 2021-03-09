@@ -171,6 +171,17 @@
         <template #cell(otherStake)="data">
           {{ formatAmount(data.item.otherStake) }}
         </template>
+        <template #cell(relativePerformance)="data">
+          <b-progress
+            v-b-tooltip.hover
+            variant="success"
+            :value="data.item.relativePerformance * 100"
+            :max="100"
+            show-progress
+            animated
+            :title="`${(data.item.relativePerformance * 100).toFixed(2)} %`"
+          ></b-progress>
+        </template>
         <template #cell(selected)="data">
           <p class="text-center mb-0">
             <a

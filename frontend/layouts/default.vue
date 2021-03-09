@@ -27,8 +27,6 @@ export default {
   methods: {
     toggleSidebar() {
       this.toggled = !this.toggled
-      // eslint-disable-next-line no-console
-      console.log('layout:', this.toggled)
     },
   },
 }

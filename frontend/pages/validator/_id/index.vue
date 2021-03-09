@@ -112,6 +112,7 @@
               <EraPoints
                 :percent="validator.eraPointsPercent"
                 :average="eraPointsAveragePercent"
+                :era-points-history="validator.eraPointsHistory"
                 :rating="validator.eraPointsRating"
               />
             </div>
@@ -120,6 +121,7 @@
             <div class="col-md-6 mb-5">
               <Commission
                 :commission="validator.commission"
+                :commission-history="validator.commissionHistory"
                 :rating="validator.commissionRating"
               />
             </div>
@@ -141,17 +143,6 @@
             <div class="col-md-6 mb-5"></div>
           </div>
         </b-tab>
-        <!-- <b-tab title="Additional data">
-          <b-alert
-            show
-            dismissible
-            variant="info"
-            class="text-center py-3 glitch"
-          >
-            This information is unverified and provided by the validator
-          </b-alert>
-          <Additional :address="validator.stashAddress" />
-        </b-tab> -->
       </b-tabs>
     </div>
   </div>
@@ -160,7 +151,6 @@
 <script>
 import Identicon from '@/components/Identicon.vue'
 import Loading from '@/components/Loading.vue'
-// import Additional from '@/components/Additional.vue'
 import VerifiedIcon from '@/components/VerifiedIcon.vue'
 import Identity from '@/components/metrics/Identity.vue'
 import Address from '@/components/metrics/Address.vue'
@@ -179,7 +169,6 @@ export default {
   components: {
     Identicon,
     Loading,
-    // Additional,
     VerifiedIcon,
     Identity,
     Address,

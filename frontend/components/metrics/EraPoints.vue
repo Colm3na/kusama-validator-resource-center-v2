@@ -24,14 +24,20 @@
     <div class="description">
       <p v-if="rating === 2">
         Above average! Validator got {{ percent.toFixed(2) }}% of the total era
-        points in the last week while average was
+        points in the last 21 days while average was
         {{ average.toFixed(2) }}%<br />
       </p>
       <p v-else>
         Below average! Validator got {{ percent.toFixed(2) }}% of the total era
-        points in the last week while average was
+        points in the last 21 days while average was
         {{ average.toFixed(2) }}%<br />
       </p>
+      <line-chart
+        :data="chartData"
+        :options="chartOptions"
+        :height="200"
+        style="background-color: rgba(0, 0, 0, 1)"
+      />
     </div>
   </div>
 </template>
@@ -46,6 +52,10 @@ export default {
       type: Number,
       default: () => 0,
     },
+    eraPointsHistory: {
+      type: Array,
+      default: () => [],
+    },
     average: {
       type: Number,
       default: () => 0,
@@ -53,6 +63,66 @@ export default {
     percent: {
       type: Number,
       default: () => 0,
+    },
+  },
+  data() {
+    return {
+      chartOptions: {
+        responsive: true,
+        legend: {
+          display: false,
+        },
+        title: {
+          display: true,
+          // text: 'history',
+          fontSize: 24,
+          fontColor: '#fff',
+        },
+        tooltips: {
+          backgroundColor: '#000000',
+        },
+        scales: {
+          xAxes: [
+            {
+              gridLines: {
+                display: true,
+                color: 'rgba(255, 255, 255, 0.1)',
+              },
+            },
+          ],
+          yAxes: [
+            {
+              ticks: {
+                beginAtZero: true,
+                suggestedMin: 0,
+                suggestedMax: 100,
+              },
+              gridLines: {
+                display: true,
+                color: 'rgba(255, 255, 255, 0.1)',
+              },
+            },
+          ],
+        },
+      },
+    }
+  },
+  computed: {
+    chartData() {
+      return {
+        labels: this.eraPointsHistory.map(({ era }) => era),
+        datasets: [
+          {
+            labels: 'commission',
+            data: this.eraPointsHistory.map(({ points }) => points),
+            backgroundColor: 'rgba(255, 255, 255, 0.8)',
+            borderColor: 'rgba(230, 0, 122, 0.8)',
+            hoverBackgroundColor: 'rgba(255, 255, 255, 0.8)',
+            fill: false,
+            showLine: true,
+          },
+        ],
+      }
     },
   },
 }
