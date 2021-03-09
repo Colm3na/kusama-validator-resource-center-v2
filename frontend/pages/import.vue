@@ -1,7 +1,7 @@
 <template>
   <div class="page container-fluid pt-3">
     <div>
-      <h1 class="mb-4">Dashboard</h1>
+      <h1 class="mb-4">Import validator set</h1>
     </div>
   </div>
 </template>

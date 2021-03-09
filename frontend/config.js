@@ -5,7 +5,7 @@ export const config = {
   denom: 'KSM',
   addressPrefix: 2,
   tokenDecimals: 12,
-  historySize: 28, // 1 week
+  historySize: 84, // 21 days
   erasPerDay: 4,
   polkascanAPI: 'https://explorer-31.polkascan.io/kusama/api/v1', // no trailing slash
   theme: '@/assets/scss/themes/kusama.scss',

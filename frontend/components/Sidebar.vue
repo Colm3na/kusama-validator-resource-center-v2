@@ -7,7 +7,7 @@
       </nuxt-link>
     </div>
     <div class="list-group list-group-flush text-center">
-      <nuxt-link class="nav-link mb-4" to="/dashboard">
+      <nuxt-link class="nav-link mb-4" to="/">
         <font-awesome-icon
           icon="chart-line"
           style="display: block; font-size: 3rem; margin: 0 auto 0.5rem"
