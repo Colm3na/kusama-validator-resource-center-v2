@@ -27,214 +27,294 @@
       </b-row>
       <!-- Exclude -->
       <div class="exclude mb-4">
-        <h5 class="exclude-title">Exclude from search:</h5>
-        <div class="row pt-3">
-          <div
-            v-for="option in options"
-            :key="option.text"
-            class="col-md-6 col-lg-3 mb-2"
-          >
-            <b-form-checkbox
-              switch
-              size="lg"
-              :checked="getExcludeState(option.value)"
-              @change="toggleExcluded(option.value)"
-            >
-              {{ option.text }}
-            </b-form-checkbox>
+        <div class="row">
+          <div class="col-11">
+            <h5 class="exclude-title mb-2">
+              Exclude from search:
+              <nuxt-link
+                v-b-tooltip.hover
+                to="/help#exclude-filter"
+                title="You can exclude groups of validators based on your preferences"
+              >
+                <font-awesome-icon
+                  icon="question-circle"
+                  class="d-inline-block"
+                  style="font-size: 1rem"
+                />
+              </nuxt-link>
+            </h5>
+          </div>
+          <div class="col-1 text-right">
+            <span v-b-toggle.exclude-filter-collapse class="m-1">
+              <font-awesome-icon icon="chevron-up" class="when-open" />
+              <font-awesome-icon icon="chevron-down" class="when-closed" />
+            </span>
           </div>
         </div>
-      </div>
-      <!-- Customize VRC score -->
-      <div class="exclude mb-4">
-        <h5 class="exclude-title mb-4">Customize VRC score (mocked!):</h5>
-        <div class="row">
-          <div class="col-12">
-            <div class="row">
-              <div class="col-md-6">
-                <div class="row">
-                  <div class="col-6">
-                    IDENTITY -
-                    <span style="color: gray"
-                      >x{{ customVRCScore.identity }}</span
-                    >
-                  </div>
-                  <div class="col-6">
-                    <b-form-input
-                      v-model="customVRCScore.identity"
-                      type="range"
-                      min="0"
-                      max="5"
-                      step="1"
-                      style="width: 5rem"
-                    ></b-form-input>
-                  </div>
-                </div>
-              </div>
-              <div class="col-md-6">
-                <div class="row">
-                  <div class="col-6">
-                    NOMINATORS -
-                    <span style="color: gray"
-                      >x{{ customVRCScore.nominators }}</span
-                    >
-                  </div>
-                  <div class="col-6">
-                    <b-form-input
-                      v-model="customVRCScore.nominators"
-                      type="range"
-                      min="0"
-                      max="5"
-                      step="1"
-                      style="width: 5rem"
-                    ></b-form-input>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div class="row">
-              <div class="col-md-6">
-                <div class="row">
-                  <div class="col-6">
-                    ADDRES CREATION -
-                    <span style="color: gray"
-                      >x{{ customVRCScore.address }}</span
-                    >
-                  </div>
-                  <div class="col-6">
-                    <b-form-input
-                      v-model="customVRCScore.address"
-                      type="range"
-                      min="0"
-                      max="5"
-                      step="1"
-                      style="width: 5rem"
-                    ></b-form-input>
-                  </div>
-                </div>
-              </div>
-              <div class="col-md-6">
-                <div class="row">
-                  <div class="col-6">
-                    PAYOUTS -
-                    <span style="color: gray"
-                      >x{{ customVRCScore.payouts }}</span
-                    >
-                  </div>
-                  <div class="col-6">
-                    <b-form-input
-                      v-model="customVRCScore.payouts"
-                      type="range"
-                      min="0"
-                      max="5"
-                      step="1"
-                      style="width: 5rem"
-                    ></b-form-input>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div class="row">
-              <div class="col-md-6">
-                <div class="row">
-                  <div class="col-6">
-                    SLASHED -
-                    <span style="color: gray"
-                      >x{{ customVRCScore.slashed }}</span
-                    >
-                  </div>
-                  <div class="col-6">
-                    <b-form-input
-                      v-model="customVRCScore.slashed"
-                      type="range"
-                      min="0"
-                      max="5"
-                      step="1"
-                      style="width: 5rem"
-                    ></b-form-input>
-                  </div>
-                </div>
-              </div>
-              <div class="col-md-6">
-                <div class="row">
-                  <div class="col-6">
-                    PERFORMANCE -
-                    <span style="color: gray"
-                      >x{{ customVRCScore.performance }}</span
-                    >
-                  </div>
-                  <div class="col-6">
-                    <b-form-input
-                      v-model="customVRCScore.performance"
-                      type="range"
-                      min="0"
-                      max="5"
-                      step="1"
-                      style="width: 5rem"
-                    ></b-form-input>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div class="row">
-              <div class="col-md-6">
-                <div class="row">
-                  <div class="col-6">
-                    SUBACCOUNTS -
-                    <span style="color: gray"
-                      >x{{ customVRCScore.subaccounts }}</span
-                    >
-                  </div>
-                  <div class="col-6">
-                    <b-form-input
-                      v-model="customVRCScore.subaccounts"
-                      type="range"
-                      min="0"
-                      max="5"
-                      step="1"
-                      style="width: 5rem"
-                    ></b-form-input>
-                  </div>
-                </div>
-              </div>
-              <div class="col-md-6">
-                <div class="row">
-                  <div class="col-6">
-                    PARTICIPATION IN GOVERNANCE -
-                    <span style="color: gray"
-                      >x{{ customVRCScore.governance }}</span
-                    >
-                  </div>
-                  <div class="col-6">
-                    <b-form-input
-                      v-model="customVRCScore.governance"
-                      type="range"
-                      min="0"
-                      max="5"
-                      step="1"
-                      style="width: 5rem"
-                    ></b-form-input>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div class="text-center my-4">
+        <b-collapse id="exclude-filter-collapse" visible>
+          <div class="row pt-3">
+            <div
+              v-for="option in options"
+              :key="option.text"
+              class="col-md-6 col-lg-3 mb-2"
+            >
               <b-form-checkbox
                 switch
                 size="lg"
-                class="xl-switch"
-                :checked="true"
-              />
+                :checked="getExcludeState(option.value)"
+                @change="toggleExcluded(option.value)"
+              >
+                {{ option.text }}
+              </b-form-checkbox>
             </div>
           </div>
+        </b-collapse>
+      </div>
+      <!-- Customize VRC score -->
+      <div class="exclude mb-4">
+        <div class="row">
+          <div class="col-11">
+            <h5 class="exclude-title mb-2">
+              Customize VRC score:
+              <nuxt-link
+                v-b-tooltip.hover
+                to="/help#custom-vrc-score"
+                title="You can customize the weights of the VRC score and thereby deviate from the default option (equal weight of each metric)"
+              >
+                <font-awesome-icon
+                  icon="question-circle"
+                  class="d-inline-block"
+                  style="font-size: 1rem"
+                />
+              </nuxt-link>
+            </h5>
+          </div>
+          <div class="col-1 text-right">
+            <span v-b-toggle.custom-vrc-score-collapse class="m-1">
+              <font-awesome-icon icon="chevron-up" class="when-open" />
+              <font-awesome-icon icon="chevron-down" class="when-closed" />
+            </span>
+          </div>
         </div>
+        <b-collapse id="custom-vrc-score-collapse" visible>
+          <div class="row mt-2">
+            <div class="col-12">
+              <div class="row">
+                <div class="col-md-6">
+                  <div class="row">
+                    <div class="col-6">
+                      IDENTITY -
+                      <span style="color: gray"
+                        >x{{ customVRCScore.identity }}</span
+                      >
+                    </div>
+                    <div class="col-6">
+                      <b-form-input
+                        v-model="customVRCScore.identity"
+                        type="range"
+                        min="0"
+                        max="5"
+                        step="1"
+                        style="width: 5rem"
+                      ></b-form-input>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="row">
+                    <div class="col-6">
+                      NOMINATORS -
+                      <span style="color: gray"
+                        >x{{ customVRCScore.nominators }}</span
+                      >
+                    </div>
+                    <div class="col-6">
+                      <b-form-input
+                        v-model="customVRCScore.nominators"
+                        type="range"
+                        min="0"
+                        max="5"
+                        step="1"
+                        style="width: 5rem"
+                      ></b-form-input>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-md-6">
+                  <div class="row">
+                    <div class="col-6">
+                      ADDRES CREATION -
+                      <span style="color: gray"
+                        >x{{ customVRCScore.address }}</span
+                      >
+                    </div>
+                    <div class="col-6">
+                      <b-form-input
+                        v-model="customVRCScore.address"
+                        type="range"
+                        min="0"
+                        max="5"
+                        step="1"
+                        style="width: 5rem"
+                      ></b-form-input>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="row">
+                    <div class="col-6">
+                      PAYOUTS -
+                      <span style="color: gray"
+                        >x{{ customVRCScore.payouts }}</span
+                      >
+                    </div>
+                    <div class="col-6">
+                      <b-form-input
+                        v-model="customVRCScore.payouts"
+                        type="range"
+                        min="0"
+                        max="5"
+                        step="1"
+                        style="width: 5rem"
+                      ></b-form-input>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-md-6">
+                  <div class="row">
+                    <div class="col-6">
+                      SLASHED -
+                      <span style="color: gray"
+                        >x{{ customVRCScore.slashed }}</span
+                      >
+                    </div>
+                    <div class="col-6">
+                      <b-form-input
+                        v-model="customVRCScore.slashed"
+                        type="range"
+                        min="0"
+                        max="5"
+                        step="1"
+                        style="width: 5rem"
+                      ></b-form-input>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="row">
+                    <div class="col-6">
+                      PERFORMANCE -
+                      <span style="color: gray"
+                        >x{{ customVRCScore.performance }}</span
+                      >
+                    </div>
+                    <div class="col-6">
+                      <b-form-input
+                        v-model="customVRCScore.performance"
+                        type="range"
+                        min="0"
+                        max="5"
+                        step="1"
+                        style="width: 5rem"
+                      ></b-form-input>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-md-6">
+                  <div class="row">
+                    <div class="col-6">
+                      SUBACCOUNTS -
+                      <span style="color: gray"
+                        >x{{ customVRCScore.subaccounts }}</span
+                      >
+                    </div>
+                    <div class="col-6">
+                      <b-form-input
+                        v-model="customVRCScore.subaccounts"
+                        type="range"
+                        min="0"
+                        max="5"
+                        step="1"
+                        style="width: 5rem"
+                      ></b-form-input>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="row">
+                    <div class="col-6">
+                      PARTICIPATION IN GOVERNANCE -
+                      <span style="color: gray"
+                        >x{{ customVRCScore.governance }}</span
+                      >
+                    </div>
+                    <div class="col-6">
+                      <b-form-input
+                        v-model="customVRCScore.governance"
+                        type="range"
+                        min="0"
+                        max="5"
+                        step="1"
+                        style="width: 5rem"
+                      ></b-form-input>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="text-center my-4">
+                <b-form-checkbox
+                  switch
+                  size="lg"
+                  class="xl-switch"
+                  :checked="true"
+                />
+              </div>
+            </div>
+          </div>
+        </b-collapse>
       </div>
       <!-- Auto-Filter -->
       <div class="exclude mb-4">
-        <h5 class="exclude-title mb-4">Auto-Filter validators:</h5>
-        <div class="text-center my-4">
-          <b-form-checkbox switch size="lg" class="xl-switch" :checked="true" />
+        <div class="row mb-2">
+          <div class="col-11">
+            <h5 class="exclude-title">
+              Auto-Filter validators:
+              <nuxt-link
+                v-b-tooltip.hover
+                to="/help#auto-filter"
+                title="Auto-filter of quantitatively dominated validators. Explanation: A validator X is dominated by another validator Y if all Y’s quantitatively metrics are at least equally good and at least one metric is strictly better"
+              >
+                <font-awesome-icon
+                  icon="question-circle"
+                  class="d-inline-block"
+                  style="font-size: 1rem"
+                />
+              </nuxt-link>
+            </h5>
+          </div>
+          <div class="col-1 text-right">
+            <span v-b-toggle.auto-filter-collapse class="m-1">
+              <font-awesome-icon icon="chevron-up" class="when-open" />
+              <font-awesome-icon icon="chevron-down" class="when-closed" />
+            </span>
+          </div>
         </div>
+        <b-collapse id="auto-filter-collapse" visible>
+          <div class="text-center mt-0 mb-4">
+            <b-form-checkbox
+              switch
+              size="lg"
+              class="xl-switch"
+              :checked="true"
+            />
+          </div>
+        </b-collapse>
       </div>
       <!-- Filter -->
       <b-row>
@@ -592,7 +672,7 @@ export default {
         payouts: 1,
         slashed: 1,
         performance: 1,
-        subsaccounts: 1,
+        subaccounts: 3,
         governance: 1,
       },
     }
@@ -779,5 +859,9 @@ export default {
   -o-transform: scale(2); /* Opera */
   transform: scale(2); /* Opera */
   padding: 10px;
+}
+.collapsed > .when-open,
+.not-collapsed > .when-closed {
+  display: none;
 }
 </style>
