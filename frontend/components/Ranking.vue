@@ -45,6 +45,197 @@
           </div>
         </div>
       </div>
+      <!-- Customize VRC score -->
+      <div class="exclude mb-4">
+        <h5 class="exclude-title mb-4">Customize VRC score (mocked!):</h5>
+        <div class="row">
+          <div class="col-12">
+            <div class="row">
+              <div class="col-md-6">
+                <div class="row">
+                  <div class="col-6">
+                    IDENTITY -
+                    <span style="color: gray"
+                      >x{{ customVRCScore.identity }}</span
+                    >
+                  </div>
+                  <div class="col-6">
+                    <b-form-input
+                      v-model="customVRCScore.identity"
+                      type="range"
+                      min="0"
+                      max="5"
+                      step="1"
+                      style="width: 5rem"
+                    ></b-form-input>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="row">
+                  <div class="col-6">
+                    NOMINATORS -
+                    <span style="color: gray"
+                      >x{{ customVRCScore.nominators }}</span
+                    >
+                  </div>
+                  <div class="col-6">
+                    <b-form-input
+                      v-model="customVRCScore.nominators"
+                      type="range"
+                      min="0"
+                      max="5"
+                      step="1"
+                      style="width: 5rem"
+                    ></b-form-input>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-6">
+                <div class="row">
+                  <div class="col-6">
+                    ADDRES CREATION -
+                    <span style="color: gray"
+                      >x{{ customVRCScore.address }}</span
+                    >
+                  </div>
+                  <div class="col-6">
+                    <b-form-input
+                      v-model="customVRCScore.address"
+                      type="range"
+                      min="0"
+                      max="5"
+                      step="1"
+                      style="width: 5rem"
+                    ></b-form-input>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="row">
+                  <div class="col-6">
+                    PAYOUTS -
+                    <span style="color: gray"
+                      >x{{ customVRCScore.payouts }}</span
+                    >
+                  </div>
+                  <div class="col-6">
+                    <b-form-input
+                      v-model="customVRCScore.payouts"
+                      type="range"
+                      min="0"
+                      max="5"
+                      step="1"
+                      style="width: 5rem"
+                    ></b-form-input>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-6">
+                <div class="row">
+                  <div class="col-6">
+                    SLASHED -
+                    <span style="color: gray"
+                      >x{{ customVRCScore.slashed }}</span
+                    >
+                  </div>
+                  <div class="col-6">
+                    <b-form-input
+                      v-model="customVRCScore.slashed"
+                      type="range"
+                      min="0"
+                      max="5"
+                      step="1"
+                      style="width: 5rem"
+                    ></b-form-input>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="row">
+                  <div class="col-6">
+                    PERFORMANCE -
+                    <span style="color: gray"
+                      >x{{ customVRCScore.performance }}</span
+                    >
+                  </div>
+                  <div class="col-6">
+                    <b-form-input
+                      v-model="customVRCScore.performance"
+                      type="range"
+                      min="0"
+                      max="5"
+                      step="1"
+                      style="width: 5rem"
+                    ></b-form-input>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-6">
+                <div class="row">
+                  <div class="col-6">
+                    SUBACCOUNTS -
+                    <span style="color: gray"
+                      >x{{ customVRCScore.subaccounts }}</span
+                    >
+                  </div>
+                  <div class="col-6">
+                    <b-form-input
+                      v-model="customVRCScore.subaccounts"
+                      type="range"
+                      min="0"
+                      max="5"
+                      step="1"
+                      style="width: 5rem"
+                    ></b-form-input>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="row">
+                  <div class="col-6">
+                    PARTICIPATION IN GOVERNANCE -
+                    <span style="color: gray"
+                      >x{{ customVRCScore.governance }}</span
+                    >
+                  </div>
+                  <div class="col-6">
+                    <b-form-input
+                      v-model="customVRCScore.governance"
+                      type="range"
+                      min="0"
+                      max="5"
+                      step="1"
+                      style="width: 5rem"
+                    ></b-form-input>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="text-center my-4">
+              <b-form-checkbox
+                switch
+                size="lg"
+                class="xl-switch"
+                :checked="true"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Auto-Filter -->
+      <div class="exclude mb-4">
+        <h5 class="exclude-title mb-4">Auto-Filter validators:</h5>
+        <div class="text-center my-4">
+          <b-form-checkbox switch size="lg" class="xl-switch" :checked="true" />
+        </div>
+      </div>
       <!-- Filter -->
       <b-row>
         <b-col cols="12">
@@ -58,6 +249,7 @@
           />
         </b-col>
       </b-row>
+      <!-- Search results -->
       <b-row>
         <b-col cols="6">
           <p class="mb-2 text-secondary">
@@ -75,6 +267,7 @@
           </JsonCSV> -->
         </b-col>
       </b-row>
+      <!-- Ranking table -->
       <b-table
         dark
         hover
@@ -296,7 +489,7 @@
 </template>
 <script>
 import { BigNumber } from 'bignumber.js'
-import JsonCSV from 'vue-json-csv'
+// import JsonCSV from 'vue-json-csv'
 import Loading from '@/components/Loading.vue'
 import Identicon from '@/components/Identicon.vue'
 import VerifiedIcon from '@/components/VerifiedIcon.vue'
@@ -310,7 +503,7 @@ export default {
     VerifiedIcon,
     SelectedValidators,
     Loading,
-    JsonCSV,
+    // JsonCSV,
   },
   mixins: [commonMixin],
   data() {
@@ -392,6 +585,16 @@ export default {
       maxValidatorsReached: false,
       polling: null,
       config,
+      customVRCScore: {
+        identity: 1,
+        nominators: 1,
+        address: 1,
+        payouts: 1,
+        slashed: 1,
+        performance: 1,
+        subsaccounts: 1,
+        governance: 1,
+      },
     }
   },
   computed: {
@@ -566,3 +769,15 @@ export default {
   },
 }
 </script>
+
+<style>
+.xl-switch {
+  /* Double-sized Checkboxes */
+  -ms-transform: scale(2); /* IE */
+  -moz-transform: scale(2); /* FF */
+  -webkit-transform: scale(2); /* Safari and Chrome */
+  -o-transform: scale(2); /* Opera */
+  transform: scale(2); /* Opera */
+  padding: 10px;
+}
+</style>
