@@ -104,22 +104,13 @@ export const actions = {
         ranking (where: {block_height: {_eq: "${blockHeight}"}}) {
           active
           active_eras
-          active_in_governance
           active_rating
           address_creation_rating
-          cluster_members
-          cluster_name
           commission
-          commission_history
           commission_rating
-          controller_address
-          council_backing
-          era_points_history
           era_points_percent
           era_points_rating
           governance_rating
-          has_sub_identity
-          identity
           identity_rating
           included_thousand_validators
           name
@@ -127,20 +118,14 @@ export const actions = {
           nominators_rating
           other_stake
           part_of_cluster
-          payout_history
           payout_rating
           performance
           rank
           relative_performance
           self_stake
           slash_rating
-          slashed
-          slashes
           stash_address
-          stash_address_creation_block
-          stash_parent_address_creation_block
           sub_accounts_rating
-          thousand_validator
           total_rating
           total_stake
           verified_identity
@@ -152,44 +137,27 @@ export const actions = {
       return {
         active: validator.active,
         activeEras: validator.active_eras,
-        activeInGovernance: validator.active_in_governance,
         activeRating: validator.active_rating,
         addressCreationRating: validator.address_creation_rating,
-        clusterMembers: parseInt(validator.cluster_members),
-        clusterName: validator.cluster_name,
         commission: parseFloat(validator.commission),
-        commissionHistory: JSON.parse(validator.commission_history),
         commissionRating: validator.commission_rating,
-        controllerAddress: validator.controller_address,
-        councilBacking: validator.council_backing,
-        eraPointsHistory: JSON.parse(validator.era_points_history),
         eraPointsPercent: parseFloat(validator.era_points_percent),
         eraPointsRating: validator.era_points_rating,
         governanceRating: validator.governance_rating,
-        hasSubIdentity: validator.has_sub_identity,
-        identity: JSON.parse(validator.identity),
         identityRating: validator.identity_rating,
         includedThousandValidators: validator.included_thousand_validators,
         name: validator.name,
         nominators: validator.nominators,
         nominatorsRating: validator.nominators_rating,
         otherStake: validator.other_stake,
-        partOfCluster: validator.part_of_cluster,
-        payoutHistory: JSON.parse(validator.payout_history),
         payoutRating: validator.payout_rating,
         performance: parseFloat(validator.performance),
         rank: validator.rank,
         relativePerformance: parseFloat(validator.relative_performance),
         selfStake: validator.self_stake,
         slashRating: validator.slash_rating,
-        slashed: validator.slashed,
-        slashes: JSON.parse(validator.slashes),
         stashAddress: validator.stash_address,
-        stashAddressCreationBlock: validator.stash_address_creation_block,
-        stashParentAddressCreationBlock:
-          validator.stash_parent_address_creation_block,
         subAccountsRating: validator.sub_accounts_rating,
-        thousandValidator: JSON.parse(validator.thousand_validator),
         totalRating: validator.total_rating,
         totalStake: validator.total_stake,
         verifiedIdentity: validator.verified_identity,

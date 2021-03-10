@@ -36,7 +36,7 @@
       <line-chart
         :data="scoreChartData"
         :options="scoreChartOptions"
-        :height="180"
+        :height="160"
         class="py-4"
         style="background-color: rgba(0, 0, 0, 1)"
       />
@@ -80,7 +80,7 @@ export default {
               ticks: {
                 beginAtZero: true,
                 suggestedMin: 0,
-                suggestedMax: 1000,
+                suggestedMax: 25,
               },
               gridLines: {
                 display: true,
@@ -96,7 +96,7 @@ export default {
           {
             labels: 'current set',
             data: [...Array(84)].map(
-              (n) => Math.floor(Math.random() * (1000 - 0)) + 0
+              (n) => Math.floor(Math.random() * (20 - 0)) + 0
             ),
             backgroundColor: 'rgba(255, 255, 255, 0.8)',
             borderColor: 'rgba(230, 0, 122, 0.8)',
@@ -107,7 +107,7 @@ export default {
           {
             labels: 'selected set',
             data: [...Array(84)].map(
-              (n) => Math.floor(Math.random() * (1000 - 0)) + 0
+              (n) => Math.floor(Math.random() * (20 - 0)) + 0
             ),
             backgroundColor: 'rgba(255, 255, 255, 0.8)',
             borderColor: 'rgba(23, 162, 184, 0.8)',

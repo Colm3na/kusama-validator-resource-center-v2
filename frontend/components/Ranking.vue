@@ -65,14 +65,14 @@
           </p>
         </b-col>
         <b-col cols="6" class="text-right">
-          <JsonCSV
+          <!-- <JsonCSV
             :data="rankingJSON"
             class="csv-export mb-2"
             name="kusama_validator_ranking.csv"
           >
             <font-awesome-icon icon="file-csv" />
             export to CSV file
-          </JsonCSV>
+          </JsonCSV> -->
         </b-col>
       </b-row>
       <b-table
@@ -88,6 +88,16 @@
         :filter="filter"
         :filter-included-fields="filterOn"
         :sort-compare="sortCompare"
+        :filter-debounce="500"
+        :filter-ignored-fields="[
+          'active',
+          'commission',
+          'selfStake',
+          'totalStake',
+          'relativePerformance',
+          'totalRating',
+          'selected',
+        ]"
         @filtered="onFiltered"
       >
         <template #cell(active)="data">
@@ -397,55 +407,55 @@ export default {
         }
       })
     },
-    rankingJSON() {
-      return this.$store.state.ranking.list.map((validator) => {
-        return {
-          rank: validator.rank,
-          name: validator.name,
-          stash_address: validator.stashAddress,
-          controller_address: validator.controllerAddress,
-          active: validator.active ? 'active' : 'inactive',
-          active_rating: validator.activeRating,
-          self_stake: validator.selfStake,
-          other_stake: validator.otherStake,
-          total_stake: validator.totalStake,
-          has_sub_identity: validator.hasSubIdentity ? 'yes' : 'no',
-          sub_accounts_rating: validator.subAccountsRating,
-          verified_identity: validator.verifiedIdentity ? 'yes' : 'no',
-          identity_rating: validator.identityRating,
-          commission: validator.commission,
-          commission_history: validator.commissionHistory
-            .map(({ era, commission }) => `${era}=${commission}`)
-            .join(','),
-          commission_rating: validator.commissionRating,
-          nominators: validator.nominators,
-          nominators_rating: validator.nominatorsRating,
-          active_eras: validator.activeEras,
-          era_points_history: validator.eraPointsHistory
-            .map(({ era, points }) => `${era}=${points}`)
-            .join(','),
-          era_points_percentage: validator.eraPointsPercent,
-          era_points_rating: validator.eraPointsRating,
-          performance: validator.performance,
-          relative_performance: validator.relativePerformance,
-          slashed: validator.slashed ? 'yes' : 'no',
-          slashes: validator.slashes,
-          slash_rating: validator.slashRating,
-          part_of_a_cluster: validator.partOfCluster ? 'yes' : 'no',
-          cluster_name: validator.clusterName,
-          cluster_members: validator.clusterMembers,
-          council_backing: validator.councilBacking ? 'yes' : 'no',
-          active_in_governance: validator.activeInGovernance ? 'yes' : 'no',
-          governance_rating: validator.governanceRating,
-          payout_history: validator.payoutHistory
-            .map(({ era, status }) => `${era}=${status}`)
-            .join(','),
-          payout_rating: validator.payoutRating,
-          total_rating: validator.totalRating,
-          selected: this.isSelected(validator.stashAddress) ? 'yes' : 'no',
-        }
-      })
-    },
+    // rankingJSON() {
+    //   return this.$store.state.ranking.list.map((validator) => {
+    //     return {
+    //       rank: validator.rank,
+    //       name: validator.name,
+    //       stash_address: validator.stashAddress,
+    //       controller_address: validator.controllerAddress,
+    //       active: validator.active ? 'active' : 'inactive',
+    //       active_rating: validator.activeRating,
+    //       self_stake: validator.selfStake,
+    //       other_stake: validator.otherStake,
+    //       total_stake: validator.totalStake,
+    //       has_sub_identity: validator.hasSubIdentity ? 'yes' : 'no',
+    //       sub_accounts_rating: validator.subAccountsRating,
+    //       verified_identity: validator.verifiedIdentity ? 'yes' : 'no',
+    //       identity_rating: validator.identityRating,
+    //       commission: validator.commission,
+    //       commission_history: validator.commissionHistory
+    //         .map(({ era, commission }) => `${era}=${commission}`)
+    //         .join(','),
+    //       commission_rating: validator.commissionRating,
+    //       nominators: validator.nominators,
+    //       nominators_rating: validator.nominatorsRating,
+    //       active_eras: validator.activeEras,
+    //       era_points_history: validator.eraPointsHistory
+    //         .map(({ era, points }) => `${era}=${points}`)
+    //         .join(','),
+    //       era_points_percentage: validator.eraPointsPercent,
+    //       era_points_rating: validator.eraPointsRating,
+    //       performance: validator.performance,
+    //       relative_performance: validator.relativePerformance,
+    //       slashed: validator.slashed ? 'yes' : 'no',
+    //       slashes: validator.slashes,
+    //       slash_rating: validator.slashRating,
+    //       part_of_a_cluster: validator.partOfCluster ? 'yes' : 'no',
+    //       cluster_name: validator.clusterName,
+    //       cluster_members: validator.clusterMembers,
+    //       council_backing: validator.councilBacking ? 'yes' : 'no',
+    //       active_in_governance: validator.activeInGovernance ? 'yes' : 'no',
+    //       governance_rating: validator.governanceRating,
+    //       payout_history: validator.payoutHistory
+    //         .map(({ era, status }) => `${era}=${status}`)
+    //         .join(','),
+    //       payout_rating: validator.payoutRating,
+    //       total_rating: validator.totalRating,
+    //       selected: this.isSelected(validator.stashAddress) ? 'yes' : 'no',
+    //     }
+    //   })
+    // },
     selectedValidatorAddresses() {
       return this.$store.state.ranking.selectedAddresses
     },
