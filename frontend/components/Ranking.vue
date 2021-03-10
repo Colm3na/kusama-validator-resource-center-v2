@@ -78,7 +78,6 @@
       <b-table
         dark
         hover
-        responsive
         :fields="fields"
         :items="filteredRanking"
         :per-page="perPage"
