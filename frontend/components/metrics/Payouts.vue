@@ -32,6 +32,12 @@
         Neutral, validator has {{ pending }} unclaimed era rewards
       </p>
       <p v-else>No payouts detected in the last week</p>
+      <bar-chart
+        :data="chartData"
+        :options="chartOptions"
+        :height="200"
+        style="background-color: rgba(0, 0, 0, 1)"
+      />
     </div>
   </div>
 </template>
@@ -55,10 +61,68 @@ export default {
   data() {
     return {
       config,
+      chartOptions: {
+        responsive: true,
+        legend: {
+          display: false,
+        },
+        title: {
+          display: true,
+          // text: 'history',
+          fontSize: 24,
+          fontColor: '#fff',
+        },
+        tooltips: {
+          backgroundColor: '#000000',
+        },
+        scales: {
+          xAxes: [
+            {
+              gridLines: {
+                display: true,
+                color: 'rgba(255, 255, 255, 0.1)',
+              },
+            },
+          ],
+          yAxes: [
+            {
+              ticks: {
+                beginAtZero: true,
+                suggestedMin: 0,
+                suggestedMax: 1,
+              },
+              gridLines: {
+                display: true,
+                color: 'rgba(255, 255, 255, 0.1)',
+              },
+            },
+          ],
+        },
+      },
     }
   },
   computed: {
+    chartData() {
+      return {
+        labels: this.payoutHistory.map(({ era }) => era),
+        datasets: [
+          {
+            labels: 'payments',
+            data: this.payoutHistory.map(({ status }) =>
+              status === 'paid' ? 1 : -1
+            ),
+            backgroundColor: 'rgba(230, 0, 122, 0.8)',
+            borderColor: 'rgba(230, 0, 122, 0.8)',
+            hoverBackgroundColor: 'rgba(255, 255, 255, 0.8)',
+            fill: true,
+            showLine: true,
+          },
+        ],
+      }
+    },
     pending() {
+      // eslint-disable-next-line no-console
+      console.log(this.payoutHistory)
       return this.payoutHistory.filter((payout) => payout.status === 'pending')
         .length
     },
