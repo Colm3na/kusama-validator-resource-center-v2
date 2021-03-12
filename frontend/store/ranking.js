@@ -82,6 +82,11 @@ export const mutations = {
       }
     )
   },
+  importValidatorSet(state, validators) {
+    state.selectedAddresses = validators
+    // eslint-disable-next-line no-console
+    console.log('imported validator set:', state.selectedAddresses)
+  },
 }
 
 export const actions = {
@@ -194,5 +199,8 @@ export const actions = {
   },
   updateSelectedAddress(context, accountId) {
     context.commit('updateSelectedAddress', accountId)
+  },
+  importValidatorSet(context, validators) {
+    context.commit('importValidatorSet', validators)
   },
 }

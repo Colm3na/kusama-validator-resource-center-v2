@@ -30,7 +30,10 @@
             >
               {{ validator }}
             </div>
-            <b-button variant="outline-primary2" class="my-4"
+            <b-button
+              variant="outline-primary2"
+              class="my-4"
+              @click="importSetFrom(account.address)"
               >IMPORT SET</b-button
             >
           </div>
@@ -154,6 +157,11 @@ export default {
       await this.$store.dispatch('ranking/updateSelectedAddress', address)
       this.$emit('close')
       return true
+    },
+    async importSetFrom(address) {
+      const staking = await this.api.query.staking.nominators(address)
+      const validators = JSON.parse(JSON.stringify(staking)).targets
+      this.$store.dispatch('ranking/importValidatorSet', validators)
     },
   },
 }
