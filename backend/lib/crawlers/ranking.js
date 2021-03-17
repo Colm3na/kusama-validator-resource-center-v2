@@ -16,7 +16,7 @@ async function getThousandValidators() {
     return response.data;
   } catch (error) {
     logger.error(loggerOptions, `Error fetching Thousand Validator Program stats: ${JSON.stringify(error)}`);
-    return false;
+    return [];
   }
 }
 
