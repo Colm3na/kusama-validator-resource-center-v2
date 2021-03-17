@@ -501,7 +501,7 @@ module.exports = {
           : new BigNumber(0);
 
         // performance
-        logger.info(loggerOptions, `Validator ${stashAddress} performance ${performance.toFixed(6)}, eraPointsPercent: ${eraPointsPercent}, commission: ${commission}, current totalStake: ${totalStake.div(new BigNumber(10).pow(config.tokenDecimals)).toNumber()}`);
+        // logger.info(loggerOptions, `Validator ${stashAddress} perf. ${performance.toFixed(6)}`);
         if (performance > maxPerformance) {
           maxPerformance = performance;
         }
