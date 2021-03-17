@@ -574,8 +574,8 @@ module.exports = {
           ...validator,
         };
       });
-    logger.info(loggerOptions, `Max. performance is ${maxPerformance.toFixed(6)}`);
-    logger.info(loggerOptions, `Min. performance is ${minPerformance.toFixed(6)}`);
+    // logger.info(loggerOptions, `Max. performance is ${maxPerformance.toFixed(6)}`);
+    // logger.info(loggerOptions, `Min. performance is ${minPerformance.toFixed(6)}`);
     logger.info(loggerOptions, `Storing ${ranking.length} validators in db...`);
     // eslint-disable-next-line no-restricted-syntax
     for (const validator of ranking) {
