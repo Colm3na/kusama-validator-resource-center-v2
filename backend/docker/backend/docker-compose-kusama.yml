@@ -99,7 +99,7 @@ services:
     depends_on:
       - 'postgres'
       - 'substrate-node'
-    restart: on-failure
+    restart: always
     environment:
       - NODE_ENV=production
       - WS_PROVIDER_URL=ws://substrate-node:9944

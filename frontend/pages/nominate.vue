@@ -279,7 +279,7 @@ export default {
   },
   async created() {
     if (this.$store.state.ranking.list.length === 0) {
-      await this.$store.dispatch('ranking/update')
+      await this.$store.dispatch('ranking/updateList')
     }
     this.enableWeb3 = await web3Enable(
       `${config.title} for ${this.capitalize(config.name)}`

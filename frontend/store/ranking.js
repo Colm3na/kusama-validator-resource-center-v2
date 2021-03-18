@@ -11,10 +11,21 @@ export const state = () => ({
   loading: true,
   selectedAddresses: [], // validators
   selectedAddress: undefined, // staking address
+  metricsWeight: {
+    identity: 1,
+    nominators: 1,
+    address: 1,
+    payouts: 1,
+    slashed: 1,
+    performance: 1,
+    subaccounts: 1,
+    governance: 1,
+  },
+  customVRCScoreEnabled: false,
 })
 
 export const mutations = {
-  update(state, { ranking, blockHeight, eraPointsAverage, loading }) {
+  updateList(state, { ranking, blockHeight, eraPointsAverage, loading }) {
     state.list = ranking
     state.blockHeight = blockHeight
     state.eraPointsAverage = eraPointsAverage
@@ -90,7 +101,7 @@ export const mutations = {
 }
 
 export const actions = {
-  async update(context) {
+  async updateList(context) {
     const startTime = new Date().getTime()
     const client = this.app.apolloProvider.defaultClient
 

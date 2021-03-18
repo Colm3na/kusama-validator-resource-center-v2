@@ -236,13 +236,13 @@ export default {
   },
   async created() {
     if (this.$store.state.ranking.list.length === 0) {
-      await this.$store.dispatch('ranking/update')
+      await this.$store.dispatch('ranking/updateList')
     }
     // update ranking every 30 min
     this.polling = setInterval(async () => {
       // eslint-disable-next-line
       console.log('refreshing...')
-      await this.$store.dispatch('ranking/update')
+      await this.$store.dispatch('ranking/updateList')
     }, 1800 * 1000)
   },
   beforeDestroy() {

@@ -786,7 +786,7 @@ export default {
   },
   async created() {
     if (this.$store.state.ranking.list.length === 0) {
-      await this.$store.dispatch('ranking/update')
+      await this.$store.dispatch('ranking/updateList')
     }
     if (this.$cookies.get(`${config.name}-exclude`)) {
       this.exclude = this.$cookies.get(`${config.name}-exclude`)
@@ -798,7 +798,7 @@ export default {
     this.polling = setInterval(async () => {
       // eslint-disable-next-line
       console.log('refreshing...')
-      await this.$store.dispatch('ranking/update')
+      await this.$store.dispatch('ranking/updateList')
     }, 1800 * 1000)
   },
   beforeDestroy() {
