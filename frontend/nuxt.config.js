@@ -101,6 +101,7 @@ export default {
       } else {
         config.resolve.extensions = ['.mjs']
       }
+      config.resolve.alias.vue = 'vue/dist/vue.common'
       config.module.rules.push({
         test: /\.mjs$/,
         include: /node_modules/,

@@ -11,18 +11,24 @@ export const state = () => ({
   loading: true,
   selectedAddresses: [], // validators
   selectedAddress: undefined, // staking address
-  metricsWeight: {
+  metricWeights: {
+    active: 1,
+    commission: 1,
+    eraPoints: 1,
+    governance: 1,
     identity: 1,
     nominators: 1,
     address: 1,
-    payouts: 1,
-    slashed: 1,
-    performance: 1,
+    payout: 1,
+    slashes: 1,
     subaccounts: 1,
-    governance: 1,
   },
   customVRCScoreEnabled: false,
 })
+
+export const getters = {
+  getmetricWeights: (state) => state.metricWeights,
+}
 
 export const mutations = {
   updateList(state, { ranking, blockHeight, eraPointsAverage, loading }) {
@@ -98,12 +104,37 @@ export const mutations = {
     // eslint-disable-next-line no-console
     console.log('imported validator set:', state.selectedAddresses)
   },
+  updateMetricWeights(state, metricWeights) {
+    state.metricWeights = metricWeights
+    // recalculate custom VRC score
+    const list = []
+    state.list.forEach((validator) => {
+      validator.customVRCScore =
+        validator.activeRating * state.metricWeights.active +
+        validator.commissionRating * state.metricWeights.commission +
+        validator.eraPointsRating * state.metricWeights.eraPoints +
+        validator.governanceRating * state.metricWeights.governance +
+        validator.identityRating * state.metricWeights.identity +
+        validator.nominatorsRating * state.metricWeights.nominators +
+        validator.addressCreationRating * state.metricWeights.address +
+        validator.payoutRating * state.metricWeights.payout +
+        validator.slashRating * state.metricWeights.slashes +
+        validator.subAccountsRating * state.metricWeights.subaccounts
+      list.push(validator)
+    })
+    state.list = list
+  },
 }
 
 export const actions = {
   async updateList(context) {
     const startTime = new Date().getTime()
     const client = this.app.apolloProvider.defaultClient
+
+    const metricWeights = this.getters['ranking/getmetricWeights']
+
+    // eslint-disable-next-line no-console
+    console.log(metricWeights)
 
     // get last block height
     let query = gql`
@@ -177,6 +208,17 @@ export const actions = {
         totalRating: validator.total_rating,
         totalStake: validator.total_stake,
         verifiedIdentity: validator.verified_identity,
+        customVRCScore:
+          validator.active_rating * metricWeights.active +
+          validator.commission_rating * metricWeights.commission +
+          validator.era_points_rating * metricWeights.eraPoints +
+          validator.governance_rating * metricWeights.governance +
+          validator.identity_rating * metricWeights.identity +
+          validator.nominators_rating * metricWeights.nominators +
+          validator.address_creation_rating * metricWeights.address +
+          validator.payout_rating * metricWeights.payout +
+          validator.slash_rating * metricWeights.slashes +
+          validator.sub_accounts_rating * metricWeights.subaccounts,
       }
     })
     const eraPointsAverage =
@@ -189,7 +231,7 @@ export const actions = {
     console.log(
       `eraPointsAverage: ${eraPointsAverage.toFixed(6)}`
     )
-    context.commit('update', {
+    context.commit('updateList', {
       ranking,
       blockHeight,
       eraPointsAverage,
@@ -213,5 +255,8 @@ export const actions = {
   },
   importValidatorSet(context, validators) {
     context.commit('importValidatorSet', validators)
+  },
+  updateMetricWeights(context, metricWeights) {
+    context.commit('updateMetricWeights', metricWeights)
   },
 }

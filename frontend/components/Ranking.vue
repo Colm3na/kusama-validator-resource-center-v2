@@ -103,19 +103,108 @@
                 <div class="col-md-6">
                   <div class="row">
                     <div class="col-6">
-                      IDENTITY -
+                      ACTIVE -
                       <span style="color: gray"
-                        >x{{ customVRCScore.identity }}</span
+                        >x{{ metricWeights.active }}</span
                       >
                     </div>
                     <div class="col-6">
                       <b-form-input
-                        v-model="customVRCScore.identity"
+                        v-model="metricWeights.active"
                         type="range"
                         min="0"
                         max="5"
                         step="1"
                         style="width: 5rem"
+                        @change="updateVCRScore()"
+                      ></b-form-input>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="row">
+                    <div class="col-6">
+                      COMMISSION -
+                      <span style="color: gray"
+                        >x{{ metricWeights.commission }}</span
+                      >
+                    </div>
+                    <div class="col-6">
+                      <b-form-input
+                        v-model="metricWeights.commission"
+                        type="range"
+                        min="0"
+                        max="5"
+                        step="1"
+                        style="width: 5rem"
+                        @change="updateVCRScore()"
+                      ></b-form-input>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-md-6">
+                  <div class="row">
+                    <div class="col-6">
+                      ERA POINTS AVG -
+                      <span style="color: gray"
+                        >x{{ metricWeights.eraPoints }}</span
+                      >
+                    </div>
+                    <div class="col-6">
+                      <b-form-input
+                        v-model="metricWeights.eraPoints"
+                        type="range"
+                        min="0"
+                        max="5"
+                        step="1"
+                        style="width: 5rem"
+                        @change="updateVCRScore()"
+                      ></b-form-input>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="row">
+                    <div class="col-6">
+                      GOVERNANCE -
+                      <span style="color: gray"
+                        >x{{ metricWeights.governance }}</span
+                      >
+                    </div>
+                    <div class="col-6">
+                      <b-form-input
+                        v-model="metricWeights.governance"
+                        type="range"
+                        min="0"
+                        max="5"
+                        step="1"
+                        style="width: 5rem"
+                        @change="updateVCRScore()"
+                      ></b-form-input>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-md-6">
+                  <div class="row">
+                    <div class="col-6">
+                      IDENTITY -
+                      <span style="color: gray"
+                        >x{{ metricWeights.identity }}</span
+                      >
+                    </div>
+                    <div class="col-6">
+                      <b-form-input
+                        v-model="metricWeights.identity"
+                        type="range"
+                        min="0"
+                        max="5"
+                        step="1"
+                        style="width: 5rem"
+                        @change="updateVCRScore()"
                       ></b-form-input>
                     </div>
                   </div>
@@ -125,17 +214,18 @@
                     <div class="col-6">
                       NOMINATORS -
                       <span style="color: gray"
-                        >x{{ customVRCScore.nominators }}</span
+                        >x{{ metricWeights.nominators }}</span
                       >
                     </div>
                     <div class="col-6">
                       <b-form-input
-                        v-model="customVRCScore.nominators"
+                        v-model="metricWeights.nominators"
                         type="range"
                         min="0"
                         max="5"
                         step="1"
                         style="width: 5rem"
+                        @change="updateVCRScore()"
                       ></b-form-input>
                     </div>
                   </div>
@@ -147,17 +237,18 @@
                     <div class="col-6">
                       ADDRES CREATION -
                       <span style="color: gray"
-                        >x{{ customVRCScore.address }}</span
+                        >x{{ metricWeights.address }}</span
                       >
                     </div>
                     <div class="col-6">
                       <b-form-input
-                        v-model="customVRCScore.address"
+                        v-model="metricWeights.address"
                         type="range"
                         min="0"
                         max="5"
                         step="1"
                         style="width: 5rem"
+                        @change="updateVCRScore()"
                       ></b-form-input>
                     </div>
                   </div>
@@ -167,17 +258,18 @@
                     <div class="col-6">
                       PAYOUTS -
                       <span style="color: gray"
-                        >x{{ customVRCScore.payouts }}</span
+                        >x{{ metricWeights.payout }}</span
                       >
                     </div>
                     <div class="col-6">
                       <b-form-input
-                        v-model="customVRCScore.payouts"
+                        v-model="metricWeights.payout"
                         type="range"
                         min="0"
                         max="5"
                         step="1"
                         style="width: 5rem"
+                        @change="updateVCRScore()"
                       ></b-form-input>
                     </div>
                   </div>
@@ -187,93 +279,45 @@
                 <div class="col-md-6">
                   <div class="row">
                     <div class="col-6">
-                      SLASHED -
+                      SLASHES -
                       <span style="color: gray"
-                        >x{{ customVRCScore.slashed }}</span
+                        >x{{ metricWeights.slashes }}</span
                       >
                     </div>
                     <div class="col-6">
                       <b-form-input
-                        v-model="customVRCScore.slashed"
+                        v-model="metricWeights.slashes"
                         type="range"
                         min="0"
                         max="5"
                         step="1"
                         style="width: 5rem"
+                        @change="updateVCRScore()"
                       ></b-form-input>
                     </div>
                   </div>
                 </div>
-                <div class="col-md-6">
-                  <div class="row">
-                    <div class="col-6">
-                      PERFORMANCE -
-                      <span style="color: gray"
-                        >x{{ customVRCScore.performance }}</span
-                      >
-                    </div>
-                    <div class="col-6">
-                      <b-form-input
-                        v-model="customVRCScore.performance"
-                        type="range"
-                        min="0"
-                        max="5"
-                        step="1"
-                        style="width: 5rem"
-                      ></b-form-input>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div class="row">
                 <div class="col-md-6">
                   <div class="row">
                     <div class="col-6">
                       SUBACCOUNTS -
                       <span style="color: gray"
-                        >x{{ customVRCScore.subaccounts }}</span
+                        >x{{ metricWeights.subaccounts }}</span
                       >
                     </div>
                     <div class="col-6">
                       <b-form-input
-                        v-model="customVRCScore.subaccounts"
+                        v-model="metricWeights.subaccounts"
                         type="range"
                         min="0"
                         max="5"
                         step="1"
                         style="width: 5rem"
+                        @change="updateVCRScore()"
                       ></b-form-input>
                     </div>
                   </div>
                 </div>
-                <div class="col-md-6">
-                  <div class="row">
-                    <div class="col-6">
-                      PARTICIPATION IN GOVERNANCE -
-                      <span style="color: gray"
-                        >x{{ customVRCScore.governance }}</span
-                      >
-                    </div>
-                    <div class="col-6">
-                      <b-form-input
-                        v-model="customVRCScore.governance"
-                        type="range"
-                        min="0"
-                        max="5"
-                        step="1"
-                        style="width: 5rem"
-                      ></b-form-input>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div class="text-center my-4">
-                <b-form-checkbox
-                  switch
-                  size="lg"
-                  class="xl-switch"
-                  :checked="true"
-                />
               </div>
             </div>
           </div>
@@ -634,6 +678,12 @@ export default {
           class: 'd-none d-sm-none d-md-none d-lg-table-cell d-xl-table-cell',
         },
         {
+          key: 'customVRCScore',
+          label: 'Custom VRC score',
+          sortable: true,
+          class: 'd-none d-sm-none d-md-none d-lg-table-cell d-xl-table-cell',
+        },
+        {
           key: 'selected',
           label: 'Select',
           sortable: true,
@@ -665,15 +715,17 @@ export default {
       maxValidatorsReached: false,
       polling: null,
       config,
-      customVRCScore: {
+      metricWeights: {
+        active: 1,
+        commission: 1,
+        eraPoints: 1,
+        governance: 1,
         identity: 1,
         nominators: 1,
         address: 1,
-        payouts: 1,
-        slashed: 1,
-        performance: 1,
-        subaccounts: 3,
-        governance: 1,
+        payout: 1,
+        slashes: 1,
+        subaccounts: 1,
       },
     }
   },
@@ -845,6 +897,12 @@ export default {
         return a < b ? -1 : 1
       }
       return a.toString().localeCompare(b.toString())
+    },
+    async updateVCRScore() {
+      await this.$store.dispatch(
+        'ranking/updateMetricWeights',
+        JSON.parse(JSON.stringify(this.metricWeights))
+      )
     },
   },
 }
