@@ -40,8 +40,6 @@ export const mutations = {
   },
   updateSelectedAddress(state, selectedAddress) {
     state.selectedAddress = selectedAddress
-    // eslint-disable-next-line no-console
-    console.log('selected address:', state.selectedAddress)
   },
   loadSelected(state) {
     const selectedAddresses =
@@ -107,8 +105,6 @@ export const mutations = {
   },
   importValidatorSet(state, validators) {
     state.selectedAddresses = validators
-    // eslint-disable-next-line no-console
-    console.log('imported validator set:', state.selectedAddresses)
   },
   updateMetricWeights(state, metricWeights) {
     state.metricWeights = metricWeights
@@ -130,8 +126,6 @@ export const mutations = {
   },
   toggleCustomVRCScore(state, customVRCScoreEnabled) {
     state.customVRCScoreEnabled = customVRCScoreEnabled
-    // eslint-disable-next-line no-console
-    console.log(state.customVRCScoreEnabled)
     // recalculate custom VRC score
     if (customVRCScoreEnabled) {
       state.list = state.list.map((validator) => {

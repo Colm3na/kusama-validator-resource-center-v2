@@ -367,8 +367,6 @@ export default {
             verifiedIdentity: validator.verified_identity,
             selected: this.isSelected(validator.stashAddress),
           }
-          // eslint-disable-next-line no-console
-          console.log(this.validator)
         },
       },
     },
