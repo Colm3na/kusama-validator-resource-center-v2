@@ -155,6 +155,7 @@ module.exports = {
     }
     logger.info(loggerOptions, 'Starting ranking crawler');
     const startTime = new Date().getTime();
+    const wsProvider = new WsProvider(wsProviderUrl);
 
     //
     // data collection
@@ -168,7 +169,6 @@ module.exports = {
 
       // chain data
       logger.info(loggerOptions, 'Fetching data from chain');
-      const wsProvider = new WsProvider(wsProviderUrl);
       const api = await ApiPromise.create({ provider: wsProvider });
       const withActive = false;
       const erasHistoric = await api.derive.staking.erasHistoric(withActive);
