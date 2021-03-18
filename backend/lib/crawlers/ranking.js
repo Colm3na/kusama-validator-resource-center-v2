@@ -248,8 +248,8 @@ module.exports = {
         })),
       ),
     );
-    logger.info(loggerOptions, 'Disconnecting from API');
-    await api.disconnect();
+    logger.info(loggerOptions, 'Disconnecting from wsProvider');
+    await wsProvider.disconnect();
     const dataCollectionEndTime = new Date().getTime();
     const dataCollectionTime = dataCollectionEndTime - startTime;
 
