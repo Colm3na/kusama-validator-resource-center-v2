@@ -153,7 +153,7 @@ module.exports = {
       logger.info(loggerOptions, `Delay ranking start for ${config.startDelay / 1000}s`);
       await wait(config.startDelay);
     }
-    logger.info(loggerOptions, 'Starting ranking crawler...');
+    logger.info(loggerOptions, 'Starting ranking crawler');
     const startTime = new Date().getTime();
 
     //
@@ -161,11 +161,12 @@ module.exports = {
     //
 
     // thousand validators program data
-    logger.info(loggerOptions, 'Fetching thousand validator program validators...');
+    logger.info(loggerOptions, 'Fetching thousand validator program validators');
     const thousandValidators = await getThousandValidators();
     logger.info(loggerOptions, `Got info from ${thousandValidators.length} validators of thousand validator program!`);
 
     // chain data
+    logger.info(loggerOptions, 'Fetching data from chain');
     const wsProvider = new WsProvider(wsProviderUrl);
     const api = await ApiPromise.create({ provider: wsProvider });
     const withActive = false;
@@ -247,7 +248,7 @@ module.exports = {
         })),
       ),
     );
-    logger.info(loggerOptions, 'Disconnect API');
+    logger.info(loggerOptions, 'Disconnecting from API');
     await api.disconnect();
     const dataCollectionEndTime = new Date().getTime();
     const dataCollectionTime = dataCollectionEndTime - startTime;
@@ -726,7 +727,7 @@ module.exports = {
         logger.error(loggerOptions, `Error inserting data in ranking table: ${JSON.stringify(error)}`);
       }
     }
-    logger.info(loggerOptions, 'Cleaning old data...');
+    logger.info(loggerOptions, 'Cleaning old data');
     const sql = `DELETE FROM ranking WHERE block_height != '${blockHeight}';`;
     try {
       await pool.query(sql);
