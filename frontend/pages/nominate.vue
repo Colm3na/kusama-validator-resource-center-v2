@@ -254,8 +254,8 @@ export default {
       return this.$store.state.ranking.loading
     },
     list() {
-      const list = this.$store.state.ranking.list.filter(({ stashAddress }) =>
-        this.selectedAddresses.includes(stashAddress)
+      const list = this.$store.state.ranking.list.filter(
+        ({ selected }) => selected
       )
       const vm = this
       list.forEach((validator) => {

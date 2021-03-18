@@ -68,9 +68,7 @@ export default {
       return this.$store.state.ranking.loading
     },
     list() {
-      return this.$store.state.ranking.list.filter(({ stashAddress }) =>
-        this.selectedAddresses.includes(stashAddress)
-      )
+      return this.$store.state.ranking.list.filter(({ selected }) => selected)
     },
     selectedAddresses() {
       return this.$store.state.ranking.selectedAddresses
