@@ -150,7 +150,7 @@ function getClusterMembers(hasSubIdentity, validators, validatorIdentity) {
 module.exports = {
   start: async (wsProviderUrl, pool, config, delayedStart = true) => {
     if (delayedStart) {
-      logger.info(loggerOptions, `Delay ranking start for ${config.startDelay}s`);
+      logger.info(loggerOptions, `Delay ranking start for ${config.startDelay / 1000}s`);
       await wait(config.startDelay);
     }
     logger.info(loggerOptions, 'Starting ranking crawler...');
