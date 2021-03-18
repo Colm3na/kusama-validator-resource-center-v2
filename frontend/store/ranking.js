@@ -27,7 +27,8 @@ export const state = () => ({
 })
 
 export const getters = {
-  getmetricWeights: (state) => state.metricWeights,
+  getMetricWeights: (state) => state.metricWeights,
+  getSelectedAddresses: (state) => state.selectedAddresses,
 }
 
 export const mutations = {
@@ -51,6 +52,10 @@ export const mutations = {
     const selectedAddresses = state.selectedAddresses
     if (selectedAddresses.includes(accountId)) {
       selectedAddresses.splice(state.selectedAddresses.indexOf(accountId), 1)
+      const validator = state.list.find(
+        ({ stashAddress }) => accountId === stashAddress
+      )
+      validator.selected = false
     } else if (selectedAddresses.length < 16) {
       // check if a member of the same cluster is already in the set
       const validator = state.list.find(
@@ -77,6 +82,7 @@ export const mutations = {
         )
       }
       selectedAddresses.push(accountId)
+      validator.selected = true
     } else {
       const bootStrapToaster = new BToast()
       bootStrapToaster.$bvToast.toast(
@@ -107,8 +113,7 @@ export const mutations = {
   updateMetricWeights(state, metricWeights) {
     state.metricWeights = metricWeights
     // recalculate custom VRC score
-    const list = []
-    state.list.forEach((validator) => {
+    state.list = state.list.map((validator) => {
       validator.customVRCScore =
         validator.activeRating * state.metricWeights.active +
         validator.commissionRating * state.metricWeights.commission +
@@ -120,9 +125,35 @@ export const mutations = {
         validator.payoutRating * state.metricWeights.payout +
         validator.slashRating * state.metricWeights.slashes +
         validator.subAccountsRating * state.metricWeights.subaccounts
-      list.push(validator)
+      return validator
     })
-    state.list = list
+  },
+  toggleCustomVRCScore(state, customVRCScoreEnabled) {
+    state.customVRCScoreEnabled = customVRCScoreEnabled
+    // eslint-disable-next-line no-console
+    console.log(state.customVRCScoreEnabled)
+    // recalculate custom VRC score
+    if (customVRCScoreEnabled) {
+      state.list = state.list.map((validator) => {
+        validator.customVRCScore =
+          validator.activeRating * state.metricWeights.active +
+          validator.commissionRating * state.metricWeights.commission +
+          validator.eraPointsRating * state.metricWeights.eraPoints +
+          validator.governanceRating * state.metricWeights.governance +
+          validator.identityRating * state.metricWeights.identity +
+          validator.nominatorsRating * state.metricWeights.nominators +
+          validator.addressCreationRating * state.metricWeights.address +
+          validator.payoutRating * state.metricWeights.payout +
+          validator.slashRating * state.metricWeights.slashes +
+          validator.subAccountsRating * state.metricWeights.subaccounts
+        return validator
+      })
+    } else {
+      state.list = state.list.map((validator) => {
+        validator.customVRCScore = validator.totalRating
+        return validator
+      })
+    }
   },
 }
 
@@ -130,12 +161,8 @@ export const actions = {
   async updateList(context) {
     const startTime = new Date().getTime()
     const client = this.app.apolloProvider.defaultClient
-
-    const metricWeights = this.getters['ranking/getmetricWeights']
-
-    // eslint-disable-next-line no-console
-    console.log(metricWeights)
-
+    const metricWeights = this.getters['ranking/getMetricWeights']
+    const selectedAddresses = this.getters['ranking/getSelectedAddresses']
     // get last block height
     let query = gql`
       query blockHeight {
@@ -183,7 +210,7 @@ export const actions = {
     const ranking = data.ranking.map((validator) => {
       return {
         active: validator.active,
-        activeEras: validator.active_eras,
+        // activeEras: validator.active_eras,
         activeRating: validator.active_rating,
         addressCreationRating: validator.address_creation_rating,
         commission: parseFloat(validator.commission),
@@ -192,13 +219,13 @@ export const actions = {
         eraPointsRating: validator.era_points_rating,
         governanceRating: validator.governance_rating,
         identityRating: validator.identity_rating,
-        includedThousandValidators: validator.included_thousand_validators,
+        // includedThousandValidators: validator.included_thousand_validators,
         name: validator.name,
-        nominators: validator.nominators,
+        // nominators: validator.nominators,
         nominatorsRating: validator.nominators_rating,
         otherStake: validator.other_stake,
         payoutRating: validator.payout_rating,
-        performance: parseFloat(validator.performance),
+        // performance: parseFloat(validator.performance),
         rank: validator.rank,
         relativePerformance: parseFloat(validator.relative_performance),
         selfStake: validator.self_stake,
@@ -219,6 +246,7 @@ export const actions = {
           validator.payout_rating * metricWeights.payout +
           validator.slash_rating * metricWeights.slashes +
           validator.sub_accounts_rating * metricWeights.subaccounts,
+        selected: selectedAddresses.includes(validator.stash_address),
       }
     })
     const eraPointsAverage =
@@ -258,5 +286,8 @@ export const actions = {
   },
   updateMetricWeights(context, metricWeights) {
     context.commit('updateMetricWeights', metricWeights)
+  },
+  toggleCustomVRCScore(context, customVRCScoreEnabled) {
+    context.commit('toggleCustomVRCScore', customVRCScoreEnabled)
   },
 }

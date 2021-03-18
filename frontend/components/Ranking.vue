@@ -71,258 +71,7 @@
         </b-collapse>
       </div>
       <!-- Customize VRC score -->
-      <div class="exclude mb-4">
-        <div class="row">
-          <div class="col-11">
-            <h5 class="exclude-title mb-2">
-              Customize VRC score:
-              <nuxt-link
-                v-b-tooltip.hover
-                to="/help#custom-vrc-score"
-                title="You can customize the weights of the VRC score and thereby deviate from the default option (equal weight of each metric)"
-              >
-                <font-awesome-icon
-                  icon="question-circle"
-                  class="d-inline-block"
-                  style="font-size: 1rem"
-                />
-              </nuxt-link>
-            </h5>
-          </div>
-          <div class="col-1 text-right">
-            <span v-b-toggle.custom-vrc-score-collapse class="m-1">
-              <font-awesome-icon icon="chevron-up" class="when-open" />
-              <font-awesome-icon icon="chevron-down" class="when-closed" />
-            </span>
-          </div>
-        </div>
-        <b-collapse id="custom-vrc-score-collapse" visible>
-          <div class="row mt-2">
-            <div class="col-12">
-              <div class="row">
-                <div class="col-md-6">
-                  <div class="row">
-                    <div class="col-6">
-                      ACTIVE -
-                      <span style="color: gray"
-                        >x{{ metricWeights.active }}</span
-                      >
-                    </div>
-                    <div class="col-6">
-                      <b-form-input
-                        v-model="metricWeights.active"
-                        type="range"
-                        min="0"
-                        max="5"
-                        step="1"
-                        style="width: 5rem"
-                        @change="updateVCRScore()"
-                      ></b-form-input>
-                    </div>
-                  </div>
-                </div>
-                <div class="col-md-6">
-                  <div class="row">
-                    <div class="col-6">
-                      COMMISSION -
-                      <span style="color: gray"
-                        >x{{ metricWeights.commission }}</span
-                      >
-                    </div>
-                    <div class="col-6">
-                      <b-form-input
-                        v-model="metricWeights.commission"
-                        type="range"
-                        min="0"
-                        max="5"
-                        step="1"
-                        style="width: 5rem"
-                        @change="updateVCRScore()"
-                      ></b-form-input>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div class="row">
-                <div class="col-md-6">
-                  <div class="row">
-                    <div class="col-6">
-                      ERA POINTS AVG -
-                      <span style="color: gray"
-                        >x{{ metricWeights.eraPoints }}</span
-                      >
-                    </div>
-                    <div class="col-6">
-                      <b-form-input
-                        v-model="metricWeights.eraPoints"
-                        type="range"
-                        min="0"
-                        max="5"
-                        step="1"
-                        style="width: 5rem"
-                        @change="updateVCRScore()"
-                      ></b-form-input>
-                    </div>
-                  </div>
-                </div>
-                <div class="col-md-6">
-                  <div class="row">
-                    <div class="col-6">
-                      GOVERNANCE -
-                      <span style="color: gray"
-                        >x{{ metricWeights.governance }}</span
-                      >
-                    </div>
-                    <div class="col-6">
-                      <b-form-input
-                        v-model="metricWeights.governance"
-                        type="range"
-                        min="0"
-                        max="5"
-                        step="1"
-                        style="width: 5rem"
-                        @change="updateVCRScore()"
-                      ></b-form-input>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div class="row">
-                <div class="col-md-6">
-                  <div class="row">
-                    <div class="col-6">
-                      IDENTITY -
-                      <span style="color: gray"
-                        >x{{ metricWeights.identity }}</span
-                      >
-                    </div>
-                    <div class="col-6">
-                      <b-form-input
-                        v-model="metricWeights.identity"
-                        type="range"
-                        min="0"
-                        max="5"
-                        step="1"
-                        style="width: 5rem"
-                        @change="updateVCRScore()"
-                      ></b-form-input>
-                    </div>
-                  </div>
-                </div>
-                <div class="col-md-6">
-                  <div class="row">
-                    <div class="col-6">
-                      NOMINATORS -
-                      <span style="color: gray"
-                        >x{{ metricWeights.nominators }}</span
-                      >
-                    </div>
-                    <div class="col-6">
-                      <b-form-input
-                        v-model="metricWeights.nominators"
-                        type="range"
-                        min="0"
-                        max="5"
-                        step="1"
-                        style="width: 5rem"
-                        @change="updateVCRScore()"
-                      ></b-form-input>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div class="row">
-                <div class="col-md-6">
-                  <div class="row">
-                    <div class="col-6">
-                      ADDRES CREATION -
-                      <span style="color: gray"
-                        >x{{ metricWeights.address }}</span
-                      >
-                    </div>
-                    <div class="col-6">
-                      <b-form-input
-                        v-model="metricWeights.address"
-                        type="range"
-                        min="0"
-                        max="5"
-                        step="1"
-                        style="width: 5rem"
-                        @change="updateVCRScore()"
-                      ></b-form-input>
-                    </div>
-                  </div>
-                </div>
-                <div class="col-md-6">
-                  <div class="row">
-                    <div class="col-6">
-                      PAYOUTS -
-                      <span style="color: gray"
-                        >x{{ metricWeights.payout }}</span
-                      >
-                    </div>
-                    <div class="col-6">
-                      <b-form-input
-                        v-model="metricWeights.payout"
-                        type="range"
-                        min="0"
-                        max="5"
-                        step="1"
-                        style="width: 5rem"
-                        @change="updateVCRScore()"
-                      ></b-form-input>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div class="row">
-                <div class="col-md-6">
-                  <div class="row">
-                    <div class="col-6">
-                      SLASHES -
-                      <span style="color: gray"
-                        >x{{ metricWeights.slashes }}</span
-                      >
-                    </div>
-                    <div class="col-6">
-                      <b-form-input
-                        v-model="metricWeights.slashes"
-                        type="range"
-                        min="0"
-                        max="5"
-                        step="1"
-                        style="width: 5rem"
-                        @change="updateVCRScore()"
-                      ></b-form-input>
-                    </div>
-                  </div>
-                </div>
-                <div class="col-md-6">
-                  <div class="row">
-                    <div class="col-6">
-                      SUBACCOUNTS -
-                      <span style="color: gray"
-                        >x{{ metricWeights.subaccounts }}</span
-                      >
-                    </div>
-                    <div class="col-6">
-                      <b-form-input
-                        v-model="metricWeights.subaccounts"
-                        type="range"
-                        min="0"
-                        max="5"
-                        step="1"
-                        style="width: 5rem"
-                        @change="updateVCRScore()"
-                      ></b-form-input>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </b-collapse>
-      </div>
+      <MetricWeights />
       <!-- Auto-Filter -->
       <div class="exclude mb-4">
         <div class="row mb-2">
@@ -375,20 +124,10 @@
       </b-row>
       <!-- Search results -->
       <b-row>
-        <b-col cols="6">
+        <b-col cols="12">
           <p class="mb-2 text-secondary">
             Search results: {{ filteredRows }} / {{ ranking.length }}
           </p>
-        </b-col>
-        <b-col cols="6" class="text-right">
-          <!-- <JsonCSV
-            :data="rankingJSON"
-            class="csv-export mb-2"
-            name="kusama_validator_ranking.csv"
-          >
-            <font-awesome-icon icon="file-csv" />
-            export to CSV file
-          </JsonCSV> -->
         </b-col>
       </b-row>
       <!-- Ranking table -->
@@ -613,11 +352,11 @@
 </template>
 <script>
 import { BigNumber } from 'bignumber.js'
-// import JsonCSV from 'vue-json-csv'
 import Loading from '@/components/Loading.vue'
 import Identicon from '@/components/Identicon.vue'
 import VerifiedIcon from '@/components/VerifiedIcon.vue'
 import SelectedValidators from '@/components/SelectedValidators.vue'
+import MetricWeights from '@/components/MetricWeights.vue'
 import commonMixin from '@/mixins/commonMixin.js'
 import { config } from '@/config.js'
 
@@ -627,7 +366,7 @@ export default {
     VerifiedIcon,
     SelectedValidators,
     Loading,
-    // JsonCSV,
+    MetricWeights,
   },
   mixins: [commonMixin],
   data() {
@@ -715,18 +454,6 @@ export default {
       maxValidatorsReached: false,
       polling: null,
       config,
-      metricWeights: {
-        active: 1,
-        commission: 1,
-        eraPoints: 1,
-        governance: 1,
-        identity: 1,
-        nominators: 1,
-        address: 1,
-        payout: 1,
-        slashes: 1,
-        subaccounts: 1,
-      },
     }
   },
   computed: {
@@ -734,62 +461,8 @@ export default {
       return this.$store.state.ranking.loading
     },
     ranking() {
-      return this.$store.state.ranking.list.map((validator) => {
-        return {
-          ...validator,
-          selected: this.isSelected(validator.stashAddress),
-        }
-      })
+      return this.$store.state.ranking.list
     },
-    // rankingJSON() {
-    //   return this.$store.state.ranking.list.map((validator) => {
-    //     return {
-    //       rank: validator.rank,
-    //       name: validator.name,
-    //       stash_address: validator.stashAddress,
-    //       controller_address: validator.controllerAddress,
-    //       active: validator.active ? 'active' : 'inactive',
-    //       active_rating: validator.activeRating,
-    //       self_stake: validator.selfStake,
-    //       other_stake: validator.otherStake,
-    //       total_stake: validator.totalStake,
-    //       has_sub_identity: validator.hasSubIdentity ? 'yes' : 'no',
-    //       sub_accounts_rating: validator.subAccountsRating,
-    //       verified_identity: validator.verifiedIdentity ? 'yes' : 'no',
-    //       identity_rating: validator.identityRating,
-    //       commission: validator.commission,
-    //       commission_history: validator.commissionHistory
-    //         .map(({ era, commission }) => `${era}=${commission}`)
-    //         .join(','),
-    //       commission_rating: validator.commissionRating,
-    //       nominators: validator.nominators,
-    //       nominators_rating: validator.nominatorsRating,
-    //       active_eras: validator.activeEras,
-    //       era_points_history: validator.eraPointsHistory
-    //         .map(({ era, points }) => `${era}=${points}`)
-    //         .join(','),
-    //       era_points_percentage: validator.eraPointsPercent,
-    //       era_points_rating: validator.eraPointsRating,
-    //       performance: validator.performance,
-    //       relative_performance: validator.relativePerformance,
-    //       slashed: validator.slashed ? 'yes' : 'no',
-    //       slashes: validator.slashes,
-    //       slash_rating: validator.slashRating,
-    //       part_of_a_cluster: validator.partOfCluster ? 'yes' : 'no',
-    //       cluster_name: validator.clusterName,
-    //       cluster_members: validator.clusterMembers,
-    //       council_backing: validator.councilBacking ? 'yes' : 'no',
-    //       active_in_governance: validator.activeInGovernance ? 'yes' : 'no',
-    //       governance_rating: validator.governanceRating,
-    //       payout_history: validator.payoutHistory
-    //         .map(({ era, status }) => `${era}=${status}`)
-    //         .join(','),
-    //       payout_rating: validator.payoutRating,
-    //       total_rating: validator.totalRating,
-    //       selected: this.isSelected(validator.stashAddress) ? 'yes' : 'no',
-    //     }
-    //   })
-    // },
     selectedValidatorAddresses() {
       return this.$store.state.ranking.selectedAddresses
     },
@@ -898,28 +571,6 @@ export default {
       }
       return a.toString().localeCompare(b.toString())
     },
-    async updateVCRScore() {
-      await this.$store.dispatch(
-        'ranking/updateMetricWeights',
-        JSON.parse(JSON.stringify(this.metricWeights))
-      )
-    },
   },
 }
 </script>
-
-<style>
-.xl-switch {
-  /* Double-sized Checkboxes */
-  -ms-transform: scale(2); /* IE */
-  -moz-transform: scale(2); /* FF */
-  -webkit-transform: scale(2); /* Safari and Chrome */
-  -o-transform: scale(2); /* Opera */
-  transform: scale(2); /* Opera */
-  padding: 10px;
-}
-.collapsed > .when-open,
-.not-collapsed > .when-closed {
-  display: none;
-}
-</style>
