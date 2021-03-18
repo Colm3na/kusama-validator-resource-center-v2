@@ -148,8 +148,11 @@ function getClusterMembers(hasSubIdentity, validators, validatorIdentity) {
 }
 
 module.exports = {
-  start: async (wsProviderUrl, pool, config) => {
-    await wait(config.startDelay);
+  start: async (wsProviderUrl, pool, config, delayedStart = true) => {
+    if (!delayedStart) {
+      logger.info(loggerOptions, `Delay ranking start for ${config.startDelay}s`);
+      await wait(config.startDelay);
+    }
     logger.info(loggerOptions, 'Starting ranking crawler...');
     const startTime = new Date().getTime();
 
@@ -730,12 +733,15 @@ module.exports = {
     } catch (error) {
       logger.error(loggerOptions, `Error deleting old data ranking table: ${JSON.stringify(error)}`);
     }
+    logger.info(loggerOptions, 'Disconnect api and WS provider');
+    api.disconnect();
+    wsProvider.disconnect();
     const endTime = new Date().getTime();
     const dataProcessingTime = endTime - dataCollectionEndTime;
     logger.info(loggerOptions, `Added ${ranking.length} validators in ${((dataCollectionTime + dataProcessingTime) / 1000).toFixed(3)}s`);
     logger.info(loggerOptions, `Next execution in ${(config.pollingTime / 60000).toFixed(0)}m...`);
     setTimeout(
-      () => module.exports.start(wsProviderUrl, pool, config),
+      () => module.exports.start(wsProviderUrl, pool, config, false),
       config.pollingTime,
     );
   },
