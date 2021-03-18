@@ -248,7 +248,7 @@ module.exports = {
       ),
     );
     logger.info(loggerOptions, 'Disconnect API');
-    api.disconnect();
+    await api.disconnect();
     const dataCollectionEndTime = new Date().getTime();
     const dataCollectionTime = dataCollectionEndTime - startTime;
 
