@@ -322,7 +322,7 @@ module.exports = {
         }
       }
 
-      const ranking = validators
+      let ranking = validators
         .map((validator) => {
           // active
           const { active } = validator;
@@ -575,14 +575,47 @@ module.exports = {
         .map((validator, rank) => {
           const relativePerformance = ((validator.performance - minPerformance)
             / (maxPerformance - minPerformance)).toFixed(6);
+
+          // Pareto-dominated validators
+          const dominated = false;
           return {
             rank: rank + 1,
             relativePerformance,
             ...validator,
+            dominated,
           };
         });
-      // logger.info(loggerOptions, `Max. performance is ${maxPerformance.toFixed(6)}`);
-      // logger.info(loggerOptions, `Min. performance is ${minPerformance.toFixed(6)}`);
+      // Find Pareto-dominated validators
+      logger.info(loggerOptions, 'Finding dominated validators');
+      const dominatedStart = new Date().getTime();
+      ranking = ranking
+        .map((validator) => {
+          let dominated = false;
+          // eslint-disable-next-line no-restricted-syntax
+          for (const opponent of validators) {
+            if (
+              opponent.activeRating >= validator.activeRating
+              && opponent.subAccountsRating >= validator.subAccountsRating
+              && opponent.identityRating >= validator.identityRating
+              && opponent.addressCreationRating >= validator.addressCreationRating
+              && opponent.nominatorsRating >= validator.nominatorsRating
+              && opponent.commissionRating >= validator.commissionRating
+              && opponent.eraPointsRating >= validator.eraPointsRating
+              && opponent.slashRating >= validator.slashRating
+              && opponent.governanceRating >= validator.governanceRating
+              && opponent.payoutRating >= validator.payoutRating
+            ) {
+              dominated = true;
+              break;
+            }
+          }
+          return {
+            ...validator,
+            dominated,
+          };
+        });
+      const dominatedEnd = new Date().getTime();
+      logger.info(loggerOptions, `Found ${ranking.filter(({ dominated }) => dominated).length} dominated validators in ${((dominatedEnd - dominatedStart) / 1000).toFixed(3)}s`);
       logger.info(loggerOptions, `Storing ${ranking.length} validators in db...`);
       // eslint-disable-next-line no-restricted-syntax
       for (const validator of ranking) {
@@ -630,6 +663,7 @@ module.exports = {
           other_stake,
           total_stake,
           total_rating,
+          dominated,
           timestamp
         ) VALUES (
           $1,
@@ -675,7 +709,8 @@ module.exports = {
           $41,
           $42,
           $43,
-          $44
+          $44,
+          $45
         )`;
         const data = [
           `${blockHeight}`,
@@ -721,6 +756,7 @@ module.exports = {
           `${validator.otherStake}`,
           `${validator.totalStake}`,
           `${validator.totalRating}`,
+          `${validator.dominated}`,
           `${startTime}`,
         ];
         try {

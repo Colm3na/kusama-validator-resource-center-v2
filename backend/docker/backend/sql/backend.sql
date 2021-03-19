@@ -92,6 +92,7 @@ CREATE TABLE IF NOT EXISTS ranking (
   other_stake BIGINT NOT NULL,
   total_stake BIGINT NOT NULL,
   total_rating INT NOT NULL,
+  dominated BOOLEAN NOT NULL,
   timestamp BIGINT NOT NULL,
   PRIMARY KEY ( block_height, stash_address )
 );
