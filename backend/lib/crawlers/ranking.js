@@ -249,8 +249,6 @@ module.exports = {
           })),
         ),
       );
-      logger.info(loggerOptions, 'Disconnecting from API');
-      await api.disconnect();
       const dataCollectionEndTime = new Date().getTime();
       const dataCollectionTime = dataCollectionEndTime - startTime;
 
@@ -773,6 +771,8 @@ module.exports = {
       } catch (error) {
         logger.error(loggerOptions, `Error deleting old data ranking table: ${JSON.stringify(error)}`);
       }
+      logger.info(loggerOptions, 'Disconnecting from API');
+      await api.disconnect().catch((error) => logger.error(loggerOptions, `Disconnect error: ${JSON.stringify(error)}`));
       const endTime = new Date().getTime();
       const dataProcessingTime = endTime - dataCollectionEndTime;
       logger.info(loggerOptions, `Added ${ranking.length} validators in ${((dataCollectionTime + dataProcessingTime) / 1000).toFixed(3)}s`);
