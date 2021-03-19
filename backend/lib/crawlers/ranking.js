@@ -592,7 +592,7 @@ module.exports = {
         .map((validator) => {
           let dominated = false;
           // eslint-disable-next-line no-restricted-syntax
-          for (const opponent of validators) {
+          for (const opponent of ranking) {
             if (
               opponent.activeRating >= validator.activeRating
               && opponent.subAccountsRating >= validator.subAccountsRating
