@@ -592,16 +592,19 @@ module.exports = {
           // eslint-disable-next-line no-restricted-syntax
           for (const opponent of ranking) {
             if (
-              opponent.activeRating >= validator.activeRating
-              && opponent.subAccountsRating >= validator.subAccountsRating
-              && opponent.identityRating >= validator.identityRating
-              && opponent.addressCreationRating >= validator.addressCreationRating
-              && opponent.nominatorsRating >= validator.nominatorsRating
-              && opponent.commissionRating >= validator.commissionRating
-              && opponent.eraPointsRating >= validator.eraPointsRating
-              && opponent.slashRating >= validator.slashRating
-              && opponent.governanceRating >= validator.governanceRating
-              && opponent.payoutRating >= validator.payoutRating
+              opponent !== validator
+              && (
+                opponent.activeRating >= validator.activeRating
+                && opponent.subAccountsRating >= validator.subAccountsRating
+                && opponent.identityRating >= validator.identityRating
+                && opponent.addressCreationRating >= validator.addressCreationRating
+                && opponent.nominatorsRating >= validator.nominatorsRating
+                && opponent.commissionRating >= validator.commissionRating
+                && opponent.eraPointsRating >= validator.eraPointsRating
+                && opponent.slashRating >= validator.slashRating
+                && opponent.governanceRating >= validator.governanceRating
+                && opponent.payoutRating >= validator.payoutRating
+              )
             ) {
               dominated = true;
               break;
