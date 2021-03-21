@@ -116,7 +116,6 @@ export const mutations = {
         if (
           opponent !== validator &&
           opponent.relativePerformance >= validator.relativePerformance &&
-          opponent.subAccountsRating >= validator.subAccountsRating &&
           new BigNumber(opponent.selfStake).lte(
             new BigNumber(validator.selfStake)
           ) &&
@@ -158,7 +157,6 @@ export const mutations = {
           if (
             opponent !== validator &&
             opponent.relativePerformance >= validator.relativePerformance &&
-            opponent.subAccountsRating >= validator.subAccountsRating &&
             new BigNumber(opponent.selfStake).lte(
               new BigNumber(validator.selfStake)
             ) &&
@@ -189,6 +187,34 @@ export const mutations = {
         return validator
       })
     }
+  },
+  updateDominated(state) {
+    // update dominated validators
+    state.list = state.list.map((validator) => {
+      let dominated = false
+      for (const opponent of state.list) {
+        if (
+          opponent !== validator &&
+          opponent.relativePerformance >= validator.relativePerformance &&
+          new BigNumber(opponent.selfStake).lte(
+            new BigNumber(validator.selfStake)
+          ) &&
+          opponent.activeEras >= validator.activeEras &&
+          opponent.totalRating >= validator.totalRating
+        ) {
+          dominated = true
+          break
+        }
+      }
+      validator.dominated = dominated
+      return validator
+    })
+    // eslint-disable-next-line no-console
+    console.log(
+      `Found ${
+        state.list.filter(({ dominated }) => dominated).length
+      } dominated validators`
+    )
   },
 }
 
@@ -244,22 +270,6 @@ export const actions = {
     `
     const { data } = await client.query({ query })
     const ranking = data.ranking.map((validator) => {
-      let dominated = false
-      for (const opponent of data.ranking) {
-        if (
-          opponent !== validator &&
-          opponent.relativePerformance >= validator.relativePerformance &&
-          opponent.subAccountsRating >= validator.subAccountsRating &&
-          new BigNumber(opponent.selfStake).lte(
-            new BigNumber(validator.selfStake)
-          ) &&
-          opponent.activeEras >= validator.activeEras &&
-          opponent.totalRating >= validator.totalRating
-        ) {
-          dominated = true
-          break
-        }
-      }
       return {
         active: validator.active,
         activeEras: validator.active_eras,
@@ -267,7 +277,7 @@ export const actions = {
         addressCreationRating: validator.address_creation_rating,
         commission: parseFloat(validator.commission),
         commissionRating: validator.commission_rating,
-        dominated,
+        dominated: validator.nominated,
         eraPointsPercent: parseFloat(validator.era_points_percent),
         eraPointsRating: validator.era_points_rating,
         governanceRating: validator.governance_rating,
@@ -342,5 +352,8 @@ export const actions = {
   },
   toggleCustomVRCScore(context, customVRCScoreEnabled) {
     context.commit('toggleCustomVRCScore', customVRCScoreEnabled)
+  },
+  updateDominated(context) {
+    context.commit('updateDominated')
   },
 }

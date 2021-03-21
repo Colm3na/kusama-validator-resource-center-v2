@@ -573,7 +573,6 @@ module.exports = {
         .map((validator, rank) => {
           const relativePerformance = ((validator.performance - minPerformance)
             / (maxPerformance - minPerformance)).toFixed(6);
-
           // Pareto-dominated validators
           const dominated = false;
           return {
@@ -594,18 +593,7 @@ module.exports = {
             if (
               opponent !== validator
               && (
-              // opponent.activeRating >= validator.activeRating
-              // && opponent.subAccountsRating >= validator.subAccountsRating
-              // && opponent.identityRating >= validator.identityRating
-              // && opponent.addressCreationRating >= validator.addressCreationRating
-              // && opponent.nominatorsRating >= validator.nominatorsRating
-              // && opponent.commissionRating >= validator.commissionRating
-              // && opponent.eraPointsRating >= validator.eraPointsRating
-              // && opponent.slashRating >= validator.slashRating
-              // && opponent.governanceRating >= validator.governanceRating
-              // && opponent.payoutRating >= validator.payoutRating
                 opponent.relativePerformance >= validator.relativePerformance
-                && opponent.subAccountsRating >= validator.subAccountsRating
                 && new BigNumber(opponent.selfStake).lte(new BigNumber(validator.selfStake))
                 && opponent.activeEras >= validator.activeEras
                 && opponent.totalRating >= validator.totalRating

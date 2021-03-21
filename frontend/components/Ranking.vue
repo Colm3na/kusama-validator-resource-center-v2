@@ -570,6 +570,7 @@ export default {
     },
     toggleAutoFilter() {
       this.autoFilter = !this.autoFilter
+      this.$store.dispatch('ranking/updateDominated')
     },
   },
 }
