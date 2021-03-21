@@ -108,9 +108,14 @@ export default {
         datasets: [
           {
             labels: 'payments',
-            data: this.payoutHistory.map(({ status }) =>
-              status === 'paid' ? 1 : -1
-            ),
+            data: this.payoutHistory.map(({ status }) => {
+              if (status === 'paid') {
+                return 1
+              } else if (status === 'inactive') {
+                return 0
+              }
+              return -1
+            }),
             backgroundColor: 'rgba(230, 0, 122, 0.8)',
             borderColor: 'rgba(230, 0, 122, 0.8)',
             hoverBackgroundColor: 'rgba(255, 255, 255, 0.8)',
@@ -121,8 +126,6 @@ export default {
       }
     },
     pending() {
-      // eslint-disable-next-line no-console
-      console.log(this.payoutHistory)
       return this.payoutHistory.filter((payout) => payout.status === 'pending')
         .length
     },
