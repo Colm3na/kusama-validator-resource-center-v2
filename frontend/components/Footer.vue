@@ -12,7 +12,7 @@
       <a href="#" @click.prevent="Klaro.show()">Cookie Settings</a>
       ·
       <a
-        href="https://github.com/Colm3na/kusama-validator-resource-center/"
+        href="https://github.com/Colm3na/kusama-validator-resource-center-v2/"
         target="_blank"
         >Fork me on GitHub!</a
       >
