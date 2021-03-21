@@ -593,7 +593,8 @@ module.exports = {
             if (
               opponent !== validator
               && (
-                opponent.relativePerformance >= validator.relativePerformance
+                parseFloat(opponent.relativePerformance)
+                  >= parseFloat(validator.relativePerformance)
                 && new BigNumber(opponent.selfStake).lte(new BigNumber(validator.selfStake))
                 && opponent.activeEras >= validator.activeEras
                 && opponent.totalRating >= validator.totalRating
