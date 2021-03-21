@@ -1,3 +1,4 @@
+import { BigNumber } from 'bignumber.js'
 import gql from 'graphql-tag'
 import { BToast } from 'bootstrap-vue'
 import { config } from '@/config.js'
@@ -108,8 +109,24 @@ export const mutations = {
   },
   updateMetricWeights(state, metricWeights) {
     state.metricWeights = metricWeights
-    // recalculate custom VRC score
+    // recalculate custom VRC score & update dominated validators
     state.list = state.list.map((validator) => {
+      let dominated = false
+      for (const opponent of state.list) {
+        if (
+          opponent !== validator &&
+          opponent.relativePerformance >= validator.relativePerformance &&
+          opponent.subAccountsRating >= validator.subAccountsRating &&
+          new BigNumber(opponent.selfStake).lte(
+            new BigNumber(validator.selfStake)
+          ) &&
+          opponent.activeEras >= validator.activeEras &&
+          opponent.totalRating >= validator.totalRating
+        ) {
+          dominated = true
+          break
+        }
+      }
       validator.customVRCScore =
         validator.activeRating * state.metricWeights.active +
         validator.commissionRating * state.metricWeights.commission +
@@ -121,14 +138,37 @@ export const mutations = {
         validator.payoutRating * state.metricWeights.payout +
         validator.slashRating * state.metricWeights.slashes +
         validator.subAccountsRating * state.metricWeights.subaccounts
+      validator.dominated = dominated
       return validator
     })
+    // eslint-disable-next-line no-console
+    console.log(
+      `Found ${
+        state.list.filter(({ dominated }) => dominated).length
+      } dominated validators`
+    )
   },
   toggleCustomVRCScore(state, customVRCScoreEnabled) {
     state.customVRCScoreEnabled = customVRCScoreEnabled
-    // recalculate custom VRC score
+    // recalculate custom VRC score & update dominated validators
     if (customVRCScoreEnabled) {
       state.list = state.list.map((validator) => {
+        let dominated = false
+        for (const opponent of state.list) {
+          if (
+            opponent !== validator &&
+            opponent.relativePerformance >= validator.relativePerformance &&
+            opponent.subAccountsRating >= validator.subAccountsRating &&
+            new BigNumber(opponent.selfStake).lte(
+              new BigNumber(validator.selfStake)
+            ) &&
+            opponent.activeEras >= validator.activeEras &&
+            opponent.totalRating >= validator.totalRating
+          ) {
+            dominated = true
+            break
+          }
+        }
         validator.customVRCScore =
           validator.activeRating * state.metricWeights.active +
           validator.commissionRating * state.metricWeights.commission +
@@ -140,6 +180,7 @@ export const mutations = {
           validator.payoutRating * state.metricWeights.payout +
           validator.slashRating * state.metricWeights.slashes +
           validator.subAccountsRating * state.metricWeights.subaccounts
+        validator.dominated = dominated
         return validator
       })
     } else {
@@ -176,6 +217,7 @@ export const actions = {
           address_creation_rating
           commission
           commission_rating
+          dominated
           era_points_percent
           era_points_rating
           governance_rating
@@ -202,6 +244,22 @@ export const actions = {
     `
     const { data } = await client.query({ query })
     const ranking = data.ranking.map((validator) => {
+      let dominated = false
+      for (const opponent of data.ranking) {
+        if (
+          opponent !== validator &&
+          opponent.relativePerformance >= validator.relativePerformance &&
+          opponent.subAccountsRating >= validator.subAccountsRating &&
+          new BigNumber(opponent.selfStake).lte(
+            new BigNumber(validator.selfStake)
+          ) &&
+          opponent.activeEras >= validator.activeEras &&
+          opponent.totalRating >= validator.totalRating
+        ) {
+          dominated = true
+          break
+        }
+      }
       return {
         active: validator.active,
         activeEras: validator.active_eras,
@@ -209,6 +267,7 @@ export const actions = {
         addressCreationRating: validator.address_creation_rating,
         commission: parseFloat(validator.commission),
         commissionRating: validator.commission_rating,
+        dominated,
         eraPointsPercent: parseFloat(validator.era_points_percent),
         eraPointsRating: validator.era_points_rating,
         governanceRating: validator.governance_rating,

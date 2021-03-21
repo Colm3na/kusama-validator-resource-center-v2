@@ -104,7 +104,7 @@
               switch
               size="lg"
               class="xl-switch"
-              :checked="true"
+              :checked="autoFilter"
             />
           </div>
         </b-collapse>
@@ -438,6 +438,7 @@ export default {
       maxValidatorsReached: false,
       polling: null,
       config,
+      autoFilter: false,
     }
   },
   computed: {
@@ -478,6 +479,10 @@ export default {
         : filteredRanking
       filteredRanking = this.exclude.includes('belowAverageEraPoints')
         ? filteredRanking.filter(({ eraPointsRating }) => eraPointsRating === 2)
+        : filteredRanking
+      // pareto-dominance auto-filter
+      filteredRanking = this.autoFilter
+        ? filteredRanking.filter(({ dominated }) => dominated)
         : filteredRanking
       return filteredRanking
     },
