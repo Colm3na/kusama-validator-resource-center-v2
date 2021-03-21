@@ -408,13 +408,6 @@ export default {
           class: 'd-none d-sm-none d-md-none d-lg-table-cell d-xl-table-cell',
         },
         {
-          key: 'dominated',
-          label: 'Dominated',
-          sortable: true,
-          class:
-            'text-center d-none d-sm-none d-md-none d-lg-table-cell d-xl-table-cell',
-        },
-        {
           key: 'selected',
           label: 'Select',
           sortable: true,
@@ -570,7 +563,6 @@ export default {
     },
     toggleAutoFilter() {
       this.autoFilter = !this.autoFilter
-      this.$store.dispatch('ranking/updateDominated')
     },
   },
 }
