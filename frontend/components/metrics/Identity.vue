@@ -6,7 +6,7 @@
           Identity
           <nuxt-link
             v-b-tooltip.hover
-            to="/metrics#identity"
+            to="/help/metrics#identity"
             title="Evaluate the quality of the identity data provided by the validator"
           >
             <font-awesome-icon

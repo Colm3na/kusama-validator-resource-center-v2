@@ -6,7 +6,7 @@
           Nominators
           <nuxt-link
             v-b-tooltip.hover
-            to="/metrics#nominators"
+            to="/help/metrics#nominators"
             title="Evaluate nominators and if the validator is oversubscribed"
           >
             <font-awesome-icon
