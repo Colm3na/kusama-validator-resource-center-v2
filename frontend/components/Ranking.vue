@@ -384,13 +384,9 @@ export default {
             'text-center d-none d-sm-none d-md-none d-lg-table-cell d-xl-table-cell',
         },
         { key: 'name', sortable: true },
-        // {
-        //   key: 'nominators',
-        //   sortable: true,
-        //   class: 'd-none d-sm-none d-md-none d-lg-table-cell d-xl-table-cell',
-        // },
         {
-          key: 'commission',
+          key: 'relativePerformance',
+          label: 'R. Performance',
           sortable: true,
           class: 'd-none d-sm-none d-md-none d-lg-table-cell d-xl-table-cell',
         },
@@ -400,25 +396,13 @@ export default {
           class: 'd-none d-sm-none d-md-none d-lg-table-cell d-xl-table-cell',
         },
         {
-          key: 'otherStake',
-          sortable: true,
-          class: 'd-none d-sm-none d-md-none d-lg-table-cell d-xl-table-cell',
-        },
-        {
-          key: 'relativePerformance',
-          label: 'R. Performance',
-          sortable: true,
-          class: 'd-none d-sm-none d-md-none d-lg-table-cell d-xl-table-cell',
-        },
-        {
-          key: 'totalRating',
-          label: 'VRC score',
+          key: 'activeEras',
           sortable: true,
           class: 'd-none d-sm-none d-md-none d-lg-table-cell d-xl-table-cell',
         },
         {
           key: 'customVRCScore',
-          label: 'Custom VRC score',
+          label: 'VRC score',
           sortable: true,
           class: 'd-none d-sm-none d-md-none d-lg-table-cell d-xl-table-cell',
         },

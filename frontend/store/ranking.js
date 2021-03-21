@@ -204,7 +204,7 @@ export const actions = {
     const ranking = data.ranking.map((validator) => {
       return {
         active: validator.active,
-        // activeEras: validator.active_eras,
+        activeEras: validator.active_eras,
         activeRating: validator.active_rating,
         addressCreationRating: validator.address_creation_rating,
         commission: parseFloat(validator.commission),
