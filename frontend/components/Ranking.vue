@@ -105,6 +105,7 @@
               size="lg"
               class="xl-switch"
               :checked="autoFilter"
+              @change="toggleAutoFilter()"
             />
           </div>
         </b-collapse>
@@ -407,6 +408,13 @@ export default {
           class: 'd-none d-sm-none d-md-none d-lg-table-cell d-xl-table-cell',
         },
         {
+          key: 'dominated',
+          label: 'Dominated',
+          sortable: true,
+          class:
+            'text-center d-none d-sm-none d-md-none d-lg-table-cell d-xl-table-cell',
+        },
+        {
           key: 'selected',
           label: 'Select',
           sortable: true,
@@ -482,7 +490,7 @@ export default {
         : filteredRanking
       // pareto-dominance auto-filter
       filteredRanking = this.autoFilter
-        ? filteredRanking.filter(({ dominated }) => dominated)
+        ? filteredRanking.filter(({ dominated }) => !dominated)
         : filteredRanking
       return filteredRanking
     },
@@ -559,6 +567,9 @@ export default {
         return a < b ? -1 : 1
       }
       return a.toString().localeCompare(b.toString())
+    },
+    toggleAutoFilter() {
+      this.autoFilter = !this.autoFilter
     },
   },
 }
