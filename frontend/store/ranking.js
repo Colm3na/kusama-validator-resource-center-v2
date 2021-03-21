@@ -277,7 +277,7 @@ export const actions = {
         addressCreationRating: validator.address_creation_rating,
         commission: parseFloat(validator.commission),
         commissionRating: validator.commission_rating,
-        dominated: validator.nominated,
+        dominated: validator.dominated,
         eraPointsPercent: parseFloat(validator.era_points_percent),
         eraPointsRating: validator.era_points_rating,
         governanceRating: validator.governance_rating,
@@ -333,6 +333,10 @@ export const actions = {
     // eslint-disable-next-line
     console.log(
       `data collection time: ${(dataCollectionTime / 1000).toFixed(3)}s`
+    )
+    // eslint-disable-next-line
+    console.log(
+      ranking
     )
   },
   loadSelected(context) {
