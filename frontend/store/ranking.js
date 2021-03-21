@@ -248,14 +248,11 @@ export const actions = {
           era_points_rating
           governance_rating
           identity_rating
-          included_thousand_validators
           name
-          nominators
           nominators_rating
           other_stake
           part_of_cluster
           payout_rating
-          performance
           rank
           relative_performance
           self_stake
@@ -282,13 +279,10 @@ export const actions = {
         eraPointsRating: validator.era_points_rating,
         governanceRating: validator.governance_rating,
         identityRating: validator.identity_rating,
-        // includedThousandValidators: validator.included_thousand_validators,
         name: validator.name,
-        // nominators: validator.nominators,
         nominatorsRating: validator.nominators_rating,
         otherStake: validator.other_stake,
         payoutRating: validator.payout_rating,
-        // performance: parseFloat(validator.performance),
         rank: validator.rank,
         relativePerformance: parseFloat(validator.relative_performance),
         selfStake: validator.self_stake,
@@ -333,10 +327,6 @@ export const actions = {
     // eslint-disable-next-line
     console.log(
       `data collection time: ${(dataCollectionTime / 1000).toFixed(3)}s`
-    )
-    // eslint-disable-next-line
-    console.log(
-      ranking
     )
   },
   loadSelected(context) {
