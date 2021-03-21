@@ -107,6 +107,10 @@
               :checked="autoFilter"
               @change="toggleAutoFilter()"
             />
+            <p class="text-center mt-4">
+              Your custom metrics weights will be taken in account to filter out
+              validators
+            </p>
           </div>
         </b-collapse>
       </div>
