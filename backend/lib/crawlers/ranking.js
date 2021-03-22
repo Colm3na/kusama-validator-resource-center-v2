@@ -598,7 +598,6 @@ module.exports = {
         .map((validator, rank) => {
           const relativePerformance = ((validator.performance - minPerformance)
             / (maxPerformance - minPerformance)).toFixed(6);
-          // Pareto-dominated validators
           const dominated = false;
           return {
             rank: rank + 1,
@@ -607,7 +606,14 @@ module.exports = {
             dominated,
           };
         });
-      // Find Pareto-dominated validators
+      // find largest cluster size
+      const largestCluster = ranking.reduce((prev, current) => (
+        (prev.clusterMembers > current.clusterMembers) ? prev : current)).clusterMembers;
+      logger.info(loggerOptions, `Largest cluster size is ${largestCluster}`);
+      logger.info(loggerOptions, `SMALL cluster size is equal or less than ${largestCluster / 3}`);
+      logger.info(loggerOptions, `MEDIUM cluster size is between ${largestCluster / 3} and ${(largestCluster / 3) * 2}`);
+      logger.info(loggerOptions, `LARGE cluster size is larger than ${(largestCluster / 3) * 2} and ${largestCluster}`);
+      // find Pareto-dominated validators
       logger.info(loggerOptions, 'Finding dominated validators');
       const dominatedStart = new Date().getTime();
       ranking = ranking
