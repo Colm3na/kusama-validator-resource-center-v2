@@ -609,9 +609,9 @@ module.exports = {
       // find largest cluster size
       const largestCluster = Math.max(...Array.from(ranking, (o) => o.clusterMembers));
       logger.info(loggerOptions, `LARGEST cluster size is ${largestCluster}`);
-      logger.info(loggerOptions, `SMALL cluster size is equal or less than ${Math.round(largestCluster / 3)}`);
+      logger.info(loggerOptions, `SMALL cluster size is between 2 and ${Math.round(largestCluster / 3)}`);
       logger.info(loggerOptions, `MEDIUM cluster size is between ${Math.round(largestCluster / 3)} and ${(Math.round(largestCluster / 3) * 2)}`);
-      logger.info(loggerOptions, `LARGE cluster size is larger than ${Math.round((largestCluster / 3) * 2)} and ${largestCluster}`);
+      logger.info(loggerOptions, `LARGE cluster size is between ${Math.round((largestCluster / 3) * 2)} and ${largestCluster}`);
       // find Pareto-dominated validators
       logger.info(loggerOptions, 'Finding dominated validators');
       const dominatedStart = new Date().getTime();
