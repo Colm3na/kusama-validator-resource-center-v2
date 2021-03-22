@@ -98,14 +98,18 @@ export default {
                     account.address,
                     config.addressPrefix
                   )
-                  const balances = await this.getAccountBalances(address)
-                  this.extensionAccounts.push({
-                    address,
-                    role: await this.getAddressRole(address),
-                    staking: await this.getStakingInfo(address),
-                    available: this.formatAmount(balances.availableBalance),
-                    selected: false,
-                  })
+                  const staking = await this.getStakingInfo(address)
+                  if (staking?.targets.length > 0) {
+                    const role = await this.getAddressRole(address)
+                    const balances = await this.getAccountBalances(address)
+                    this.extensionAccounts.push({
+                      address,
+                      role,
+                      staking,
+                      available: this.formatAmount(balances.availableBalance),
+                      selected: false,
+                    })
+                  }
                 }
                 if (
                   this.extensionAccounts.length > 0 &&
