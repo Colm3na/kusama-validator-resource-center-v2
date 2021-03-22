@@ -144,7 +144,7 @@ function getClusterInfo(hasSubIdentity, validators, validatorIdentity) {
     // samples: DISC-SOFT-01, BINANCE_KSM_9, SNZPool-1
     if (validatorIdentity.display) {
       const stringSize = 6;
-      const clusterSize = validators.filter(
+      const clusterMembers = validators.filter(
         ({ identity }) => (identity.display || '').substring(0, stringSize)
             === validatorIdentity.display.substring(0, stringSize),
       ).length;
@@ -154,22 +154,22 @@ function getClusterInfo(hasSubIdentity, validators, validatorIdentity) {
         .replace(/_$/g, '');
       return {
         clusterName,
-        clusterSize,
+        clusterMembers,
       };
     }
     return {
       clusterName: '',
-      clusterSize: 0,
+      clusterMembers: 0,
     };
   }
 
-  const clusterSize = validators.filter(
+  const clusterMembers = validators.filter(
     ({ identity }) => identity.displayParent === validatorIdentity.displayParent,
   ).length;
   const clusterName = getClusterName(validatorIdentity);
   return {
     clusterName,
-    clusterSize,
+    clusterMembers,
   };
 }
 
