@@ -282,6 +282,7 @@ export const actions = {
         name: validator.name,
         nominatorsRating: validator.nominators_rating,
         otherStake: validator.other_stake,
+        partOfCluster: validator.part_of_cluster,
         payoutRating: validator.payout_rating,
         rank: validator.rank,
         relativePerformance: parseFloat(validator.relative_performance),

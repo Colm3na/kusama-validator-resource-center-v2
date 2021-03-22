@@ -436,6 +436,10 @@ export default {
           text: 'No participation in governance',
           value: 'noParticipateGovernance',
         },
+        {
+          text: 'Cluster members',
+          value: 'partOfCluster',
+        },
       ],
       filter: null,
       filterOn: [],
@@ -484,6 +488,9 @@ export default {
         : filteredRanking
       filteredRanking = this.exclude.includes('belowAverageEraPoints')
         ? filteredRanking.filter(({ eraPointsRating }) => eraPointsRating === 2)
+        : filteredRanking
+      filteredRanking = this.exclude.includes('partOfCluster')
+        ? filteredRanking.filter(({ partOfCluster }) => !partOfCluster)
         : filteredRanking
       // pareto-dominance auto-filter
       filteredRanking = this.autoFilter
