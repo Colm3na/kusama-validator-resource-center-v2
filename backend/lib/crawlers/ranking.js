@@ -142,13 +142,14 @@ function getClusterMembers(hasSubIdentity, validators, validatorIdentity) {
   if (!hasSubIdentity) {
     // string detection
     // samples: DISC-SOFT-01, BINANCE_KSM_9, SNZPool-1
-    const stringSize = 6;
-    return JSON.stringify(validatorIdentity) !== '{"judgements":[]}'
-      ? validators.filter(
-        ({ identity }) => identity?.displayName.substring(0, stringSize)
-          === validatorIdentity?.displayName.substring(0, stringSize),
-      ).length
-      : 0;
+    if (JSON.stringify(validatorIdentity) !== '{"judgements":[]}') {
+      const stringSize = 6;
+      return validators.filter(
+        ({ identity }) => identity.display.substring(0, stringSize)
+            === validatorIdentity.display.substring(0, stringSize),
+      ).length;
+    }
+    return 0;
   }
   return validators.filter(
     ({ identity }) => identity.displayParent === validatorIdentity.displayParent,
