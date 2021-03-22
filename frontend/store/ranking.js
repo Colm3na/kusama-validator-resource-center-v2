@@ -116,7 +116,7 @@ export const mutations = {
         if (
           opponent !== validator &&
           opponent.relativePerformance >= validator.relativePerformance &&
-          new BigNumber(opponent.selfStake).lte(
+          new BigNumber(opponent.selfStake).gte(
             new BigNumber(validator.selfStake)
           ) &&
           opponent.activeEras >= validator.activeEras &&
@@ -157,7 +157,7 @@ export const mutations = {
           if (
             opponent !== validator &&
             opponent.relativePerformance >= validator.relativePerformance &&
-            new BigNumber(opponent.selfStake).lte(
+            new BigNumber(opponent.selfStake).gte(
               new BigNumber(validator.selfStake)
             ) &&
             opponent.activeEras >= validator.activeEras &&
@@ -196,7 +196,7 @@ export const mutations = {
         if (
           opponent !== validator &&
           opponent.relativePerformance >= validator.relativePerformance &&
-          new BigNumber(opponent.selfStake).lte(
+          new BigNumber(opponent.selfStake).gte(
             new BigNumber(validator.selfStake)
           ) &&
           opponent.activeEras >= validator.activeEras &&
