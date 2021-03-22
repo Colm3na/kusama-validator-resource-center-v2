@@ -608,7 +608,7 @@ module.exports = {
         });
       // find largest cluster size
       const largestCluster = Math.max(...ranking.map((o) => o.clusterMembers), 0);
-      logger.info(loggerOptions, `Largest cluster size is ${largestCluster}`);
+      logger.info(loggerOptions, `LARGEST cluster size is ${largestCluster}`);
       logger.info(loggerOptions, `SMALL cluster size is equal or less than ${largestCluster / 3}`);
       logger.info(loggerOptions, `MEDIUM cluster size is between ${largestCluster / 3} and ${(largestCluster / 3) * 2}`);
       logger.info(loggerOptions, `LARGE cluster size is larger than ${(largestCluster / 3) * 2} and ${largestCluster}`);
