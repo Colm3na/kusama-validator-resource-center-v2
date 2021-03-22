@@ -182,7 +182,6 @@ module.exports = {
     logger.info(loggerOptions, 'Starting ranking crawler');
     const startTime = new Date().getTime();
     const wsProvider = new WsProvider(wsProviderUrl);
-    let largestCluster = 0;
 
     //
     // data collection
@@ -408,9 +407,6 @@ module.exports = {
             validators,
             validator.identity,
           );
-          if (clusterMembers > largestCluster) {
-            largestCluster = clusterMembers;
-          }
           const partOfCluster = clusterMembers > 1;
           const subAccountsRating = hasSubIdentity ? 2 : 0;
 
@@ -612,6 +608,9 @@ module.exports = {
         });
       // find largest cluster size
       // const largestCluster = Math.max(...ranking.map((o) => o.clusterMembers), 0);
+      const largestCluster = Math.max(...Array.from(ranking, (o) => o.clusterMembers));
+      const largestClusterMembers = ranking.filter((o) => o.clusterMembers === largestCluster);
+      logger.info(loggerOptions, `LARGEST cluster MEMBERS ${JSON.stringify(largestClusterMembers, null, 2)}`);
       logger.info(loggerOptions, `LARGEST cluster size is ${largestCluster}`);
       logger.info(loggerOptions, `SMALL cluster size is equal or less than ${largestCluster / 3}`);
       logger.info(loggerOptions, `MEDIUM cluster size is between ${largestCluster / 3} and ${(largestCluster / 3) * 2}`);
