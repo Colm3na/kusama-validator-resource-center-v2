@@ -145,8 +145,8 @@ function getClusterMembers(hasSubIdentity, validators, validatorIdentity) {
     if (JSON.stringify(validatorIdentity) !== '{"judgements":[]}') {
       const stringSize = 6;
       return validators.filter(
-        ({ identity }) => identity.display.substring(0, stringSize)
-            === validatorIdentity.display.substring(0, stringSize),
+        ({ identity }) => identity.display.toString().substring(0, stringSize)
+            === validatorIdentity.display.toString().substring(0, stringSize),
       ).length;
     }
     return 0;
