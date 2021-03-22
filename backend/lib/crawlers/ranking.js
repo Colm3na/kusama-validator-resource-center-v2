@@ -138,22 +138,39 @@ function getPayoutRating(payoutHistory, config) {
   return 0;
 }
 
-function getClusterMembers(hasSubIdentity, validators, validatorIdentity) {
+function getClusterInfo(hasSubIdentity, validators, validatorIdentity) {
   if (!hasSubIdentity) {
     // string detection
     // samples: DISC-SOFT-01, BINANCE_KSM_9, SNZPool-1
     if (validatorIdentity.display) {
       const stringSize = 6;
-      return validators.filter(
+      const clusterSize = validators.filter(
         ({ identity }) => (identity.display || '').substring(0, stringSize)
             === validatorIdentity.display.substring(0, stringSize),
       ).length;
+      const clusterName = validatorIdentity.display
+        .replace(/\d{1,2}$/g, '')
+        .replace(/-$/g, '')
+        .replace(/_$/g, '');
+      return {
+        clusterName,
+        clusterSize,
+      };
     }
-    return 0;
+    return {
+      clusterName: '',
+      clusterSize: 0,
+    };
   }
-  return validators.filter(
+
+  const clusterSize = validators.filter(
     ({ identity }) => identity.displayParent === validatorIdentity.displayParent,
   ).length;
+  const clusterName = getClusterName(validatorIdentity);
+  return {
+    clusterName,
+    clusterSize,
+  };
 }
 
 module.exports = {
@@ -385,13 +402,12 @@ module.exports = {
           const identity = JSON.parse(JSON.stringify(validator.identity));
 
           // sub-accounts
-          const clusterMembers = getClusterMembers(
+          const { clusterMembers, clusterName } = getClusterInfo(
             hasSubIdentity,
             validators,
             validator.identity,
           );
           const partOfCluster = clusterMembers > 1;
-          const clusterName = getClusterName(validator.identity);
           const subAccountsRating = hasSubIdentity ? 2 : 0;
 
           // nominators
