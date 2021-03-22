@@ -68,7 +68,7 @@ CREATE TABLE IF NOT EXISTS ranking (
   thousand_validator TEXT NOT NULL,
   part_of_cluster BOOLEAN NOT NULL,
   cluster_name TEXT NOT NULL,
-  cluster_members TEXT NOT NULL,
+  cluster_members INT NOT NULL,
   nominators INT NOT NULL,
   nominators_rating INT NOT NULL,
   commission TEXT NOT NULL,
