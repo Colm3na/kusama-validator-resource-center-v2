@@ -47,7 +47,6 @@ CREATE TABLE IF NOT EXISTS extrinsic (
   PRIMARY KEY ( block_number, extrinsic_index ) 
 );
 
-
 CREATE TABLE IF NOT EXISTS ranking (
   block_height BIGINT NOT NULL,
   rank INT NOT NULL,
@@ -69,6 +68,7 @@ CREATE TABLE IF NOT EXISTS ranking (
   part_of_cluster BOOLEAN NOT NULL,
   cluster_name TEXT NOT NULL,
   cluster_members INT NOT NULL,
+  show_cluster_member BOOLEAN NOT NULL,
   nominators INT NOT NULL,
   nominators_rating INT NOT NULL,
   commission TEXT NOT NULL,
