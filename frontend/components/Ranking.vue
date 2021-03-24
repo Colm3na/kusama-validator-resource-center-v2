@@ -490,7 +490,7 @@ export default {
         ? filteredRanking.filter(({ eraPointsRating }) => eraPointsRating === 2)
         : filteredRanking
       filteredRanking = this.exclude.includes('partOfCluster')
-        ? filteredRanking.filter(({ partOfCluster }) => !partOfCluster)
+        ? filteredRanking.filter(({ showClusterMember }) => showClusterMember)
         : filteredRanking
       // pareto-dominance auto-filter
       filteredRanking = this.autoFilter

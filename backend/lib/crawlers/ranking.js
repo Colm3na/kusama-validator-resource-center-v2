@@ -788,7 +788,7 @@ module.exports = {
           $42,
           $43,
           $44,
-          $45
+          $45,
           $46
         )`;
         const data = [

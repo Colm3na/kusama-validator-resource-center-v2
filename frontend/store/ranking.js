@@ -252,6 +252,7 @@ export const actions = {
           nominators_rating
           other_stake
           part_of_cluster
+          show_cluster_member
           payout_rating
           rank
           relative_performance
@@ -283,6 +284,7 @@ export const actions = {
         nominatorsRating: validator.nominators_rating,
         otherStake: validator.other_stake,
         partOfCluster: validator.part_of_cluster,
+        showClusterMember: validator.show_cluster_member,
         payoutRating: validator.payout_rating,
         rank: validator.rank,
         relativePerformance: parseFloat(validator.relative_performance),
