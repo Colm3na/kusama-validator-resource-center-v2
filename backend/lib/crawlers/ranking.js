@@ -173,6 +173,24 @@ function getClusterInfo(hasSubIdentity, validators, validatorIdentity) {
   };
 }
 
+// taken from https://stackoverflow.com/questions/19269545/how-to-get-a-number-of-random-elements-from-an-array
+function getRandom(arr, n) {
+  const result = new Array(n);
+  let len = arr.length;
+  const taken = new Array(len);
+  if (n > len) {
+    throw new RangeError('getRandom: more elements taken than available');
+  }
+  // eslint-disable-next-line no-param-reassign,no-plusplus
+  while (n--) {
+    const x = Math.floor(Math.random() * len);
+    result[n] = arr[x in taken ? taken[x] : x];
+    // eslint-disable-next-line no-plusplus
+    taken[x] = --len in taken ? taken[len] : len;
+  }
+  return result;
+}
+
 module.exports = {
   start: async (wsProviderUrl, pool, config, delayedStart = true) => {
     if (delayedStart) {
@@ -182,6 +200,7 @@ module.exports = {
     logger.info(loggerOptions, 'Starting ranking crawler');
     const startTime = new Date().getTime();
     const wsProvider = new WsProvider(wsProviderUrl);
+    const clusters = [];
 
     //
     // data collection
@@ -407,6 +426,9 @@ module.exports = {
             validators,
             validator.identity,
           );
+          if (clusterName && !clusters.includes(clusterName)) {
+            clusters.push(clusterName);
+          }
           const partOfCluster = clusterMembers > 1;
           const subAccountsRating = hasSubIdentity ? 2 : 0;
 
@@ -539,6 +561,8 @@ module.exports = {
             minPerformance = performance;
           }
 
+          const showClusterMember = true;
+
           // total rating
           const totalRating = activeRating
             + addressCreationRating
@@ -570,6 +594,7 @@ module.exports = {
             partOfCluster,
             clusterName,
             clusterMembers,
+            showClusterMember,
             nominators,
             nominatorsRating,
             commission,
@@ -641,6 +666,45 @@ module.exports = {
         });
       const dominatedEnd = new Date().getTime();
       logger.info(loggerOptions, `Found ${ranking.filter(({ dominated }) => dominated).length} dominated validators in ${((dominatedEnd - dominatedStart) / 1000).toFixed(3)}s`);
+
+      // cluster categorization
+      logger.info(loggerOptions, 'Random selection of validators to show from a cluster based on cluster size');
+      const validatorsToHide = [];
+      // eslint-disable-next-line no-restricted-syntax
+      for (const cluster of clusters) {
+        const clusterMembers = ranking.filter(({ clusterName }) => clusterName === cluster);
+        const clusterSize = clusterMembers[0].clusterMembers;
+        // EXTRASMALL: 2 - Show all (2)
+        let show = 2;
+        if (clusterSize > 50) {
+          // EXTRALARGE: 51-150 - Show 20% val. (up to 30)
+          show = Math.round(clusterSize * 0.2);
+        } else if (clusterSize > 20) {
+          // LARGE: 21-50 - Show 40% val. (up to 20)
+          show = Math.round(clusterSize * 0.4);
+        } else if (clusterSize > 10) {
+          // MEDIUM: 11-20 - Show 60% val. (up to 12)
+          show = Math.round(clusterSize * 0.6);
+        } else if (clusterSize > 2) {
+          // SMALL: 3-10 - Show 80% val. (up to 8)
+          show = Math.round(clusterSize * 0.8);
+        }
+        const hide = clusterSize - show;
+        // randomly select 'hide' number of validators
+        // from cluster and set 'showClusterMember' prop to false
+        const rankingPositions = clusterMembers.map((validator) => validator.rank);
+        validatorsToHide.concat(getRandom(rankingPositions, hide));
+      }
+      ranking = ranking
+        .map((validator) => {
+          const modValidator = validator;
+          if (validatorsToHide.includes(validator.rank)) {
+            modValidator.showClusterMember = false;
+          }
+          return modValidator;
+        });
+      logger.info(loggerOptions, `Finished, ${validatorsToHide.length} validators hided!`);
+
       logger.info(loggerOptions, `Storing ${ranking.length} validators in db...`);
       // eslint-disable-next-line no-restricted-syntax
       for (const validator of ranking) {
@@ -665,6 +729,7 @@ module.exports = {
           part_of_cluster,
           cluster_name,
           cluster_members,
+          show_cluster_member,
           nominators,
           nominators_rating,
           commission,
@@ -736,6 +801,7 @@ module.exports = {
           $43,
           $44,
           $45
+          $46
         )`;
         const data = [
           `${blockHeight}`,
@@ -758,6 +824,7 @@ module.exports = {
           `${validator.partOfCluster}`,
           `${validator.clusterName}`,
           `${validator.clusterMembers}`,
+          `${validator.showClusterMember}`,
           `${validator.nominators}`,
           `${validator.nominatorsRating}`,
           `${validator.commission}`,

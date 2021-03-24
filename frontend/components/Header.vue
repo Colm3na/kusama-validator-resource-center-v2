@@ -1,5 +1,5 @@
 <template>
-  <b-navbar type="dark" variant="dark" sticky>
+  <b-navbar type="dark" variant="dark">
     <b-container fluid>
       <button id="menu-toggle" class="btn btn-primary" @click="toggleSidebar()">
         <font-awesome-icon icon="bars" />
