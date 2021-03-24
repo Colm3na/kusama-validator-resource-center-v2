@@ -175,20 +175,8 @@ function getClusterInfo(hasSubIdentity, validators, validatorIdentity) {
 
 // taken from https://stackoverflow.com/questions/19269545/how-to-get-a-number-of-random-elements-from-an-array
 function getRandom(arr, n) {
-  const result = new Array(n);
-  let len = arr.length;
-  const taken = new Array(len);
-  if (n > len) {
-    throw new RangeError('getRandom: more elements taken than available');
-  }
-  // eslint-disable-next-line no-param-reassign,no-plusplus
-  while (n--) {
-    const x = Math.floor(Math.random() * len);
-    result[n] = arr[x in taken ? taken[x] : x];
-    // eslint-disable-next-line no-plusplus
-    taken[x] = --len in taken ? taken[len] : len;
-  }
-  return result;
+  const shuffled = [...arr].sort(() => 0.5 - Math.random());
+  return shuffled.slice(0, n);
 }
 
 module.exports = {
@@ -669,7 +657,7 @@ module.exports = {
 
       // cluster categorization
       logger.info(loggerOptions, 'Random selection of validators to show from a cluster based on cluster size');
-      const validatorsToHide = [];
+      let validatorsToHide = [];
       // eslint-disable-next-line no-restricted-syntax
       for (const cluster of clusters) {
         const clusterMembers = ranking.filter(({ clusterName }) => clusterName === cluster);
@@ -678,22 +666,22 @@ module.exports = {
         let show = 2;
         if (clusterSize > 50) {
           // EXTRALARGE: 51-150 - Show 20% val. (up to 30)
-          show = Math.round(clusterSize * 0.2);
+          show = Math.floor(clusterSize * 0.2);
         } else if (clusterSize > 20) {
           // LARGE: 21-50 - Show 40% val. (up to 20)
-          show = Math.round(clusterSize * 0.4);
+          show = Math.floor(clusterSize * 0.4);
         } else if (clusterSize > 10) {
           // MEDIUM: 11-20 - Show 60% val. (up to 12)
-          show = Math.round(clusterSize * 0.6);
+          show = Math.floor(clusterSize * 0.6);
         } else if (clusterSize > 2) {
           // SMALL: 3-10 - Show 80% val. (up to 8)
-          show = Math.round(clusterSize * 0.8);
+          show = Math.floor(clusterSize * 0.8);
         }
         const hide = clusterSize - show;
         // randomly select 'hide' number of validators
         // from cluster and set 'showClusterMember' prop to false
         const rankingPositions = clusterMembers.map((validator) => validator.rank);
-        validatorsToHide.concat(getRandom(rankingPositions, hide));
+        validatorsToHide = validatorsToHide.concat(getRandom(rankingPositions, hide));
       }
       ranking = ranking
         .map((validator) => {
