@@ -77,6 +77,11 @@ export default {
       return this.selectedAddresses.join('\r\n')
     },
   },
+  async created() {
+    if (this.$store.state.ranking.list.length === 0) {
+      await this.$store.dispatch('ranking/updateList')
+    }
+  },
   methods: {
     showToast() {
       this.$bvToast.toast(this.selectedAddressesText, {
