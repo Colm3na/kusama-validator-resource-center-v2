@@ -13,6 +13,12 @@
         <span v-else>{{ shortAddress(featured.stashAddress) }}</span>
       </nuxt-link>
       <VerifiedIcon v-if="featured.verifiedIdentity" />
+      <b-button
+        :disabled="disabled"
+        variant="outline-primary"
+        @click="toggleSelected(featured.stashAddress)"
+        >Add to your set</b-button
+      >
     </b-alert>
   </div>
 </template>
@@ -20,6 +26,11 @@
 import commonMixin from '@/mixins/commonMixin.js'
 export default {
   mixins: [commonMixin],
+  data() {
+    return {
+      disabled: false,
+    }
+  },
   computed: {
     loading() {
       return this.$store.state.ranking.loading
@@ -49,6 +60,12 @@ export default {
   },
   beforeDestroy() {
     clearInterval(this.polling)
+  },
+  methods: {
+    toggleSelected(accountId) {
+      this.$store.dispatch('ranking/toggleSelected', { accountId })
+      this.disabled = true
+    },
   },
 }
 </script>

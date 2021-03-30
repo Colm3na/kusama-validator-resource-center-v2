@@ -315,10 +315,6 @@ export const actions = {
           accumulator + parseFloat(eraPointsPercent),
         0
       ) / ranking.filter(({ active }) => active === true).length
-    // eslint-disable-next-line
-    console.log(
-      `eraPointsAverage: ${eraPointsAverage.toFixed(6)}`
-    )
     context.commit('updateList', {
       ranking,
       blockHeight,
