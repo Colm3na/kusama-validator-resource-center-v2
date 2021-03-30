@@ -1,6 +1,7 @@
 <template>
   <div class="page container-fluid pt-3">
     <div>
+      <Inactive />
       <Ranking />
     </div>
   </div>
