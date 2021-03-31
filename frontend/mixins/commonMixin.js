@@ -18,10 +18,10 @@ export default {
         return number.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,')
       }
     },
-    formatAmount(amount) {
+    formatAmount(amount, decimals = 1) {
       return `${new BigNumber(amount)
         .div(new BigNumber(10).pow(config.tokenDecimals))
-        .toFixed(1)
+        .toFixed(decimals)
         .replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,')} ${config.denom}`
     },
     capitalize(s) {

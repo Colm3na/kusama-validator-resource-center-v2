@@ -27,38 +27,8 @@
           validator set.
         </p>
       </b-alert>
-      <b-alert variant="warning" show dismissible>
-        <p class="text-center mb-2 mt-2">
-          <strong>WARNING!</strong> mocked data
-        </p>
-      </b-alert>
       <h1 class="mb-4">Dashboard</h1>
-      <div class="row text-center dashboard-global-stats">
-        <div class="col-md-6 col-lg-3 mb-4">
-          <div class="box">
-            <h4>Validators</h4>
-            <span class="stat">900/900</span>
-          </div>
-        </div>
-        <div class="col-md-6 col-lg-3 mb-4">
-          <div class="box">
-            <h4>Current era</h4>
-            <span class="stat">1786</span>
-          </div>
-        </div>
-        <div class="col-md-6 col-lg-3 mb-4">
-          <div class="box">
-            <h4>Nominators</h4>
-            <span class="stat">7000</span>
-          </div>
-        </div>
-        <div class="col-md-6 col-lg-3 mb-4">
-          <div class="box">
-            <h4>Mininum stake</h4>
-            <span class="stat">1 KSM</span>
-          </div>
-        </div>
-      </div>
+      <Stats />
       <line-chart
         :data="scoreChartData"
         :options="scoreChartOptions"
