@@ -244,10 +244,8 @@
         <template #cell(relativePerformance)="data">
           <b-progress
             v-b-tooltip.hover
-            variant="success"
             :max="100"
             show-progress
-            animated
             :title="`${(data.item.relativePerformance * 100).toFixed(2)} %`"
           >
             <b-progress-bar
