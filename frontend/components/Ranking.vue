@@ -148,7 +148,6 @@
         :filter="filter"
         :filter-included-fields="filterOn"
         :sort-compare="sortCompare"
-        :filter-debounce="500"
         :filter-ignored-fields="[
           'active',
           'commission',

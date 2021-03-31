@@ -31,7 +31,19 @@
             <div class="col-md-6">
               <div class="row">
                 <div class="col-8 col-md-6">
-                  ACTIVE -
+                  ELECTED
+                  <nuxt-link
+                    v-b-tooltip.hover
+                    to="/help/metrics#elected"
+                    title="Check metric definition"
+                  >
+                    <font-awesome-icon
+                      icon="question-circle"
+                      class="d-inline-block"
+                      style="font-size: 0.9rem"
+                    />
+                  </nuxt-link>
+                  -
                   <span style="color: gray">x{{ metricWeights.active }}</span>
                 </div>
                 <div class="col-4 col-md-6">
@@ -50,7 +62,19 @@
             <div class="col-md-6">
               <div class="row">
                 <div class="col-8 col-md-6">
-                  COMMISSION -
+                  COMMISSION
+                  <nuxt-link
+                    v-b-tooltip.hover
+                    to="/help/metrics#commission"
+                    title="Check metric definition"
+                  >
+                    <font-awesome-icon
+                      icon="question-circle"
+                      class="d-inline-block"
+                      style="font-size: 0.9rem"
+                    />
+                  </nuxt-link>
+                  -
                   <span style="color: gray"
                     >x{{ metricWeights.commission }}</span
                   >
@@ -73,7 +97,19 @@
             <div class="col-md-6">
               <div class="row">
                 <div class="col-8 col-md-6">
-                  ERA POINTS AVG -
+                  ERA POINTS AVG
+                  <nuxt-link
+                    v-b-tooltip.hover
+                    to="/help/metrics#erapoints"
+                    title="Check metric definition"
+                  >
+                    <font-awesome-icon
+                      icon="question-circle"
+                      class="d-inline-block"
+                      style="font-size: 0.9rem"
+                    />
+                  </nuxt-link>
+                  -
                   <span style="color: gray"
                     >x{{ metricWeights.eraPoints }}</span
                   >
@@ -94,7 +130,19 @@
             <div class="col-md-6">
               <div class="row">
                 <div class="col-8 col-md-6">
-                  GOVERNANCE -
+                  GOVERNANCE
+                  <nuxt-link
+                    v-b-tooltip.hover
+                    to="/help/metrics#governance"
+                    title="Check metric definition"
+                  >
+                    <font-awesome-icon
+                      icon="question-circle"
+                      class="d-inline-block"
+                      style="font-size: 0.9rem"
+                    />
+                  </nuxt-link>
+                  -
                   <span style="color: gray"
                     >x{{ metricWeights.governance }}</span
                   >
@@ -117,7 +165,19 @@
             <div class="col-md-6">
               <div class="row">
                 <div class="col-8 col-md-6">
-                  IDENTITY -
+                  IDENTITY
+                  <nuxt-link
+                    v-b-tooltip.hover
+                    to="/help/metrics#identity"
+                    title="Check metric definition"
+                  >
+                    <font-awesome-icon
+                      icon="question-circle"
+                      class="d-inline-block"
+                      style="font-size: 0.9rem"
+                    />
+                  </nuxt-link>
+                  -
                   <span style="color: gray">x{{ metricWeights.identity }}</span>
                 </div>
                 <div class="col-4 col-md-6">
@@ -136,7 +196,19 @@
             <div class="col-md-6">
               <div class="row">
                 <div class="col-8 col-md-6">
-                  NOMINATORS -
+                  NOMINATORS
+                  <nuxt-link
+                    v-b-tooltip.hover
+                    to="/help/metrics#nominators"
+                    title="Check metric definition"
+                  >
+                    <font-awesome-icon
+                      icon="question-circle"
+                      class="d-inline-block"
+                      style="font-size: 0.9rem"
+                    />
+                  </nuxt-link>
+                  -
                   <span style="color: gray"
                     >x{{ metricWeights.nominators }}</span
                   >
@@ -159,7 +231,19 @@
             <div class="col-md-6">
               <div class="row">
                 <div class="col-8 col-md-6">
-                  ADDRES CREATION -
+                  ADDRES CREATION
+                  <nuxt-link
+                    v-b-tooltip.hover
+                    to="/help/metrics#address"
+                    title="Check metric definition"
+                  >
+                    <font-awesome-icon
+                      icon="question-circle"
+                      class="d-inline-block"
+                      style="font-size: 0.9rem"
+                    />
+                  </nuxt-link>
+                  -
                   <span style="color: gray">x{{ metricWeights.address }}</span>
                 </div>
                 <div class="col-4 col-md-6">
@@ -178,7 +262,19 @@
             <div class="col-md-6">
               <div class="row">
                 <div class="col-8 col-md-6">
-                  PAYOUTS -
+                  PAYOUTS
+                  <nuxt-link
+                    v-b-tooltip.hover
+                    to="/help/metrics#payouts"
+                    title="Check metric definition"
+                  >
+                    <font-awesome-icon
+                      icon="question-circle"
+                      class="d-inline-block"
+                      style="font-size: 0.9rem"
+                    />
+                  </nuxt-link>
+                  -
                   <span style="color: gray">x{{ metricWeights.payout }}</span>
                 </div>
                 <div class="col-4 col-md-6">
@@ -199,7 +295,19 @@
             <div class="col-md-6">
               <div class="row">
                 <div class="col-8 col-md-6">
-                  SLASHES -
+                  SLASHES
+                  <nuxt-link
+                    v-b-tooltip.hover
+                    to="/help/metrics#slashes"
+                    title="Check metric definition"
+                  >
+                    <font-awesome-icon
+                      icon="question-circle"
+                      class="d-inline-block"
+                      style="font-size: 0.9rem"
+                    />
+                  </nuxt-link>
+                  -
                   <span style="color: gray">x{{ metricWeights.slashes }}</span>
                 </div>
                 <div class="col-4 col-md-6">
@@ -218,7 +326,19 @@
             <div class="col-md-6">
               <div class="row">
                 <div class="col-8 col-md-6">
-                  SUBACCOUNTS -
+                  SUBACCOUNTS
+                  <nuxt-link
+                    v-b-tooltip.hover
+                    to="/help/metrics#subaccounts"
+                    title="Check metric definition"
+                  >
+                    <font-awesome-icon
+                      icon="question-circle"
+                      class="d-inline-block"
+                      style="font-size: 0.9rem"
+                    />
+                  </nuxt-link>
+                  -
                   <span style="color: gray"
                     >x{{ metricWeights.subaccounts }}</span
                   >

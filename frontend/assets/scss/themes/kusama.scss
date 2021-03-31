@@ -173,6 +173,7 @@ pre {
   overflow-x: hidden;
 }
 #sidebar-wrapper {
+  z-index: 10;
   min-height: 100vh;
   margin-left: -15rem;
   -webkit-transition: margin 0.25s ease-out;
