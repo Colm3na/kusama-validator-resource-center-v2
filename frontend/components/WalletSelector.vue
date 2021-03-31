@@ -8,7 +8,12 @@
       </p>
     </div>
     <div v-else>
-      <b-table striped :items="extensionAccounts" class="account-table">
+      <b-table
+        striped
+        :fields="fields"
+        :items="extensionAccounts"
+        class="account-table"
+      >
         <template #cell(address)="data">
           <Identicon :address="data.item.address" :size="24" />
           {{ shortAddress(data.item.address) }}
@@ -45,6 +50,24 @@ export default {
       error: null,
       noAccountsFound: true,
       loading: true,
+      fields: [
+        {
+          key: 'address',
+          label: 'Address',
+        },
+        {
+          key: 'role',
+          label: 'Role',
+        },
+        {
+          key: 'available',
+          label: 'Available balance',
+        },
+        {
+          key: 'selected',
+          label: '',
+        },
+      ],
     }
   },
   async created() {
