@@ -341,3 +341,9 @@ pre {
 .csv-export {
   cursor: pointer;
 }
+
+@media (max-width: 768px) {
+  .btn {
+    font-size: 0.8rem !important;
+  }
+}

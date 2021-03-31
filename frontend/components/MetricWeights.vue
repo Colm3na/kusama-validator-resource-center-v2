@@ -1,7 +1,7 @@
 <template>
   <div class="exclude mb-4">
     <div class="row">
-      <div class="col-11">
+      <div class="col-10">
         <h5 class="exclude-title mb-2">
           <nuxt-link
             v-b-tooltip.hover
@@ -17,7 +17,7 @@
           Customize VRC score
         </h5>
       </div>
-      <div class="col-1 text-right">
+      <div class="col-2 text-right">
         <span v-b-toggle.custom-vrc-score-collapse class="m-1">
           <font-awesome-icon icon="chevron-up" class="when-open" />
           <font-awesome-icon icon="chevron-down" class="when-closed" />
@@ -30,11 +30,11 @@
           <div class="row">
             <div class="col-md-6">
               <div class="row">
-                <div class="col-6">
+                <div class="col-8 col-md-6">
                   ACTIVE -
                   <span style="color: gray">x{{ metricWeights.active }}</span>
                 </div>
-                <div class="col-6">
+                <div class="col-4 col-md-6">
                   <b-form-input
                     v-model="metricWeights.active"
                     type="range"
@@ -49,13 +49,13 @@
             </div>
             <div class="col-md-6">
               <div class="row">
-                <div class="col-6">
+                <div class="col-8 col-md-6">
                   COMMISSION -
                   <span style="color: gray"
                     >x{{ metricWeights.commission }}</span
                   >
                 </div>
-                <div class="col-6">
+                <div class="col-4 col-md-6">
                   <b-form-input
                     v-model="metricWeights.commission"
                     type="range"
@@ -72,13 +72,13 @@
           <div class="row">
             <div class="col-md-6">
               <div class="row">
-                <div class="col-6">
+                <div class="col-8 col-md-6">
                   ERA POINTS AVG -
                   <span style="color: gray"
                     >x{{ metricWeights.eraPoints }}</span
                   >
                 </div>
-                <div class="col-6">
+                <div class="col-4 col-md-6">
                   <b-form-input
                     v-model="metricWeights.eraPoints"
                     type="range"
@@ -93,13 +93,13 @@
             </div>
             <div class="col-md-6">
               <div class="row">
-                <div class="col-6">
+                <div class="col-8 col-md-6">
                   GOVERNANCE -
                   <span style="color: gray"
                     >x{{ metricWeights.governance }}</span
                   >
                 </div>
-                <div class="col-6">
+                <div class="col-4 col-md-6">
                   <b-form-input
                     v-model="metricWeights.governance"
                     type="range"
@@ -116,11 +116,11 @@
           <div class="row">
             <div class="col-md-6">
               <div class="row">
-                <div class="col-6">
+                <div class="col-8 col-md-6">
                   IDENTITY -
                   <span style="color: gray">x{{ metricWeights.identity }}</span>
                 </div>
-                <div class="col-6">
+                <div class="col-4 col-md-6">
                   <b-form-input
                     v-model="metricWeights.identity"
                     type="range"
@@ -135,13 +135,13 @@
             </div>
             <div class="col-md-6">
               <div class="row">
-                <div class="col-6">
+                <div class="col-8 col-md-6">
                   NOMINATORS -
                   <span style="color: gray"
                     >x{{ metricWeights.nominators }}</span
                   >
                 </div>
-                <div class="col-6">
+                <div class="col-4 col-md-6">
                   <b-form-input
                     v-model="metricWeights.nominators"
                     type="range"
@@ -158,11 +158,11 @@
           <div class="row">
             <div class="col-md-6">
               <div class="row">
-                <div class="col-6">
+                <div class="col-8 col-md-6">
                   ADDRES CREATION -
                   <span style="color: gray">x{{ metricWeights.address }}</span>
                 </div>
-                <div class="col-6">
+                <div class="col-4 col-md-6">
                   <b-form-input
                     v-model="metricWeights.address"
                     type="range"
@@ -177,11 +177,11 @@
             </div>
             <div class="col-md-6">
               <div class="row">
-                <div class="col-6">
+                <div class="col-8 col-md-6">
                   PAYOUTS -
                   <span style="color: gray">x{{ metricWeights.payout }}</span>
                 </div>
-                <div class="col-6">
+                <div class="col-4 col-md-6">
                   <b-form-input
                     v-model="metricWeights.payout"
                     type="range"
@@ -198,11 +198,11 @@
           <div class="row">
             <div class="col-md-6">
               <div class="row">
-                <div class="col-6">
+                <div class="col-8 col-md-6">
                   SLASHES -
                   <span style="color: gray">x{{ metricWeights.slashes }}</span>
                 </div>
-                <div class="col-6">
+                <div class="col-4 col-md-6">
                   <b-form-input
                     v-model="metricWeights.slashes"
                     type="range"
@@ -217,13 +217,13 @@
             </div>
             <div class="col-md-6">
               <div class="row">
-                <div class="col-6">
+                <div class="col-8 col-md-6">
                   SUBACCOUNTS -
                   <span style="color: gray"
                     >x{{ metricWeights.subaccounts }}</span
                   >
                 </div>
-                <div class="col-6">
+                <div class="col-4 col-md-6">
                   <b-form-input
                     v-model="metricWeights.subaccounts"
                     type="range"

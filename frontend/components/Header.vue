@@ -1,9 +1,20 @@
 <template>
   <b-navbar type="dark" variant="dark">
     <b-container fluid>
-      <button id="menu-toggle" class="btn btn-primary" @click="toggleSidebar()">
-        <font-awesome-icon icon="bars" />
-      </button>
+      <span v-if="collapsed" v-b-tooltip.hover title="Show sidebar">
+        <font-awesome-icon
+          icon="chevron-right"
+          style="cursor: pointer; font-size: 1.2rem; margin-left: -0.5rem"
+          @click="toggleSidebar()"
+        />
+      </span>
+      <span v-else v-b-tooltip.hover title="Collapse sidebar">
+        <font-awesome-icon
+          icon="chevron-left"
+          style="cursor: pointer; font-size: 1.2rem; margin-left: -0.5rem"
+          @click="toggleSidebar()"
+        />
+      </span>
       <b-navbar-nav>
         <button
           v-b-modal.wallet-modal
@@ -11,7 +22,7 @@
           class="btn btn-outline-info mr-4"
         >
           <span v-if="selectedAddress">
-            <Identicon :address="selectedAddress" :size="24" />
+            <Identicon :address="selectedAddress" :size="22" />
             {{ shortAddress(selectedAddress) }}
           </span>
           <span v-else>Connect wallet</span>
@@ -61,6 +72,7 @@ export default {
   data() {
     return {
       config,
+      collapsed: false,
     }
   },
   computed: {
@@ -84,6 +96,7 @@ export default {
   },
   methods: {
     toggleSidebar() {
+      this.collapsed = !this.collapsed
       this.$emit('toggle')
     },
   },

@@ -28,7 +28,7 @@
       <!-- Exclude -->
       <div class="exclude mb-4">
         <div class="row">
-          <div class="col-11">
+          <div class="col-10">
             <h5 class="exclude-title mb-2">
               <nuxt-link
                 v-b-tooltip.hover
@@ -44,7 +44,7 @@
               Exclude from search
             </h5>
           </div>
-          <div class="col-1 text-right">
+          <div class="col-2 text-right">
             <span v-b-toggle.exclude-filter-collapse class="m-1">
               <font-awesome-icon icon="chevron-up" class="when-open" />
               <font-awesome-icon icon="chevron-down" class="when-closed" />
@@ -75,7 +75,7 @@
       <!-- Auto-Filter -->
       <div class="exclude mb-4">
         <div class="row mb-2">
-          <div class="col-11">
+          <div class="col-10">
             <h5 class="exclude-title">
               <nuxt-link
                 v-b-tooltip.hover
@@ -91,7 +91,7 @@
               Auto-Filter validators
             </h5>
           </div>
-          <div class="col-1 text-right">
+          <div class="col-2 text-right">
             <span v-b-toggle.auto-filter-collapse class="m-1">
               <font-awesome-icon icon="chevron-up" class="when-open" />
               <font-awesome-icon icon="chevron-down" class="when-closed" />
@@ -507,26 +507,6 @@ export default {
         maxAge: 60 * 60 * 24 * 7,
       })
     },
-  },
-  async created() {
-    if (this.$store.state.ranking.list.length === 0) {
-      await this.$store.dispatch('ranking/updateList')
-    }
-    if (this.$cookies.get(`${config.name}-exclude`)) {
-      this.exclude = this.$cookies.get(`${config.name}-exclude`)
-    }
-    if (this.$cookies.get(`${config.name}-filter`)) {
-      this.filter = this.$cookies.get(`${config.name}-filter`)
-    }
-    // update ranking every 1 min
-    this.polling = setInterval(async () => {
-      // eslint-disable-next-line
-      console.log('refreshing...')
-      await this.$store.dispatch('ranking/updateList')
-    }, 60 * 1000)
-  },
-  beforeDestroy() {
-    clearInterval(this.polling)
   },
   methods: {
     setPageSize(size) {

@@ -234,20 +234,6 @@ export default {
       return this.$store.state.ranking.eraPointsAverage
     },
   },
-  async created() {
-    if (this.$store.state.ranking.list.length === 0) {
-      await this.$store.dispatch('ranking/updateList')
-    }
-    // update ranking every 1 min
-    this.polling = setInterval(async () => {
-      // eslint-disable-next-line
-      console.log('refreshing...')
-      await this.$store.dispatch('ranking/updateList')
-    }, 60 * 1000)
-  },
-  beforeDestroy() {
-    clearInterval(this.polling)
-  },
   methods: {
     isSelected(accountId) {
       return this.selectedValidatorAddresses.includes(accountId)
