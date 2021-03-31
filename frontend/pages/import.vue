@@ -22,13 +22,13 @@
             </div>
           </div>
           <div v-if="account.staking" class="mb-4 pl-4">
-            <h4>Validator set:</h4>
+            <h4 class="mb-4">Validator set:</h4>
             <div
               v-for="validator in account.staking.targets"
               :key="`${account.address}-${validator}`"
               class="d-block my-1"
             >
-              {{ validator }}
+              <Validator :address="validator" />
             </div>
             <b-button
               variant="outline-primary2"
@@ -36,6 +36,7 @@
               @click="importSetFrom(account.address)"
               >IMPORT SET</b-button
             >
+            <span>WARNING: This will replace your current set!</span>
           </div>
         </div>
       </div>
