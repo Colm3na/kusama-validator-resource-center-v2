@@ -6,7 +6,7 @@
       style="display: inline-block; width: 2.4rem"
       >#{{ validator.rank }}</span
     >
-    <Identicon :address="validator.stashAddress" :size="24" />
+    <Identicon :address="validator.stashAddress" :size="22" />
     <nuxt-link :to="`/validator/${validator.stashAddress}`">
       <span v-if="validator.name">{{ validator.name }}</span>
       <span v-else>{{ shortAddress(validator.stashAddress) }}</span>
