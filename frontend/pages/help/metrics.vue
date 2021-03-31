@@ -1,8 +1,8 @@
 <template>
   <div class="page metrics-page container-fluid py-3">
     <div>
-      <h1 class="mb-4">Ranking criteria</h1>
-      <p>The ranking is based on this on-chain metrics:</p>
+      <h1 class="mb-4">Ranking score metrics</h1>
+      <p>The ranking score is based on this on-chain metrics:</p>
       <div
         v-for="metric in metrics"
         :id="metric.id"
@@ -37,6 +37,22 @@ export default {
     return {
       config,
       metrics: [
+        {
+          id: 'elected',
+          title: 'Elected',
+          description:
+            'Evaluate if the validator is currently included in the active validator set.',
+          rating: [
+            {
+              rating: 0,
+              description: 'Validator is waiting',
+            },
+            {
+              rating: 2,
+              description: 'Validator is active',
+            },
+          ],
+        },
         {
           id: 'identity',
           title: 'Identity',
@@ -92,15 +108,15 @@ export default {
           id: 'slashes',
           title: 'Slashes over time',
           description:
-            'Evaluate if the validator was slashed in the last 28 eras (1 week)',
+            'Evaluate if the validator was slashed in the last 84 eras (21 days)',
           rating: [
             {
               rating: 0,
-              description: 'Validator have an unapplied slash',
+              description: 'Validator was slashed',
             },
             {
               rating: 2,
-              description: "Validator doesn't have an unapplied slash",
+              description: 'Validator was not slashed',
             },
           ],
         },
@@ -156,7 +172,7 @@ export default {
         {
           id: 'commission',
           title: 'Commission over time',
-          description: 'Commission changes over last 28 eras (1 week)',
+          description: 'Commission changes over last 84 eras (21 days)',
           rating: [
             {
               rating: 0,
