@@ -30,7 +30,6 @@
         <div class="row">
           <div class="col-11">
             <h5 class="exclude-title mb-2">
-              Exclude from search:
               <nuxt-link
                 v-b-tooltip.hover
                 to="/help#exclude-filter"
@@ -42,6 +41,7 @@
                   style="font-size: 1rem"
                 />
               </nuxt-link>
+              Exclude from search
             </h5>
           </div>
           <div class="col-1 text-right">
@@ -77,7 +77,6 @@
         <div class="row mb-2">
           <div class="col-11">
             <h5 class="exclude-title">
-              Auto-Filter validators:
               <nuxt-link
                 v-b-tooltip.hover
                 to="/help#auto-filter"
@@ -89,6 +88,7 @@
                   style="font-size: 1rem"
                 />
               </nuxt-link>
+              Auto-Filter validators
             </h5>
           </div>
           <div class="col-1 text-right">
@@ -108,8 +108,8 @@
               @change="toggleAutoFilter()"
             />
             <p class="text-center mt-4">
-              Your custom metrics weights will be taken in account to filter out
-              validators
+              Your custom metric weights will be taken into account to filter
+              out validators
             </p>
           </div>
         </b-collapse>

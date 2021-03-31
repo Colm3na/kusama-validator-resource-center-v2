@@ -3,7 +3,6 @@
     <div class="row">
       <div class="col-11">
         <h5 class="exclude-title mb-2">
-          Customize VRC score:
           <nuxt-link
             v-b-tooltip.hover
             to="/help#custom-vrc-score"
@@ -15,6 +14,7 @@
               style="font-size: 1rem"
             />
           </nuxt-link>
+          Customize VRC score
         </h5>
       </div>
       <div class="col-1 text-right">
