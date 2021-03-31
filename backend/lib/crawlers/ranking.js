@@ -323,31 +323,31 @@ module.exports = {
       logger.info(loggerOptions, `Current era is ${currentEra}`);
       logger.info(loggerOptions, `Minimum amount to stake is ${minimumStake}`);
       try {
-        const sql = `UPDATE total SET count = '${activeValidatorCount}' WHERE name = 'active_validator_count`;
+        const sql = `UPDATE total SET count = '${activeValidatorCount}' WHERE name = 'active_validator_count'`;
         await pool.query(sql);
       } catch (error) {
         logger.error(loggerOptions, `Error updating total: ${JSON.stringify(error)}`);
       }
       try {
-        const sql = `UPDATE total SET count = '${waitingValidatorCount}' WHERE name = 'waiting_validator_count`;
+        const sql = `UPDATE total SET count = '${waitingValidatorCount}' WHERE name = 'waiting_validator_count'`;
         await pool.query(sql);
       } catch (error) {
         logger.error(loggerOptions, `Error updating total: ${JSON.stringify(error)}`);
       }
       try {
-        const sql = `UPDATE total SET count = '${nominatorCount}' WHERE name = 'nominator_count`;
+        const sql = `UPDATE total SET count = '${nominatorCount}' WHERE name = 'nominator_count'`;
         await pool.query(sql);
       } catch (error) {
         logger.error(loggerOptions, `Error updating total: ${JSON.stringify(error)}`);
       }
       try {
-        const sql = `UPDATE total SET count = '${currentEra}' WHERE name = 'current_era`;
+        const sql = `UPDATE total SET count = '${currentEra}' WHERE name = 'current_era'`;
         await pool.query(sql);
       } catch (error) {
         logger.error(loggerOptions, `Error updating total: ${JSON.stringify(error)}`);
       }
       try {
-        const sql = `UPDATE total SET count = '${minimumStake}' WHERE name = 'minimum_stake`;
+        const sql = `UPDATE total SET count = '${minimumStake}' WHERE name = 'minimum_stake'`;
         await pool.query(sql);
       } catch (error) {
         logger.error(loggerOptions, `Error updating total: ${JSON.stringify(error)}`);
