@@ -5,7 +5,7 @@
         <font-awesome-icon icon="bars" />
       </button>
       <b-navbar-nav>
-        <!-- <button
+        <button
           v-b-modal.wallet-modal
           type="button"
           class="btn btn-outline-info mr-4"
@@ -15,7 +15,7 @@
             {{ shortAddress(selectedAddress) }}
           </span>
           <span v-else>Connect wallet</span>
-        </button> -->
+        </button>
         <b-nav-item-dropdown
           id="selected-validators"
           ref="selectedValidators"
