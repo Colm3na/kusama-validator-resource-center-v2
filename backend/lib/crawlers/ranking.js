@@ -205,6 +205,7 @@ module.exports = {
       const api = await ApiPromise.create({ provider: wsProvider });
       const withActive = false;
       const erasHistoric = await api.derive.staking.erasHistoric(withActive);
+      const chainCurrentEra = await api.query.staking.currentEra();
       const eraIndexes = erasHistoric.slice(
         Math.max(erasHistoric.length - config.historySize, 0),
       );
@@ -299,6 +300,58 @@ module.exports = {
         0,
       );
       const eraPointsAverage = eraPointsHistoryTotalsSum / numActiveValidators;
+
+      // dashboard metrics
+      const activeValidatorCount = validatorAddresses.length;
+      const waitingValidatorCount = waitingInfo.info.length;
+      const nominatorCount = nominators.length;
+      const currentEra = chainCurrentEra.toString();
+      const nominatorStakes = [];
+      // eslint-disable-next-line
+      for (const validator of validators){
+        // eslint-disable-next-line
+        for (const nominatorStake of validator.exposure.others){
+          nominatorStakes.push(nominatorStake.value);
+        }
+      }
+      nominatorStakes.sort((a, b) => a.toNumber() - b.toNumber());
+      const minimumStake = nominatorStakes[0];
+      logger.info(loggerOptions, `${activeValidatorCount} active validators`);
+      logger.info(loggerOptions, `${waitingValidatorCount} waiting validators`);
+      logger.info(loggerOptions, `${nominatorCount} nominators`);
+      logger.info(loggerOptions, `Current era is ${currentEra}`);
+      logger.info(loggerOptions, `Minimum amount to stake is ${minimumStake}`);
+      try {
+        const sql = `UPDATE total SET count = '${activeValidatorCount}' WHERE name = 'active_validator_count`;
+        await pool.query(sql);
+      } catch (error) {
+        logger.error(loggerOptions, `Error updating total: ${JSON.stringify(error)}`);
+      }
+      try {
+        const sql = `UPDATE total SET count = '${waitingValidatorCount}' WHERE name = 'waiting_validator_count`;
+        await pool.query(sql);
+      } catch (error) {
+        logger.error(loggerOptions, `Error updating total: ${JSON.stringify(error)}`);
+      }
+      try {
+        const sql = `UPDATE total SET count = '${nominatorCount}' WHERE name = 'nominator_count`;
+        await pool.query(sql);
+      } catch (error) {
+        logger.error(loggerOptions, `Error updating total: ${JSON.stringify(error)}`);
+      }
+      try {
+        const sql = `UPDATE total SET count = '${currentEra}' WHERE name = 'current_era`;
+        await pool.query(sql);
+      } catch (error) {
+        logger.error(loggerOptions, `Error updating total: ${JSON.stringify(error)}`);
+      }
+      try {
+        const sql = `UPDATE total SET count = '${minimumStake}' WHERE name = 'minimum_stake`;
+        await pool.query(sql);
+      } catch (error) {
+        logger.error(loggerOptions, `Error updating total: ${JSON.stringify(error)}`);
+      }
+
       // eslint-disable-next-line
       const nominations = nominators.map(([key, nominations]) => {
         const nominator = key.toHuman()[0];

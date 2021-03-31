@@ -103,7 +103,7 @@ CREATE TABLE IF NOT EXISTS total (
   PRIMARY KEY ( name )
 );
 
-INSERT INTO total (name, count) VALUES ('blocks', 0),('extrinsics', 0),('transfers', 0),('events', 0);
+INSERT INTO total (name, count) VALUES ('blocks', 0),('extrinsics', 0),('transfers', 0),('events', 0),('active_validator_count', 0),('waiting_validator_count', 0),('nominator_count', 0),('current_era', 0),('minimum_stake', 0);
 
 CREATE INDEX IF NOT EXISTS extrinsic_section_idx ON extrinsic (section);
 CREATE INDEX IF NOT EXISTS extrinsic_method_idx ON extrinsic (method);
