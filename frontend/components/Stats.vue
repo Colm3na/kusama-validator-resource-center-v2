@@ -2,7 +2,7 @@
   <div class="row text-center dashboard-global-stats">
     <div class="col-md-6 col-lg-3 mb-4">
       <div class="box">
-        <h4>Active/Wating valid.</h4>
+        <h4>Active/Waiting valid.</h4>
         <span class="stat"
           >{{ activeValidatorCount }}/{{ waitingValidatorCount }}</span
         >
