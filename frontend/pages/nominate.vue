@@ -106,7 +106,7 @@
           <p class="pt-4">Target validators:</p>
           <div
             v-for="validator in list"
-            :key="validator.stashAddress"
+            :key="`nominate-validator-${validator.stashAddress}`"
             class="row pb-1"
           >
             <div class="col-10">

@@ -20,7 +20,11 @@
         </span>
       </div>
     </div>
-    <div v-for="validator in list" :key="validator.stashAddress" class="row">
+    <div
+      v-for="validator in list"
+      :key="`selected-validator-${validator.stashAddress}`"
+      class="row"
+    >
       <div class="col-10 selected-validator">
         <Identicon :address="validator.stashAddress" :size="20" />
         <nuxt-link :to="`/validator/${validator.stashAddress}`">
@@ -68,7 +72,9 @@ export default {
       return this.$store.state.ranking.loading
     },
     list() {
-      return this.$store.state.ranking.list.filter(({ selected }) => selected)
+      return this.$store.state.ranking.list.filter(({ stashAddress }) =>
+        this.selectedAddresses.includes(stashAddress)
+      )
     },
     selectedAddresses() {
       return this.$store.state.ranking.selectedAddresses
