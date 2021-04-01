@@ -12,11 +12,11 @@ export default ({ app }) => {
     disabled: kusamaValidatorsNetwork
       ? !kusamaValidatorsNetwork.googleAnalytics
       : true,
-    // debug: {
-    //   enabled: true,
-    // },
+    debug: {
+      enabled: true,
+    },
     fields: {
-      cookieDomain: 'validators.kusama.network',
+      cookieDomain: 'validatorsv2.kusama.polkastats.io',
     },
   })
 }
