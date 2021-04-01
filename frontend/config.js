@@ -14,7 +14,7 @@ export const config = {
   favicon: 'img/favicon/kusama.ico',
   baseURL: '/',
   showValSelectorInPage: false, // set to false when showing val selector in header
-  googleAnalytics: '',
+  googleAnalytics: 'G-0MDQV4GFD9',
   backendWs: 'wss://validatorsv2.kusama.polkastats.io/api/v3',
   backendHttp: 'https://validatorsv2.kusama.polkastats.io/api/v3',
 }
