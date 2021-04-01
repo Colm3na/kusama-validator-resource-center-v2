@@ -455,7 +455,7 @@ export default {
           value: 'noParticipateGovernance',
         },
         {
-          text: 'Cluster members',
+          text: 'Cluster member excess',
           value: 'partOfCluster',
         },
       ],
