@@ -56,12 +56,12 @@ export default {
       )
       if (kusamaValidatorsNetwork) {
         if (kusamaValidatorsNetwork.googleAnalytics) {
-          vm.$gtag.disabled(true)
+          vm.$gtag.optIn()
         } else {
-          vm.$gtag.disabled(false)
+          vm.$gtag.optOut()
         }
       } else {
-        vm.$gtag.disabled(false)
+        vm.$gtag.optOut()
       }
     }, 10000)
   },
