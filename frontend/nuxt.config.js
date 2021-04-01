@@ -33,7 +33,7 @@ export default {
   css: [config.theme],
 
   // Plugins to run before rendering page (https://go.nuxtjs.dev/config-plugins)
-  plugins: ['@/plugins/vue-typed-text.js', '@/plugins/vue-analytics.js'],
+  plugins: ['@/plugins/vue-typed-text.js', '@/plugins/vue-gtag.js'],
 
   // Auto import components (https://go.nuxtjs.dev/config-components)
   components: true,
