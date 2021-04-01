@@ -25,6 +25,7 @@ export const state = () => ({
     subaccounts: 1,
   },
   customVRCScoreEnabled: false,
+  onlyOneClusterMember: true,
 })
 
 export const getters = {
@@ -70,18 +71,33 @@ export const mutations = {
         )
       if (clusterMemberAlreadyIncluded) {
         const bootStrapToaster = new BToast()
-        bootStrapToaster.$bvToast.toast(
-          'Selecting more than one member of a cluster is not recommended',
-          {
-            title: 'Cluster already included!',
-            variant: 'warning',
-            autoHideDelay: 5000,
-            appendToast: false,
-          }
-        )
+        if (!state.onlyOneClusterMember) {
+          bootStrapToaster.$bvToast.toast(
+            'Selecting more than one member of a cluster is not recommended',
+            {
+              title: 'Cluster already included!',
+              variant: 'warning',
+              autoHideDelay: 5000,
+              appendToast: false,
+            }
+          )
+          selectedAddresses.push(accountId)
+          validator.selected = true
+        } else {
+          bootStrapToaster.$bvToast.toast(
+            'Selecting more than one member of a cluster is not allowed',
+            {
+              title: 'Cluster already included!',
+              variant: 'danger',
+              autoHideDelay: 5000,
+              appendToast: false,
+            }
+          )
+        }
+      } else {
+        selectedAddresses.push(accountId)
+        validator.selected = true
       }
-      selectedAddresses.push(accountId)
-      validator.selected = true
     } else {
       const bootStrapToaster = new BToast()
       bootStrapToaster.$bvToast.toast(
@@ -216,6 +232,15 @@ export const mutations = {
       } dominated validators`
     )
   },
+  toggleOnlyOneClusterMember(state, onlyOneClusterMember) {
+    state.onlyOneClusterMember = onlyOneClusterMember
+    // eslint-disable-next-line no-console
+    console.log(
+      `Allow only one cluster member per set is ${
+        state.onlyOneClusterMember ? 'on' : 'off'
+      }`
+    )
+  },
 }
 
 export const actions = {
@@ -252,6 +277,7 @@ export const actions = {
           nominators_rating
           other_stake
           part_of_cluster
+          cluster_name
           show_cluster_member
           payout_rating
           rank
@@ -284,6 +310,7 @@ export const actions = {
         nominatorsRating: validator.nominators_rating,
         otherStake: validator.other_stake,
         partOfCluster: validator.part_of_cluster,
+        clusterName: validator.cluster_name,
         showClusterMember: validator.show_cluster_member,
         payoutRating: validator.payout_rating,
         rank: validator.rank,
@@ -348,5 +375,8 @@ export const actions = {
   },
   updateDominated(context) {
     context.commit('updateDominated')
+  },
+  toggleOnlyOneClusterMember(context, onlyOneClusterMember) {
+    context.commit('toggleOnlyOneClusterMember', onlyOneClusterMember)
   },
 }

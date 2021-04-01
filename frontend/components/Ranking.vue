@@ -68,6 +68,15 @@
               </b-form-checkbox>
             </div>
           </div>
+          <p class="text-center">
+            <b-form-checkbox
+              switch
+              :checked="onlyOneClusterMember"
+              @change="toggleOnlyOneClusterMember()"
+            >
+              Allow only one cluster member
+            </b-form-checkbox>
+          </p>
         </b-collapse>
       </div>
       <!-- Customize VRC score -->
@@ -92,9 +101,21 @@
             </h5>
           </div>
           <div class="col-2 text-right">
-            <span v-b-toggle.auto-filter-collapse class="m-1">
-              <font-awesome-icon icon="chevron-up" class="when-open" />
-              <font-awesome-icon icon="chevron-down" class="when-closed" />
+            <span
+              v-b-toggle.auto-filter-collapse
+              class="m-1"
+              style="z-index: 100"
+            >
+              <font-awesome-icon
+                icon="chevron-up"
+                class="when-open"
+                style="z-index: 100"
+              />
+              <font-awesome-icon
+                icon="chevron-down"
+                class="when-closed"
+                style="z-index: 100"
+              />
             </span>
           </div>
         </div>
@@ -445,6 +466,7 @@ export default {
       polling: null,
       config,
       autoFilter: false,
+      onlyOneClusterMember: true,
     }
   },
   computed: {
@@ -551,6 +573,13 @@ export default {
     },
     toggleAutoFilter() {
       this.autoFilter = !this.autoFilter
+    },
+    toggleOnlyOneClusterMember() {
+      this.onlyOneClusterMember = !this.onlyOneClusterMember
+      this.$store.dispatch(
+        'ranking/toggleOnlyOneClusterMember',
+        JSON.parse(JSON.stringify(this.onlyOneClusterMember))
+      )
     },
   },
 }
