@@ -36,7 +36,7 @@
               @click="importSetFrom(account.address)"
               >IMPORT SET</b-button
             >
-            <span>WARNING: This will replace your current set!</span>
+            <span>WARNING: Importing your on-chain nominations will replace your current selection in the Validator Resource Center!</span>
           </div>
         </div>
       </div>
