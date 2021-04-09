@@ -22,7 +22,7 @@
     </div>
     <div class="col-md-6 col-lg-3 mb-4">
       <div class="box">
-        <h4>Mininum stake</h4>
+        <h4>Minimum stake</h4>
         <span class="stat">{{ formatAmount(minimumStake, 2) }}</span>
       </div>
     </div>
