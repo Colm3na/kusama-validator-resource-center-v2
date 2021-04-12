@@ -203,6 +203,7 @@ module.exports = {
       // chain data
       logger.info(loggerOptions, 'Fetching data from chain');
       const api = await ApiPromise.create({ provider: wsProvider });
+      await api.isReady;
       const withActive = false;
       const erasHistoric = await api.derive.staking.erasHistoric(withActive);
       const chainCurrentEra = await api.query.staking.currentEra();

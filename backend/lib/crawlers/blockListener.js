@@ -15,6 +15,7 @@ module.exports = {
     logger.info(loggerOptions, 'Starting block listener...');
     const wsProvider = new WsProvider(wsProviderUrl);
     const api = await ApiPromise.create({ provider: wsProvider });
+    await api.isReady;
     // Subscribe to new blocks
     await api.rpc.chain.subscribeNewHeads(async (blockHeader) => {
       // Get block hash

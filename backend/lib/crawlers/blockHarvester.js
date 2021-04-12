@@ -17,6 +17,7 @@ module.exports = {
     const startTime = new Date().getTime();
     const wsProvider = new WsProvider(wsProviderUrl);
     const api = await ApiPromise.create({ provider: wsProvider });
+    await api.isReady;
 
     // Get gaps from block table
     const sqlSelect = `
@@ -59,6 +60,8 @@ module.exports = {
         );
       }
     }
+    logger.info(loggerOptions, 'Disconnecting from API');
+    await api.disconnect().catch((error) => logger.error(loggerOptions, `Disconnect error: ${JSON.stringify(error)}`));
     // Log execution time
     const endTime = new Date().getTime();
     logger.info(loggerOptions, `Executed in ${((endTime - startTime) / 1000).toFixed(0)}s`);
