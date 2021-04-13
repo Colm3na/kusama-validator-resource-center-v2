@@ -79,6 +79,7 @@ CREATE TABLE IF NOT EXISTS ranking (
   era_points_percent TEXT NOT NULL,
   era_points_rating INT NOT NULL,
   performance TEXT NOT NULL,
+  performance_history TEXT NOT NULL,
   relative_performance TEXT NOT NULL,
   slashed BOOLEAN NOT NULL,
   slash_rating INT NOT NULL,
@@ -103,7 +104,16 @@ CREATE TABLE IF NOT EXISTS total (
   PRIMARY KEY ( name )
 );
 
-INSERT INTO total (name, count) VALUES ('blocks', 0),('extrinsics', 0),('transfers', 0),('events', 0),('active_validator_count', 0),('waiting_validator_count', 0),('nominator_count', 0),('current_era', 0),('minimum_stake', 0);
+INSERT INTO total (name, count) VALUES
+  ('blocks', 0),
+  ('extrinsics', 0),
+  ('transfers', 0),
+  ('events', 0),
+  ('active_validator_count', 0),
+  ('waiting_validator_count', 0),
+  ('nominator_count', 0),
+  ('current_era', 0),
+  ('minimum_stake', 0);
 
 CREATE INDEX IF NOT EXISTS extrinsic_section_idx ON extrinsic (section);
 CREATE INDEX IF NOT EXISTS extrinsic_method_idx ON extrinsic (method);

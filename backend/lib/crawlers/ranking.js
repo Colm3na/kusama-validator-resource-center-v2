@@ -536,6 +536,7 @@ module.exports = {
           // era points and frecuency of payouts
           const eraPointsHistory = [];
           const payoutHistory = [];
+          const performanceHistory = [];
           let activeEras = 0;
           let performance = 0;
           // eslint-disable-next-line
@@ -563,11 +564,19 @@ module.exports = {
               );
               eraPerformance = (points * (1 - (commission / 100)))
                 / (eraTotalStake.div(new BigNumber(10).pow(config.tokenDecimals)).toNumber());
+              performanceHistory.push({
+                era: new BigNumber(era.toString()).toString(10),
+                performance: eraPerformance,
+              });
             } else {
               // validator was not active in that era
               eraPointsHistory.push({
                 era: new BigNumber(era.toString()).toString(10),
                 points: 0,
+              });
+              performanceHistory.push({
+                era: new BigNumber(era.toString()).toString(10),
+                performance: 0,
               });
             }
             payoutHistory.push({
@@ -648,6 +657,7 @@ module.exports = {
             eraPointsPercent,
             eraPointsRating,
             performance,
+            performanceHistory,
             slashed,
             slashRating,
             slashes,
@@ -783,6 +793,7 @@ module.exports = {
           era_points_percent,
           era_points_rating,
           performance,
+          performance_history,
           relative_performance,
           slashed,
           slash_rating,
@@ -844,7 +855,8 @@ module.exports = {
           $43,
           $44,
           $45,
-          $46
+          $46,
+          $47
         )`;
         const data = [
           `${blockHeight}`,
@@ -878,6 +890,7 @@ module.exports = {
           `${validator.eraPointsPercent}`,
           `${validator.eraPointsRating}`,
           `${validator.performance}`,
+          `${validator.performanceHistory}`,
           `${validator.relativePerformance}`,
           `${validator.slashed}`,
           `${validator.slashRating}`,
