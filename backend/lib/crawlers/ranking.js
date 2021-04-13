@@ -692,7 +692,8 @@ module.exports = {
         });
 
       // populate minMaxEraPerformance
-      eraIndexes.forEach((era) => {
+      eraIndexes.forEach((eraIndex) => {
+        const era = new BigNumber(eraIndex.toString()).toString(10);
         const eraPerformances = ranking.map(
           ({ performanceHistory }) => performanceHistory.find(
             (performance) => performance.era === era,
