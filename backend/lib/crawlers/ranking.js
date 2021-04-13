@@ -301,12 +301,15 @@ module.exports = {
         0,
       );
       const eraPointsAverage = eraPointsHistoryTotalsSum / numActiveValidators;
+      const minMaxEraPerformance = []; // needed to calculate rel. performance per era
 
       // dashboard metrics
       const activeValidatorCount = validatorAddresses.length;
       const waitingValidatorCount = waitingInfo.info.length;
       const nominatorCount = nominators.length;
       const currentEra = chainCurrentEra.toString();
+
+      // get minimun stake
       const nominatorStakes = [];
       // eslint-disable-next-line
       for (const validator of validators){
@@ -318,6 +321,7 @@ module.exports = {
       nominatorStakes.sort((a, b) => (
         (new BigNumber(a.toString()).lte(new BigNumber(b.toString())) ? 1 : 0)));
       const minimumStake = nominatorStakes[0];
+
       logger.info(loggerOptions, `${activeValidatorCount} active validators`);
       logger.info(loggerOptions, `${waitingValidatorCount} waiting validators`);
       logger.info(loggerOptions, `${nominatorCount} nominators`);
@@ -677,13 +681,30 @@ module.exports = {
           const relativePerformance = ((validator.performance - minPerformance)
             / (maxPerformance - minPerformance)).toFixed(6);
           const dominated = false;
+          const relativePerformanceHistory = [];
           return {
             rank: rank + 1,
             relativePerformance,
+            relativePerformanceHistory,
             ...validator,
             dominated,
           };
         });
+
+      // populate minMaxEraPerformance
+      eraIndexes.forEach((era) => {
+        const eraPerformances = ranking.map(
+          ({ performanceHistory }) => performanceHistory.find(
+            (performance) => performance.era === era,
+          ).performance,
+        );
+        minMaxEraPerformance.push({
+          era,
+          min: Math.min(...eraPerformances),
+          max: Math.max(...eraPerformances),
+        });
+      });
+
       // find largest cluster size
       const largestCluster = Math.max(...Array.from(ranking, (o) => o.clusterMembers));
       logger.info(loggerOptions, `LARGEST cluster size is ${largestCluster}`);
@@ -695,6 +716,23 @@ module.exports = {
       const dominatedStart = new Date().getTime();
       ranking = ranking
         .map((validator) => {
+          // populate relativePerformanceHistory
+          const relativePerformanceHistory = [];
+          validator.performanceHistory.forEach((performance) => {
+            const eraMinPerformance = minMaxEraPerformance.find(
+              ({ era }) => era === performance.era,
+            ).min;
+            const eraMaxPerformance = minMaxEraPerformance.find(
+              ({ era }) => era === performance.era,
+            ).max;
+            const relativePerformance = ((performance.performance - eraMinPerformance)
+            / (eraMaxPerformance - eraMinPerformance)).toFixed(6);
+            relativePerformanceHistory.push({
+              era: performance.era,
+              relativePerformance,
+            });
+          });
+          // dominated validator logic
           let dominated = false;
           // eslint-disable-next-line no-restricted-syntax
           for (const opponent of ranking) {
@@ -714,6 +752,7 @@ module.exports = {
           }
           return {
             ...validator,
+            relativePerformanceHistory,
             dominated,
           };
         });
@@ -795,6 +834,7 @@ module.exports = {
           performance,
           performance_history,
           relative_performance,
+          relative_performance_history,
           slashed,
           slash_rating,
           slashes,
@@ -856,7 +896,8 @@ module.exports = {
           $44,
           $45,
           $46,
-          $47
+          $47,
+          $48
         )`;
         const data = [
           `${blockHeight}`,
@@ -890,8 +931,9 @@ module.exports = {
           `${validator.eraPointsPercent}`,
           `${validator.eraPointsRating}`,
           `${validator.performance}`,
-          `${validator.performanceHistory}`,
+          `${JSON.stringify(validator.performanceHistory)}`,
           `${validator.relativePerformance}`,
+          `${JSON.stringify(validator.relativePerformanceHistory)}`,
           `${validator.slashed}`,
           `${validator.slashRating}`,
           `${JSON.stringify(validator.slashes)}`,

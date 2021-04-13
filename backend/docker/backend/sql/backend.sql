@@ -81,6 +81,7 @@ CREATE TABLE IF NOT EXISTS ranking (
   performance TEXT NOT NULL,
   performance_history TEXT NOT NULL,
   relative_performance TEXT NOT NULL,
+  relative_performance_history TEXT NOT NULL,
   slashed BOOLEAN NOT NULL,
   slash_rating INT NOT NULL,
   slashes TEXT NOT NULL,
