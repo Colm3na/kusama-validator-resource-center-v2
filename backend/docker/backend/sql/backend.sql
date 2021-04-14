@@ -99,6 +99,13 @@ CREATE TABLE IF NOT EXISTS ranking (
   PRIMARY KEY ( block_height, stash_address )
 );
 
+CREATE TABLE IF NOT EXISTS era_vrc (  
+  stash_address TEXT NOT NULL,
+  era INT NOT NULL,
+  total_rating INT NOT NULL,
+  PRIMARY KEY ( stash_address, era )
+);
+
 CREATE TABLE IF NOT EXISTS total (  
   name TEXT,
   count BIGINT NOT NULL,
@@ -128,4 +135,5 @@ GRANT ALL PRIVILEGES ON TABLE harvester_error TO vrc;
 GRANT ALL PRIVILEGES ON TABLE event TO vrc;
 GRANT ALL PRIVILEGES ON TABLE extrinsic TO vrc;
 GRANT ALL PRIVILEGES ON TABLE ranking TO vrc;
+GRANT ALL PRIVILEGES ON TABLE era_vrc TO vrc;
 GRANT ALL PRIVILEGES ON TABLE total TO vrc;

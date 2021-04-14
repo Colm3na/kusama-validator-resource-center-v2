@@ -799,6 +799,34 @@ module.exports = {
         });
       logger.info(loggerOptions, `Finished, ${validatorsToHide.length} validators hided!`);
 
+      // insert era vrc score for validators when era change
+      logger.info(loggerOptions, 'Storing era VRC score in db...');
+      // eslint-disable-next-line no-restricted-syntax
+      for (const validator of ranking) {
+        const sql = `INSERT INTO era_vrc (
+          stash_address,
+          era,
+          total_rating
+        ) VALUES (
+          $1,
+          $2,
+          $3
+        )
+        ON CONFLICT ON CONSTRAINT era_vrc_pkey 
+        DO NOTHING;`;
+        const data = [
+          `${validator.stashAddress}`,
+          `${currentEra}`,
+          `${validator.totalRating}`,
+        ];
+        try {
+          // eslint-disable-next-line no-await-in-loop
+          await pool.query(sql, data);
+        } catch (error) {
+          logger.error(loggerOptions, `Error inserting data in era_vrc table: ${JSON.stringify(error)}`);
+        }
+      }
+
       logger.info(loggerOptions, `Storing ${ranking.length} validators in db...`);
       // eslint-disable-next-line no-restricted-syntax
       for (const validator of ranking) {
