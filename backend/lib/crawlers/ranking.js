@@ -705,7 +705,6 @@ module.exports = {
           max: Math.max(...eraPerformances),
         });
       });
-      logger.info(loggerOptions, `minMaxEraPerformance: ${JSON.stringify(minMaxEraPerformance)}`);
 
       // find largest cluster size
       const largestCluster = Math.max(...Array.from(ranking, (o) => o.clusterMembers));
