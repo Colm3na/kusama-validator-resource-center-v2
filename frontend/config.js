@@ -1,6 +1,6 @@
 export const config = {
   name: 'kusama',
-  title: 'Validator resource center and ranking',
+  title: 'Validator Resource Center and Ranking',
   nodeWs: 'wss://kusama-rpc.polkadot.io',
   denom: 'KSM',
   addressPrefix: 2,
