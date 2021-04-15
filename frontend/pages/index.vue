@@ -29,13 +29,7 @@
       </b-alert>
       <h1 class="mb-4">Dashboard</h1>
       <Stats />
-      <line-chart
-        :data="scoreChartData"
-        :options="scoreChartOptions"
-        :height="160"
-        class="py-4"
-        style="background-color: rgba(0, 0, 0, 1)"
-      />
+      <VRCScore />
     </div>
   </div>
 </template>
