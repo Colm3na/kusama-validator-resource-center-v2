@@ -2,9 +2,8 @@
   <reactive-line-chart
     :chart-data="chartData"
     :options="chartOptions"
-    :height="160"
     class="py-4"
-    style="background-color: rgba(0, 0, 0, 1)"
+    style="height: 400px; background-color: rgba(0, 0, 0, 1)"
   />
 </template>
 
@@ -19,6 +18,7 @@ export default {
       config,
       chartOptions: {
         responsive: true,
+        maintainAspectRatio: false,
         legend: {
           display: true,
         },
