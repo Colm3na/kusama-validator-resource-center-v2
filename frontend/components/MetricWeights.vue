@@ -62,7 +62,7 @@
             <div class="col-md-6">
               <div class="row">
                 <div class="col-8 col-md-6">
-                  COMMISSION
+                  COMMISSION CHANGES
                   <nuxt-link
                     v-b-tooltip.hover
                     to="/help/metrics#commission"
@@ -130,7 +130,7 @@
             <div class="col-md-6">
               <div class="row">
                 <div class="col-8 col-md-6">
-                  GOVERNANCE
+                  GOVERNANCE PARTICIPATION
                   <nuxt-link
                     v-b-tooltip.hover
                     to="/help/metrics#governance"
@@ -196,7 +196,7 @@
             <div class="col-md-6">
               <div class="row">
                 <div class="col-8 col-md-6">
-                  NOMINATORS
+                  NUMBER OF NOMINATORS
                   <nuxt-link
                     v-b-tooltip.hover
                     to="/help/metrics#nominators"
@@ -262,7 +262,7 @@
             <div class="col-md-6">
               <div class="row">
                 <div class="col-8 col-md-6">
-                  PAYOUTS
+                  PAYOUT FREQUENCY
                   <nuxt-link
                     v-b-tooltip.hover
                     to="/help/metrics#payouts"
