@@ -231,7 +231,7 @@
             <div class="col-md-6">
               <div class="row">
                 <div class="col-8 col-md-6">
-                  ADDRES CREATION
+                  ADDRESS CREATION
                   <nuxt-link
                     v-b-tooltip.hover
                     to="/help/metrics#address"
