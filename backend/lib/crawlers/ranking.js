@@ -957,6 +957,8 @@ module.exports = {
         if (res.rows.length > 0) {
           if (res.rows[0].commission_avg) {
             sql = `INSERT INTO era_commission_avg (era, commission_avg) VALUES ('${era}', '${res.rows[0].commission_avg}') ON CONFLICT ON CONSTRAINT era_commission_avg_pkey DO NOTHING;`;
+            // eslint-disable-next-line no-await-in-loop
+            res = await pool.query(sql);
           }
         }
         sql = `SELECT AVG(self_stake) AS self_stake_avg FROM era_self_stake WHERE era = '${era}'`;
@@ -965,6 +967,8 @@ module.exports = {
         if (res.rows.length > 0) {
           if (res.rows[0].self_stake_avg) {
             sql = `INSERT INTO era_self_stake_avg (era, self_stake_avg) VALUES ('${era}', '${res.rows[0].self_stake_avg}') ON CONFLICT ON CONSTRAINT era_self_stake_avg_pkey DO NOTHING;`;
+            // eslint-disable-next-line no-await-in-loop
+            res = await pool.query(sql);
           }
         }
         sql = `SELECT AVG(relative_performance) AS relative_performance_avg FROM era_relative_performance WHERE era = '${era}'`;
@@ -973,6 +977,8 @@ module.exports = {
         if (res.rows.length > 0) {
           if (res.rows[0].relative_performance_avg) {
             sql = `INSERT INTO era_relative_performance_avg (era, relative_performance_avg) VALUES ('${era}', '${res.rows[0].relative_performance_avg}') ON CONFLICT ON CONSTRAINT era_relative_performance_avg_pkey DO NOTHING;`;
+            // eslint-disable-next-line no-await-in-loop
+            res = await pool.query(sql);
           }
         }
         sql = `SELECT AVG(points) AS points_avg FROM era_points WHERE era = '${era}'`;
@@ -981,6 +987,8 @@ module.exports = {
         if (res.rows.length > 0) {
           if (res.rows[0].points_avg) {
             sql = `INSERT INTO era_points_avg (era, points_avg) VALUES ('${era}', '${res.rows[0].points_avg}') ON CONFLICT ON CONSTRAINT era_points_avg_pkey DO NOTHING;`;
+            // eslint-disable-next-line no-await-in-loop
+            res = await pool.query(sql);
           }
         }
       }
