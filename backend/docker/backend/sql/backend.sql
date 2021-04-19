@@ -105,8 +105,20 @@ CREATE TABLE IF NOT EXISTS era_stats (
   total_rating INT NOT NULL,
   commission FLOAT NOT NULL,
   self_stake BIGINT NOT NULL,
+  PRIMARY KEY ( stash_address, era )
+);
+
+CREATE TABLE IF NOT EXISTS era_relative_performance (  
+  stash_address TEXT NOT NULL,
+  era INT NOT NULL,
   relative_performance FLOAT NOT NULL,
-  era_points INT NOT NULL,
+  PRIMARY KEY ( stash_address, era )
+);
+
+CREATE TABLE IF NOT EXISTS era_points (  
+  stash_address TEXT NOT NULL,
+  era INT NOT NULL,
+  points INT NOT NULL,
   PRIMARY KEY ( stash_address, era )
 );
 
@@ -140,4 +152,6 @@ GRANT ALL PRIVILEGES ON TABLE event TO vrc;
 GRANT ALL PRIVILEGES ON TABLE extrinsic TO vrc;
 GRANT ALL PRIVILEGES ON TABLE ranking TO vrc;
 GRANT ALL PRIVILEGES ON TABLE era_stats TO vrc;
+GRANT ALL PRIVILEGES ON TABLE era_relative_performance TO vrc;
+GRANT ALL PRIVILEGES ON TABLE era_points TO vrc;
 GRANT ALL PRIVILEGES ON TABLE total TO vrc;

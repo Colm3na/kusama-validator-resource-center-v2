@@ -797,48 +797,90 @@ module.exports = {
           return modValidator;
         });
       logger.info(loggerOptions, `Finished, ${validatorsToHide.length} validators hided!`);
-
-      // insert era vrc score for validators when era change
-      logger.info(loggerOptions, 'Storing era VRC score in db...');
+      logger.info(loggerOptions, 'Storing era stats in db...');
       // eslint-disable-next-line no-restricted-syntax
       for (const validator of ranking) {
-        const sql = `INSERT INTO era_stats (
-          stash_address,
-          era,
-          total_rating,
-          commission,
-          self_stake,
-          relative_performance,
-          era_points,
-        ) VALUES (
-          $1,
-          $2,
-          $3,
-          $4,
-          $5,
-          $6,
-          $7
-        )
-        ON CONFLICT ON CONSTRAINT era_stats_pkey 
-        DO NOTHING;`;
-        //
-        // WARN: total rating, commission and self stake are current values.
-        // relative performace and era points are based on previous era data
-        //
-        const data = [
-          `${validator.stashAddress}`,
-          `${currentEra}`,
-          `${validator.totalRating}`,
-          `${validator.commission}`,
-          `${validator.selfStake}`,
-          `${validator.relativePerformanceHistory[validator.relativePerformanceHistory.length - 1].performace}`,
-          `${validator.eraPointsHistory[validator.eraPointsHistory.length - 1].points}`,
-        ];
         try {
+          const sql = `INSERT INTO era_stats (
+            stash_address,
+            era,
+            total_rating,
+            commission,
+            self_stake
+          ) VALUES (
+            $1,
+            $2,
+            $3,
+            $4,
+            $5
+          )
+          ON CONFLICT ON CONSTRAINT era_stats_pkey 
+          DO NOTHING;`;
+          //
+          // WARN: total rating, commission and self stake are current values.
+          // relative performace and era points are based on previous era data
+          //
+          const data = [
+            `${validator.stashAddress}`,
+            `${currentEra}`,
+            `${validator.totalRating}`,
+            `${validator.commission}`,
+            `${validator.selfStake}`,
+          ];
           // eslint-disable-next-line no-await-in-loop
           await pool.query(sql, data);
         } catch (error) {
           logger.error(loggerOptions, `Error inserting data in era_stats table: ${JSON.stringify(error)}`);
+        }
+        // eslint-disable-next-line no-restricted-syntax
+        for (const perfHistoryItem of validator.relativePerformanceHistory) {
+          try {
+            const sql = `INSERT INTO era_relative_performance (
+              stash_address,
+              era,
+              relative_performance
+            ) VALUES (
+              $1,
+              $2,
+              $3
+            )
+            ON CONFLICT ON CONSTRAINT era_relative_performance_pkey 
+            DO NOTHING;`;
+            const data = [
+              `${validator.stashAddress}`,
+              `${perfHistoryItem.era}`,
+              `${perfHistoryItem.relativePerformance}`,
+            ];
+            // eslint-disable-next-line no-await-in-loop
+            await pool.query(sql, data);
+          } catch (error) {
+            logger.error(loggerOptions, `Error inserting row in era_relative_performance table: ${JSON.stringify(error)}`);
+          }
+        }
+        // eslint-disable-next-line no-restricted-syntax
+        for (const eraPointsHistoryItem of validator.eraPointsHistory) {
+          try {
+            const sql = `INSERT INTO era_points (
+              stash_address,
+              era,
+              points
+            ) VALUES (
+              $1,
+              $2,
+              $3
+            )
+            ON CONFLICT ON CONSTRAINT era_points_pkey 
+            DO NOTHING;`;
+            const data = [
+              `${validator.stashAddress}`,
+              `${eraPointsHistoryItem.era}`,
+              `${eraPointsHistoryItem.points}`,
+            ];
+            // eslint-disable-next-line no-await-in-loop
+            await pool.query(sql, data);
+          } catch (error) {
+            logger.error(loggerOptions, `Error inserting row in era_points table: ${JSON.stringify(error)}`);
+          }
         }
       }
 
