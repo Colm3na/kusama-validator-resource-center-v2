@@ -852,7 +852,7 @@ module.exports = {
             const sql = `INSERT INTO era_commission (
               stash_address,
               era,
-              commision
+              commission
             ) VALUES (
               $1,
               $2,
