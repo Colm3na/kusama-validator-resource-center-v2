@@ -541,6 +541,7 @@ module.exports = {
           const eraPointsHistory = [];
           const payoutHistory = [];
           const performanceHistory = [];
+          const stakeHistory = [];
           let activeEras = 0;
           let performance = 0;
           // eslint-disable-next-line
@@ -566,6 +567,22 @@ module.exports = {
                   (eraExposure) => eraExposure.era === era,
                 ).validators[stashAddress].total,
               );
+              const eraSelfStake = new BigNumber(
+                erasExposure.find(
+                  (eraExposure) => eraExposure.era === era,
+                ).validators[stashAddress].own,
+              );
+              const eraOthersStake = new BigNumber(
+                erasExposure.find(
+                  (eraExposure) => eraExposure.era === era,
+                ).validators[stashAddress].others,
+              );
+              stakeHistory.push({
+                era: new BigNumber(era.toString()).toString(10),
+                self: eraSelfStake.toString(10),
+                others: eraOthersStake.toString(10),
+                total: eraTotalStake.toString(10),
+              });
               eraPerformance = (points * (1 - (commission / 100)))
                 / (eraTotalStake.div(new BigNumber(10).pow(config.tokenDecimals)).toNumber());
               performanceHistory.push({
@@ -577,6 +594,12 @@ module.exports = {
               eraPointsHistory.push({
                 era: new BigNumber(era.toString()).toString(10),
                 points: 0,
+              });
+              stakeHistory.push({
+                era: new BigNumber(era.toString()).toString(10),
+                self: 0,
+                others: 0,
+                total: 0,
               });
               performanceHistory.push({
                 era: new BigNumber(era.toString()).toString(10),
@@ -673,6 +696,7 @@ module.exports = {
             selfStake,
             otherStake,
             totalStake,
+            stakeHistory,
             totalRating,
           };
         })
@@ -801,36 +825,51 @@ module.exports = {
       // eslint-disable-next-line no-restricted-syntax
       for (const validator of ranking) {
         try {
-          const sql = `INSERT INTO era_stats (
+          const sql = `INSERT INTO era_vrc_score (
             stash_address,
             era,
-            total_rating,
-            commission,
-            self_stake
+            vrc_score
           ) VALUES (
             $1,
             $2,
-            $3,
-            $4,
-            $5
+            $3
           )
-          ON CONFLICT ON CONSTRAINT era_stats_pkey 
+          ON CONFLICT ON CONSTRAINT era_vrc_score_pkey 
           DO NOTHING;`;
-          //
-          // WARN: total rating, commission and self stake are current values.
-          // relative performace and era points are based on previous era data
-          //
           const data = [
             `${validator.stashAddress}`,
             `${currentEra}`,
             `${validator.totalRating}`,
-            `${validator.commission}`,
-            `${validator.selfStake}`,
           ];
           // eslint-disable-next-line no-await-in-loop
           await pool.query(sql, data);
         } catch (error) {
-          logger.error(loggerOptions, `Error inserting data in era_stats table: ${JSON.stringify(error)}`);
+          logger.error(loggerOptions, `Error inserting data in era_vrc_score table: ${JSON.stringify(error)}`);
+        }
+        // eslint-disable-next-line no-restricted-syntax
+        for (const commissionHistoryItem of validator.commissionHistory) {
+          try {
+            const sql = `INSERT INTO era_commission (
+              stash_address,
+              era,
+              relative_performance
+            ) VALUES (
+              $1,
+              $2,
+              $3
+            )
+            ON CONFLICT ON CONSTRAINT era_commission_pkey 
+            DO NOTHING;`;
+            const data = [
+              `${validator.stashAddress}`,
+              `${commissionHistoryItem.era}`,
+              `${commissionHistoryItem.commission}`,
+            ];
+            // eslint-disable-next-line no-await-in-loop
+            await pool.query(sql, data);
+          } catch (error) {
+            logger.error(loggerOptions, `Error inserting row in era_commission table: ${JSON.stringify(error)}`);
+          }
         }
         // eslint-disable-next-line no-restricted-syntax
         for (const perfHistoryItem of validator.relativePerformanceHistory) {
@@ -855,6 +894,31 @@ module.exports = {
             await pool.query(sql, data);
           } catch (error) {
             logger.error(loggerOptions, `Error inserting row in era_relative_performance table: ${JSON.stringify(error)}`);
+          }
+        }
+        // eslint-disable-next-line no-restricted-syntax
+        for (const stakefHistoryItem of validator.stakeHistory) {
+          try {
+            const sql = `INSERT INTO era_self_stake (
+              stash_address,
+              era,
+              self_stake
+            ) VALUES (
+              $1,
+              $2,
+              $3
+            )
+            ON CONFLICT ON CONSTRAINT era_self_stake_pkey 
+            DO NOTHING;`;
+            const data = [
+              `${validator.stashAddress}`,
+              `${stakefHistoryItem.era}`,
+              `${stakefHistoryItem.self}`,
+            ];
+            // eslint-disable-next-line no-await-in-loop
+            await pool.query(sql, data);
+          } catch (error) {
+            logger.error(loggerOptions, `Error inserting row in era_self_stake table: ${JSON.stringify(error)}`);
           }
         }
         // eslint-disable-next-line no-restricted-syntax
@@ -883,7 +947,43 @@ module.exports = {
           }
         }
       }
-
+      logger.info(loggerOptions, 'Storing era stats averages in db...');
+      // eslint-disable-next-line no-restricted-syntax
+      for (const eraIndex of eraIndexes) {
+        const era = new BigNumber(eraIndex.toString()).toString(10);
+        let sql = `SELECT AVG(commission) AS commission_avg FROM era_commission WHERE era = '${era}'`;
+        // eslint-disable-next-line no-await-in-loop
+        let res = await pool.query(sql);
+        if (res.rows.length > 0) {
+          if (res.rows[0].commission_avg) {
+            sql = `INSERT INTO era_commission_avg (era, commission_avg) VALUES ('${era}', '${res.rows[0].commission_avg}') ON CONFLICT ON CONSTRAINT era_commission_avg_pkey DO NOTHING;`;
+          }
+        }
+        sql = `SELECT AVG(self_stake) AS self_stake_avg FROM era_self_stake WHERE era = '${era}'`;
+        // eslint-disable-next-line no-await-in-loop
+        res = await pool.query(sql);
+        if (res.rows.length > 0) {
+          if (res.rows[0].self_stake_avg) {
+            sql = `INSERT INTO era_self_stake_avg (era, self_stake_avg) VALUES ('${era}', '${res.rows[0].self_stake_avg}') ON CONFLICT ON CONSTRAINT era_self_stake_avg_pkey DO NOTHING;`;
+          }
+        }
+        sql = `SELECT AVG(relative_performance) AS relative_performance_avg FROM era_relative_performance WHERE era = '${era}'`;
+        // eslint-disable-next-line no-await-in-loop
+        res = await pool.query(sql);
+        if (res.rows.length > 0) {
+          if (res.rows[0].relative_performance_avg) {
+            sql = `INSERT INTO era_relative_performance_avg (era, relative_performance_avg) VALUES ('${era}', '${res.rows[0].relative_performance_avg}') ON CONFLICT ON CONSTRAINT era_relative_performance_avg_pkey DO NOTHING;`;
+          }
+        }
+        sql = `SELECT AVG(points) AS points_avg FROM era_points WHERE era = '${era}'`;
+        // eslint-disable-next-line no-await-in-loop
+        res = await pool.query(sql);
+        if (res.rows.length > 0) {
+          if (res.rows[0].points_avg) {
+            sql = `INSERT INTO era_points_avg (era, points_avg) VALUES ('${era}', '${res.rows[0].points_avg}') ON CONFLICT ON CONSTRAINT era_points_avg_pkey DO NOTHING;`;
+          }
+        }
+      }
       logger.info(loggerOptions, `Storing ${ranking.length} validators in db...`);
       // eslint-disable-next-line no-restricted-syntax
       for (const validator of ranking) {
@@ -933,6 +1033,7 @@ module.exports = {
           self_stake,
           other_stake,
           total_stake,
+          stake_history,
           total_rating,
           dominated,
           timestamp
@@ -984,7 +1085,8 @@ module.exports = {
           $45,
           $46,
           $47,
-          $48
+          $48,
+          $49
         )`;
         const data = [
           `${blockHeight}`,
@@ -1032,6 +1134,7 @@ module.exports = {
           `${validator.selfStake}`,
           `${validator.otherStake}`,
           `${validator.totalStake}`,
+          `${JSON.stringify(validator.stakeHistory)}`,
           `${validator.totalRating}`,
           `${validator.dominated}`,
           `${startTime}`,

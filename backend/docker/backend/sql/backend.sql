@@ -93,19 +93,44 @@ CREATE TABLE IF NOT EXISTS ranking (
   self_stake BIGINT NOT NULL,
   other_stake BIGINT NOT NULL,
   total_stake BIGINT NOT NULL,
+  stake_history TEXT NOT NULL,
   total_rating INT NOT NULL,
   dominated BOOLEAN NOT NULL,
   timestamp BIGINT NOT NULL,
   PRIMARY KEY ( block_height, stash_address )
 );
 
-CREATE TABLE IF NOT EXISTS era_stats (  
+CREATE TABLE IF NOT EXISTS era_vrc_score (  
   stash_address TEXT NOT NULL,
   era INT NOT NULL,
-  total_rating INT NOT NULL,
+  vrc_score INT NOT NULL,
+  PRIMARY KEY ( stash_address, era )
+);
+
+CREATE TABLE IF NOT EXISTS era_commission (  
+  stash_address TEXT NOT NULL,
+  era INT NOT NULL,
   commission FLOAT NOT NULL,
+  PRIMARY KEY ( stash_address, era )
+);
+
+CREATE TABLE IF NOT EXISTS era_commission_avg (  
+  era INT NOT NULL,
+  commission_avg FLOAT NOT NULL,
+  PRIMARY KEY ( era )
+);
+
+CREATE TABLE IF NOT EXISTS era_self_stake (  
+  stash_address TEXT NOT NULL,
+  era INT NOT NULL,
   self_stake BIGINT NOT NULL,
   PRIMARY KEY ( stash_address, era )
+);
+
+CREATE TABLE IF NOT EXISTS era_self_stake_avg (  
+  era INT NOT NULL,
+  self_stake_avg BIGINT NOT NULL,
+  PRIMARY KEY ( era )
 );
 
 CREATE TABLE IF NOT EXISTS era_relative_performance (  
@@ -115,11 +140,23 @@ CREATE TABLE IF NOT EXISTS era_relative_performance (
   PRIMARY KEY ( stash_address, era )
 );
 
+CREATE TABLE IF NOT EXISTS era_relative_performance_avg (
+  era INT NOT NULL,
+  relative_performance_avg FLOAT NOT NULL,
+  PRIMARY KEY ( era )
+);
+
 CREATE TABLE IF NOT EXISTS era_points (  
   stash_address TEXT NOT NULL,
   era INT NOT NULL,
   points INT NOT NULL,
   PRIMARY KEY ( stash_address, era )
+);
+
+CREATE TABLE IF NOT EXISTS era_points_avg (
+  era INT NOT NULL,
+  points_avg INT NOT NULL,
+  PRIMARY KEY ( era )
 );
 
 CREATE TABLE IF NOT EXISTS total (  
@@ -151,7 +188,15 @@ GRANT ALL PRIVILEGES ON TABLE harvester_error TO vrc;
 GRANT ALL PRIVILEGES ON TABLE event TO vrc;
 GRANT ALL PRIVILEGES ON TABLE extrinsic TO vrc;
 GRANT ALL PRIVILEGES ON TABLE ranking TO vrc;
-GRANT ALL PRIVILEGES ON TABLE era_stats TO vrc;
+
+GRANT ALL PRIVILEGES ON TABLE era_vrc_score TO vrc;
+GRANT ALL PRIVILEGES ON TABLE era_vrc_commission TO vrc;
+GRANT ALL PRIVILEGES ON TABLE era_vrc_commission_avg TO vrc;
+GRANT ALL PRIVILEGES ON TABLE era_vrc_self_stake TO vrc;
+GRANT ALL PRIVILEGES ON TABLE era_vrc_self_stake_avg TO vrc;
 GRANT ALL PRIVILEGES ON TABLE era_relative_performance TO vrc;
+GRANT ALL PRIVILEGES ON TABLE era_relative_performance_avg TO vrc;
 GRANT ALL PRIVILEGES ON TABLE era_points TO vrc;
+GRANT ALL PRIVILEGES ON TABLE era_points_avg TO vrc;
+
 GRANT ALL PRIVILEGES ON TABLE total TO vrc;

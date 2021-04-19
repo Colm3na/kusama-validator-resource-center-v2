@@ -29,7 +29,23 @@
       </b-alert>
       <h1 class="mb-4">Dashboard</h1>
       <Stats />
-      <VRCScore />
+      <DashboardVRCScore />
+      <div class="row">
+        <div class="col-md-6">
+          <DashboardCommission />
+        </div>
+        <div class="col-md-6">
+          <DashboardSelfStake />
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-6">
+          <DashboardPerformance />
+        </div>
+        <div class="col-md-6">
+          <DashboardEraPoints />
+        </div>
+      </div>
     </div>
   </div>
 </template>

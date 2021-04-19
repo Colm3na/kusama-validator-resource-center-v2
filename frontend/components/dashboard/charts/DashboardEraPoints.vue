@@ -24,7 +24,7 @@ export default {
         },
         title: {
           display: true,
-          text: 'VRC score',
+          text: 'Average era points',
           fontSize: 24,
           fontColor: '#fff',
         },
@@ -45,7 +45,7 @@ export default {
               ticks: {
                 beginAtZero: true,
                 suggestedMin: 0,
-                suggestedMax: 25,
+                suggestedMax: 1,
               },
               gridLines: {
                 display: true,
@@ -57,18 +57,6 @@ export default {
       },
       chartData: null,
       rows: [],
-    }
-  },
-  head() {
-    return {
-      title: `${config.title} for ${this.capitalize(config.name)}`,
-      meta: [
-        {
-          hid: 'description',
-          name: 'description',
-          content: `${config.title} for ${this.capitalize(config.name)}`,
-        },
-      ],
     }
   },
   methods: {
@@ -84,7 +72,7 @@ export default {
         (era) =>
           this.rows
             .filter((row) => row.era === era)
-            .map((v) => parseFloat(v.total_rating))
+            .map((v) => v.points)
             .reduce((a, b) => a + b) /
           this.rows.filter((row) => row.era === era).length
       )
@@ -94,16 +82,15 @@ export default {
     $subscribe: {
       validator: {
         query: gql`
-          subscription era_stats {
-            era_stats(order_by: { era: asc }) {
-              stash_address
+          subscription era_points {
+            era_points(order_by: { era: asc }) {
               era
-              total_rating
+              points
             }
           }
         `,
         result({ data }) {
-          this.rows = data.era_stats
+          this.rows = data.era_points
           this.chartData = {
             labels: this.getLabels(),
             datasets: [
