@@ -863,7 +863,7 @@ module.exports = {
             const data = [
               `${validator.stashAddress}`,
               `${commissionHistoryItem.era}`,
-              `${commissionHistoryItem.commission}`,
+              `${commissionHistoryItem.commission || 0}`,
             ];
             // eslint-disable-next-line no-await-in-loop
             await pool.query(sql, data);
