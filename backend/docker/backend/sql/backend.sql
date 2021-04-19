@@ -190,10 +190,10 @@ GRANT ALL PRIVILEGES ON TABLE extrinsic TO vrc;
 GRANT ALL PRIVILEGES ON TABLE ranking TO vrc;
 
 GRANT ALL PRIVILEGES ON TABLE era_vrc_score TO vrc;
-GRANT ALL PRIVILEGES ON TABLE era_vrc_commission TO vrc;
-GRANT ALL PRIVILEGES ON TABLE era_vrc_commission_avg TO vrc;
-GRANT ALL PRIVILEGES ON TABLE era_vrc_self_stake TO vrc;
-GRANT ALL PRIVILEGES ON TABLE era_vrc_self_stake_avg TO vrc;
+GRANT ALL PRIVILEGES ON TABLE era_commission TO vrc;
+GRANT ALL PRIVILEGES ON TABLE era_commission_avg TO vrc;
+GRANT ALL PRIVILEGES ON TABLE era_self_stake TO vrc;
+GRANT ALL PRIVILEGES ON TABLE era_self_stake_avg TO vrc;
 GRANT ALL PRIVILEGES ON TABLE era_relative_performance TO vrc;
 GRANT ALL PRIVILEGES ON TABLE era_relative_performance_avg TO vrc;
 GRANT ALL PRIVILEGES ON TABLE era_points TO vrc;
