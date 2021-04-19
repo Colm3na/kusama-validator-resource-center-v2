@@ -94,8 +94,8 @@ export default {
     $subscribe: {
       validator: {
         query: gql`
-          subscription era_vrc {
-            era_vrc(order_by: { era: asc }) {
+          subscription era_stats {
+            era_stats(order_by: { era: asc }) {
               stash_address
               era
               total_rating
@@ -103,7 +103,7 @@ export default {
           }
         `,
         result({ data }) {
-          this.rows = data.era_vrc
+          this.rows = data.era_stats
           this.chartData = {
             labels: this.getLabels(),
             datasets: [

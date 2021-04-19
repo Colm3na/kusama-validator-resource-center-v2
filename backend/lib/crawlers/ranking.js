@@ -802,27 +802,43 @@ module.exports = {
       logger.info(loggerOptions, 'Storing era VRC score in db...');
       // eslint-disable-next-line no-restricted-syntax
       for (const validator of ranking) {
-        const sql = `INSERT INTO era_vrc (
+        const sql = `INSERT INTO era_stats (
           stash_address,
           era,
-          total_rating
+          total_rating,
+          commission,
+          self_stake,
+          relative_performance,
+          era_points,
         ) VALUES (
           $1,
           $2,
-          $3
+          $3,
+          $4,
+          $5,
+          $6,
+          $7
         )
-        ON CONFLICT ON CONSTRAINT era_vrc_pkey 
+        ON CONFLICT ON CONSTRAINT era_stats_pkey 
         DO NOTHING;`;
+        //
+        // WARN: total rating, commission and self stake are current values.
+        // relative performace and era points are based on previous era data
+        //
         const data = [
           `${validator.stashAddress}`,
           `${currentEra}`,
           `${validator.totalRating}`,
+          `${validator.commission}`,
+          `${validator.selfStake}`,
+          `${validator.relativePerformanceHistory[validator.relativePerformanceHistory.length - 1].performace}`,
+          `${validator.eraPointsHistory[validator.eraPointsHistory.length - 1].points}`,
         ];
         try {
           // eslint-disable-next-line no-await-in-loop
           await pool.query(sql, data);
         } catch (error) {
-          logger.error(loggerOptions, `Error inserting data in era_vrc table: ${JSON.stringify(error)}`);
+          logger.error(loggerOptions, `Error inserting data in era_stats table: ${JSON.stringify(error)}`);
         }
       }
 
