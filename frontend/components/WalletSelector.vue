@@ -122,6 +122,18 @@ export default {
       const balances = await this.api.derive.balances.all(address)
       return balances
     },
+    async importChainValidatorAddresses(address) {
+      const chainStaking = await this.api.query.staking.nominators(address)
+      const staking = JSON.parse(JSON.stringify(chainStaking))
+      // eslint-disable-next-line no-console
+      console.log(staking)
+      if (staking?.targets.length > 0) {
+        await this.$store.dispatch(
+          'ranking/importChainValidatorAddresses',
+          staking.targets
+        )
+      }
+    },
     async getAddressRole(address) {
       const bonded = await this.api.query.staking.bonded(address)
       if (bonded.toString() && bonded.toString() === address) {
@@ -138,6 +150,7 @@ export default {
       }
     },
     async selectAddress(address) {
+      await this.importChainValidatorAddresses(address)
       await this.$store.dispatch('ranking/updateSelectedAddress', address)
       this.$emit('close')
       return true

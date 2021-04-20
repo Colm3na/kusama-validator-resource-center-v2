@@ -1,7 +1,7 @@
 export const config = {
   name: 'kusama',
   title: 'Validator Resource Center and Ranking',
-  nodeWs: 'wss://kusama-rpc.polkadot.io',
+  nodeWs: 'wss://kusama.api.onfinality.io/public-ws',
   denom: 'KSM',
   addressPrefix: 2,
   tokenDecimals: 12,

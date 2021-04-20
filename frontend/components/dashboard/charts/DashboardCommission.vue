@@ -59,28 +59,20 @@ export default {
       rows: [],
     }
   },
-  methods: {
-    getLabels() {
-      return this.rows.length > 0
-        ? this.rows
-            .map(({ era }) => era)
-            .filter((v, i, a) => a.indexOf(v) === i)
-        : []
+  computed: {
+    eras() {
+      return this.rows.map((row) => row.era)
     },
-    getNetworkAvgData() {
-      return this.getLabels().map(
-        (era) =>
-          this.rows
-            .filter((row) => row.era === era)
-            .map((v) => parseFloat(v.commission))
-            .reduce((a, b) => a + b) /
-          this.rows.filter((row) => row.era === era).length
-      )
+    selectedValidatorAddresses() {
+      return this.$store.state.ranking.selectedAddresses
+    },
+    chainValidatorAddresses() {
+      return this.$store.state.ranking.chainValidatorAddresses
     },
   },
   apollo: {
     $subscribe: {
-      validator: {
+      network_commission_avg: {
         query: gql`
           subscription era_commission_avg {
             era_commission_avg(order_by: { era: asc }) {
@@ -92,10 +84,10 @@ export default {
         result({ data }) {
           this.rows = data.era_commission_avg
           this.chartData = {
-            labels: [...this.rows.map((row) => row.era)],
+            labels: [...this.eras],
             datasets: [
               {
-                label: 'network avg commission',
+                label: 'network avg',
                 data: [...this.rows.map((row) => row.commission_avg)],
                 backgroundColor: 'rgba(255, 255, 255, 0.8)',
                 borderColor: 'rgba(23, 162, 184, 0.8)',
@@ -104,6 +96,49 @@ export default {
                 showLine: true,
               },
             ],
+          }
+        },
+      },
+      chain_commission_avg: {
+        query: gql`
+          subscription era_commission($validators: [String!]) {
+            era_commission(
+              order_by: { era: asc }
+              where: { stash_address: { _in: $validators } }
+            ) {
+              era
+              commission
+            }
+          }
+        `,
+        variables() {
+          return {
+            validators: this.chainValidatorAddresses,
+          }
+        },
+        skip() {
+          return !this.chartData || this.chainValidatorAddresses.lenght === 0
+        },
+        result({ data }) {
+          if (data.era_commission.length > 0) {
+            const dataset = this.eras.map((era) => {
+              return (
+                data.era_commission
+                  .filter((row) => row.era === era)
+                  .map((v) => parseFloat(v.commission))
+                  .reduce((a, b) => a + b) /
+                data.era_commission.filter((row) => row.era === era).length
+              )
+            })
+            this.chartData.datasets.push({
+              label: 'on-chain set avg',
+              data: dataset,
+              backgroundColor: 'rgba(255, 255, 255, 0.8)',
+              borderColor: 'rgba(184, 162, 23, 0.8)',
+              hoverBackgroundColor: 'rgba(255, 255, 255, 0.8)',
+              fill: false,
+              showLine: true,
+            })
           }
         },
       },

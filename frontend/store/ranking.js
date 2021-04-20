@@ -10,8 +10,9 @@ export const state = () => ({
   eraPointsHistoryTotalsSum: 0,
   eraPointsAverage: 0,
   loading: true,
-  selectedAddresses: [], // validators
-  selectedAddress: undefined, // staking address
+  chainValidatorAddresses: [], // on-chain validator set
+  selectedAddresses: [], // selected validators
+  selectedAddress: undefined, // connected stash address
   metricWeights: {
     active: 1,
     commission: 1,
@@ -122,6 +123,9 @@ export const mutations = {
   },
   importValidatorSet(state, validators) {
     state.selectedAddresses = validators
+  },
+  importChainValidatorAddresses(state, validators) {
+    state.chainValidatorAddresses = validators
   },
   updateMetricWeights(state, metricWeights) {
     state.metricWeights = metricWeights
@@ -366,6 +370,9 @@ export const actions = {
   },
   importValidatorSet(context, validators) {
     context.commit('importValidatorSet', validators)
+  },
+  importChainValidatorAddresses(context, validators) {
+    context.commit('importChainValidatorAddresses', validators)
   },
   updateMetricWeights(context, metricWeights) {
     context.commit('updateMetricWeights', metricWeights)

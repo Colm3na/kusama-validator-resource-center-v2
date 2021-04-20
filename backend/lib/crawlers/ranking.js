@@ -313,8 +313,7 @@ module.exports = {
           nominatorStakes.push(nominatorStake.value);
         }
       }
-      nominatorStakes.sort((a, b) => (
-        (new BigNumber(a.toString()).lte(new BigNumber(b.toString())) ? 1 : 0)));
+      nominatorStakes.sort((a, b) => ((a.unwrap().lt(b.unwrap())) ? -1 : 1));
       const minimumStake = nominatorStakes[0];
 
       logger.info(loggerOptions, `${activeValidatorCount} active validators`);
