@@ -311,6 +311,24 @@ pre {
   color: white;
 }
 
+// wallet selector
+.wallet-selector {
+  color: gray;
+}
+.account-table {
+  color: gray;
+}
+
+// dashboard
+.dashboard-global-stats .stat {
+  font-size: 2rem;
+  font-weight: 200;
+}
+.dashboard-global-stats .box {
+  padding: 1rem;
+  border: 1px solid gray;
+}
+
 // metrics page
 .metrics-page p {
   color: gray;

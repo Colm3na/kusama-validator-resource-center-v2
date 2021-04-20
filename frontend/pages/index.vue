@@ -139,14 +139,3 @@ export default {
   },
 }
 </script>
-
-<style>
-.dashboard-global-stats .stat {
-  font-size: 3rem;
-  font-weight: 200;
-}
-.dashboard-global-stats .box {
-  padding: 1rem;
-  border: 1px solid gray;
-}
-</style>

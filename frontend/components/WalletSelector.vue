@@ -158,12 +158,3 @@ export default {
   },
 }
 </script>
-
-<style>
-.wallet-selector {
-  color: gray;
-}
-.account-table {
-  color: gray;
-}
-</style>
