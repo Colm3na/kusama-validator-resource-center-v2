@@ -33,12 +33,8 @@
 </template>
 
 <script>
-import Rating from '@/components/Rating.vue'
 import commonMixin from '@/mixins/commonMixin.js'
 export default {
-  components: {
-    Rating,
-  },
   mixins: [commonMixin],
   props: {
     accountId: {

@@ -36,12 +36,8 @@
   </div>
 </template>
 <script>
-import Rating from '@/components/Rating.vue'
 import { config } from '@/config.js'
 export default {
-  components: {
-    Rating,
-  },
   props: {
     payoutHistory: {
       type: Array,

@@ -8,13 +8,9 @@
 </template>
 
 <script>
-import Ranking from '@/components/Ranking.vue'
 import { config } from '@/config.js'
 import commonMixin from '@/mixins/commonMixin.js'
 export default {
-  components: {
-    Ranking,
-  },
   mixins: [commonMixin],
   data() {
     return {

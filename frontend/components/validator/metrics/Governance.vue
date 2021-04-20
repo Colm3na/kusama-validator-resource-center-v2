@@ -38,11 +38,7 @@
   </div>
 </template>
 <script>
-import Rating from '@/components/Rating.vue'
 export default {
-  components: {
-    Rating,
-  },
   props: {
     councilBacking: {
       type: Boolean,

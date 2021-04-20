@@ -51,11 +51,9 @@
 import { web3Accounts, web3Enable } from '@polkadot/extension-dapp'
 import { ApiPromise, WsProvider } from '@polkadot/api'
 import { encodeAddress } from '@polkadot/keyring'
-import Identicon from '@/components/Identicon.vue'
 import commonMixin from '@/mixins/commonMixin.js'
 import { config } from '@/config.js'
 export default {
-  components: { Identicon },
   mixins: [commonMixin],
   data() {
     return {

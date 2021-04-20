@@ -24,14 +24,9 @@
 </template>
 
 <script>
-import Rating from '@/components/Rating.vue'
-// eslint-disable-next-line
 import commonMixin from '@/mixins/commonMixin.js'
 import { config } from '@/config.js'
 export default {
-  components: {
-    Rating,
-  },
   mixins: [commonMixin],
   data() {
     return {

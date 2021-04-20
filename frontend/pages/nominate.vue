@@ -204,12 +204,11 @@ import { encodeAddress } from '@polkadot/keyring'
 import { validationMixin } from 'vuelidate'
 import { required } from 'vuelidate/lib/validators'
 import { Promised } from 'vue-promised'
-import Identicon from '@/components/Identicon.vue'
 import commonMixin from '@/mixins/commonMixin.js'
 import { config } from '@/config.js'
 
 export default {
-  components: { Identicon, Promised },
+  components: { Promised },
   mixins: [commonMixin, validationMixin],
   data() {
     return {

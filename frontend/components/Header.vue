@@ -61,13 +61,7 @@
 <script>
 import { config } from '@/config.js'
 import commonMixin from '@/mixins/commonMixin.js'
-import SelectedValidators from '@/components/SelectedValidators.vue'
-import WalletSelector from '@/components/WalletSelector.vue'
 export default {
-  components: {
-    SelectedValidators,
-    WalletSelector,
-  },
   mixins: [commonMixin],
   data() {
     return {

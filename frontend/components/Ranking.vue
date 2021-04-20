@@ -375,22 +375,10 @@
 </template>
 <script>
 import { BigNumber } from 'bignumber.js'
-import Loading from '@/components/Loading.vue'
-import Identicon from '@/components/Identicon.vue'
-import VerifiedIcon from '@/components/VerifiedIcon.vue'
-import SelectedValidators from '@/components/SelectedValidators.vue'
-import MetricWeights from '@/components/MetricWeights.vue'
 import commonMixin from '@/mixins/commonMixin.js'
 import { config } from '@/config.js'
 
 export default {
-  components: {
-    Identicon,
-    VerifiedIcon,
-    SelectedValidators,
-    Loading,
-    MetricWeights,
-  },
   mixins: [commonMixin],
   data() {
     return {
