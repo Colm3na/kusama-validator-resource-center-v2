@@ -59,28 +59,20 @@ export default {
       rows: [],
     }
   },
-  methods: {
-    getLabels() {
-      return this.rows.length > 0
-        ? this.rows
-            .map(({ era }) => era)
-            .filter((v, i, a) => a.indexOf(v) === i)
-        : []
+  computed: {
+    eras() {
+      return this.rows.map((row) => row.era)
     },
-    getNetworkAvgData() {
-      return this.getLabels().map(
-        (era) =>
-          this.rows
-            .filter((row) => row.era === era)
-            .map((v) => v.relative_performance)
-            .reduce((a, b) => a + b) /
-          this.rows.filter((row) => row.era === era).length
-      )
+    selectedValidatorAddresses() {
+      return this.$store.state.ranking.selectedAddresses
+    },
+    chainValidatorAddresses() {
+      return this.$store.state.ranking.chainValidatorAddresses
     },
   },
   apollo: {
     $subscribe: {
-      era_relative_performance: {
+      era_relative_performance_avg: {
         query: gql`
           subscription era_relative_performance_avg {
             era_relative_performance_avg(order_by: { era: asc }) {
@@ -95,7 +87,7 @@ export default {
             labels: [...this.rows.map((row) => row.era)],
             datasets: [
               {
-                label: 'network avg rel. performance',
+                label: 'network',
                 data: [...this.rows.map((row) => row.relative_performance_avg)],
                 backgroundColor: 'rgba(255, 255, 255, 0.8)',
                 borderColor: 'rgba(23, 162, 184, 0.8)',
@@ -104,6 +96,100 @@ export default {
                 showLine: true,
               },
             ],
+          }
+        },
+      },
+      chain_relative_performance_avg: {
+        query: gql`
+          subscription era_relative_performance($validators: [String!]) {
+            era_relative_performance(
+              order_by: { era: asc }
+              where: { stash_address: { _in: $validators } }
+            ) {
+              era
+              relative_performance
+            }
+          }
+        `,
+        variables() {
+          return {
+            validators: this.chainValidatorAddresses,
+          }
+        },
+        skip() {
+          return !this.chartData || this.chainValidatorAddresses.lenght === 0
+        },
+        result({ data }) {
+          if (data.era_relative_performance.length > 0) {
+            const dataset = this.eras.map((era) => {
+              return (
+                data.era_relative_performance
+                  .filter((row) => row.era === era)
+                  .map((v) => parseFloat(v.relative_performance))
+                  .reduce((a, b) => a + b) /
+                data.era_relative_performance.filter((row) => row.era === era).length
+              )
+            })
+            const localChartData = {
+              ...this.chartData,
+            }
+            localChartData.datasets.push({
+              label: 'on-chain validators',
+              data: dataset,
+              backgroundColor: 'rgba(255, 255, 255, 0.8)',
+              borderColor: 'rgba(184, 162, 23, 0.8)',
+              hoverBackgroundColor: 'rgba(255, 255, 255, 0.8)',
+              fill: false,
+              showLine: true,
+            })
+            this.chartData = localChartData
+          }
+        },
+      },
+      selected_relative_performance_avg: {
+        query: gql`
+          subscription era_relative_performance($validators: [String!]) {
+            era_relative_performance(
+              order_by: { era: asc }
+              where: { stash_address: { _in: $validators } }
+            ) {
+              era
+              relative_performance
+            }
+          }
+        `,
+        variables() {
+          return {
+            validators: this.selectedValidatorAddresses,
+          }
+        },
+        skip() {
+          return !this.chartData || this.selectedValidatorAddresses.lenght === 0
+        },
+        result({ data }) {
+          if (data.era_relative_performance.length > 0) {
+            const dataset = this.eras.map((era) => {
+              return (
+                data.era_relative_performance
+                  .filter((row) => row.era === era)
+                  .map((v) => parseFloat(v.relative_performance))
+                  .reduce((a, b) => a + b) /
+                data.era_relative_performance.filter((row) => row.era === era).length
+              )
+            })
+            const localChartData = {
+              ...this.chartData,
+            }
+            localChartData.datasets.push({
+              label: 'selected validators',
+              data: dataset,
+              backgroundColor: 'rgba(255, 255, 255, 0.8)',
+              borderColor: 'rgba(184, 23, 102, 0.8)',
+              hoverBackgroundColor: 'rgba(255, 255, 255, 0.8)',
+              fill: false,
+              showLine: true,
+            })
+            this.chartData = localChartData
           }
         },
       },

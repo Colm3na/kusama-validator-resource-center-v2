@@ -87,7 +87,7 @@ export default {
             labels: [...this.eras],
             datasets: [
               {
-                label: 'network avg',
+                label: 'network',
                 data: [...this.rows.map((row) => row.commission_avg)],
                 backgroundColor: 'rgba(255, 255, 255, 0.8)',
                 borderColor: 'rgba(23, 162, 184, 0.8)',
@@ -130,8 +130,11 @@ export default {
                 data.era_commission.filter((row) => row.era === era).length
               )
             })
-            this.chartData.datasets.push({
-              label: 'on-chain set avg',
+            const localChartData = {
+              ...this.chartData,
+            }
+            localChartData.datasets.push({
+              label: 'on-chain validators',
               data: dataset,
               backgroundColor: 'rgba(255, 255, 255, 0.8)',
               borderColor: 'rgba(184, 162, 23, 0.8)',
@@ -139,6 +142,54 @@ export default {
               fill: false,
               showLine: true,
             })
+            this.chartData = localChartData
+          }
+        },
+      },
+      selected_commission_avg: {
+        query: gql`
+          subscription era_commission($validators: [String!]) {
+            era_commission(
+              order_by: { era: asc }
+              where: { stash_address: { _in: $validators } }
+            ) {
+              era
+              commission
+            }
+          }
+        `,
+        variables() {
+          return {
+            validators: this.selectedValidatorAddresses,
+          }
+        },
+        skip() {
+          return !this.chartData || this.selectedValidatorAddresses.lenght === 0
+        },
+        result({ data }) {
+          if (data.era_commission.length > 0) {
+            const dataset = this.eras.map((era) => {
+              return (
+                data.era_commission
+                  .filter((row) => row.era === era)
+                  .map((v) => parseFloat(v.commission))
+                  .reduce((a, b) => a + b) /
+                data.era_commission.filter((row) => row.era === era).length
+              )
+            })
+            const localChartData = {
+              ...this.chartData,
+            }
+            localChartData.datasets.push({
+              label: 'selected validators',
+              data: dataset,
+              backgroundColor: 'rgba(255, 255, 255, 0.8)',
+              borderColor: 'rgba(184, 23, 102, 0.8)',
+              hoverBackgroundColor: 'rgba(255, 255, 255, 0.8)',
+              fill: false,
+              showLine: true,
+            })
+            this.chartData = localChartData
           }
         },
       },

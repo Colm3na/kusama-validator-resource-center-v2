@@ -59,28 +59,20 @@ export default {
       rows: [],
     }
   },
-  methods: {
-    getLabels() {
-      return this.rows.length > 0
-        ? this.rows
-            .map(({ era }) => era)
-            .filter((v, i, a) => a.indexOf(v) === i)
-        : []
+  computed: {
+    eras() {
+      return this.rows.map((row) => row.era)
     },
-    getNetworkAvgData() {
-      return this.getLabels().map(
-        (era) =>
-          this.rows
-            .filter((row) => row.era === era)
-            .map((v) => parseFloat(v.self_stake))
-            .reduce((a, b) => a + b) /
-          this.rows.filter((row) => row.era === era).length
-      )
+    selectedValidatorAddresses() {
+      return this.$store.state.ranking.selectedAddresses
+    },
+    chainValidatorAddresses() {
+      return this.$store.state.ranking.chainValidatorAddresses
     },
   },
   apollo: {
     $subscribe: {
-      validator: {
+      self_stake_avg: {
         query: gql`
           subscription era_self_stake_avg {
             era_self_stake_avg(order_by: { era: asc }) {
@@ -92,10 +84,10 @@ export default {
         result({ data }) {
           this.rows = data.era_self_stake_avg
           this.chartData = {
-            labels: [...this.rows.map((row) => row.era)],
+            labels: [...this.eras],
             datasets: [
               {
-                label: 'network avg self stake',
+                label: 'network',
                 data: [
                   ...this.rows.map((row) =>
                     new BigNumber(row.self_stake_avg)
@@ -110,6 +102,112 @@ export default {
                 showLine: true,
               },
             ],
+          }
+        },
+      },
+      chain_self_stake_avg: {
+        query: gql`
+          subscription era_self_stake($validators: [String!]) {
+            era_self_stake(
+              order_by: { era: asc }
+              where: { stash_address: { _in: $validators } }
+            ) {
+              era
+              self_stake
+            }
+          }
+        `,
+        variables() {
+          return {
+            validators: this.chainValidatorAddresses,
+          }
+        },
+        skip() {
+          return !this.chartData || this.chainValidatorAddresses.lenght === 0
+        },
+        result({ data }) {
+          if (data.era_self_stake.length > 0) {
+            const dataset = this.eras.map((era) => {
+              return (
+                data.era_self_stake
+                  .filter((row) => row.era === era)
+                  .map((v) => parseFloat(v.self_stake))
+                  .reduce((a, b) => a + b) /
+                data.era_self_stake.filter((row) => row.era === era).length
+              )
+            })
+            const localChartData = {
+              ...this.chartData,
+            }
+            localChartData.datasets.push({
+              label: 'on-chain validators',
+              data: [
+                ...dataset.map((row) =>
+                  new BigNumber(row)
+                    .div(new BigNumber(10).pow(config.tokenDecimals))
+                    .toNumber()
+                ),
+              ],
+              backgroundColor: 'rgba(255, 255, 255, 0.8)',
+              borderColor: 'rgba(184, 162, 23, 0.8)',
+              hoverBackgroundColor: 'rgba(255, 255, 255, 0.8)',
+              fill: false,
+              showLine: true,
+            })
+            this.chartData = localChartData
+          }
+        },
+      },
+      selected_self_stake_avg: {
+        query: gql`
+          subscription era_self_stake($validators: [String!]) {
+            era_self_stake(
+              order_by: { era: asc }
+              where: { stash_address: { _in: $validators } }
+            ) {
+              era
+              self_stake
+            }
+          }
+        `,
+        variables() {
+          return {
+            validators: this.selectedValidatorAddresses,
+          }
+        },
+        skip() {
+          return !this.chartData || this.selectedValidatorAddresses.lenght === 0
+        },
+        result({ data }) {
+          if (data.era_self_stake.length > 0) {
+            const dataset = this.eras.map((era) => {
+              return (
+                data.era_self_stake
+                  .filter((row) => row.era === era)
+                  .map((v) => parseFloat(v.self_stake))
+                  .reduce((a, b) => a + b) /
+                data.era_self_stake.filter((row) => row.era === era).length
+              )
+            })
+            const localChartData = {
+              ...this.chartData,
+            }
+            localChartData.datasets.push({
+              label: 'selected validators',
+              data: [
+                ...dataset.map((row) =>
+                  new BigNumber(row)
+                    .div(new BigNumber(10).pow(config.tokenDecimals))
+                    .toNumber()
+                ),
+              ],
+              backgroundColor: 'rgba(255, 255, 255, 0.8)',
+              borderColor: 'rgba(184, 23, 102, 0.8)',
+              hoverBackgroundColor: 'rgba(255, 255, 255, 0.8)',
+              fill: false,
+              showLine: true,
+            })
+            this.chartData = localChartData
           }
         },
       },
