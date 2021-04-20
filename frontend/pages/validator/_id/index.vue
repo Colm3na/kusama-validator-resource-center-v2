@@ -67,7 +67,7 @@
         </div>
       </div>
       <b-tabs content-class="py-4">
-        <b-tab title="Chain data" active>
+        <b-tab title="Metrics" active>
           <b-alert
             show
             dismissible
@@ -158,6 +158,30 @@
             </div>
           </div>
         </b-tab>
+        <b-tab title="Charts">
+          <div class="row">
+            <div class="col-md-6 pb-4">
+              <EraPointsChart
+                :era-points-history="validator.eraPointsHistory"
+              />
+            </div>
+            <div class="col-md-6 pb-4">
+              <CommissionChart
+                :commission-history="validator.commissionHistory"
+              />
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-6 pb-4">
+              <PayoutsChart :payout-history="validator.payoutHistory" />
+            </div>
+            <div class="col-md-6 pb-4">
+              <!-- <CommissionChart
+                :commission-history="validator.commissionHistory"
+              /> -->
+            </div>
+          </div>
+        </b-tab>
       </b-tabs>
     </div>
   </div>
@@ -165,40 +189,10 @@
 
 <script>
 import gql from 'graphql-tag'
-import Identicon from '@/components/Identicon.vue'
-import Loading from '@/components/Loading.vue'
-import VerifiedIcon from '@/components/VerifiedIcon.vue'
-import Identity from '@/components/metrics/Identity.vue'
-import Address from '@/components/metrics/Address.vue'
-import Slashes from '@/components/metrics/Slashes.vue'
-import Subaccounts from '@/components/metrics/Subaccounts.vue'
-import Nominators from '@/components/metrics/Nominators.vue'
-import EraPoints from '@/components/metrics/EraPoints.vue'
-import Commission from '@/components/metrics/Commission.vue'
-import Payouts from '@/components/metrics/Payouts.vue'
-import Governance from '@/components/metrics/Governance.vue'
-import Thousand from '@/components/metrics/Thousand.vue'
-import SelectedValidators from '@/components/SelectedValidators.vue'
 import commonMixin from '@/mixins/commonMixin.js'
 import { config } from '@/config.js'
 
 export default {
-  components: {
-    Identicon,
-    Loading,
-    VerifiedIcon,
-    Identity,
-    Address,
-    Slashes,
-    Subaccounts,
-    Nominators,
-    EraPoints,
-    Commission,
-    Payouts,
-    Governance,
-    Thousand,
-    SelectedValidators,
-  },
   mixins: [commonMixin],
   data() {
     return {

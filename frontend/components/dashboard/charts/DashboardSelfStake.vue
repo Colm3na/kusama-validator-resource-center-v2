@@ -26,8 +26,9 @@ export default {
         title: {
           display: true,
           text: 'Average self stake',
-          fontSize: 24,
+          fontSize: 18,
           fontColor: '#fff',
+          fontStyle: 'lighter',
         },
         tooltips: {
           backgroundColor: '#000000',

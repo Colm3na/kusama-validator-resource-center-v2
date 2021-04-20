@@ -25,8 +25,9 @@ export default {
         title: {
           display: true,
           text: 'Average performance',
-          fontSize: 24,
+          fontSize: 18,
           fontColor: '#fff',
+          fontStyle: 'lighter',
         },
         tooltips: {
           backgroundColor: '#000000',
@@ -127,7 +128,8 @@ export default {
                   .filter((row) => row.era === era)
                   .map((v) => parseFloat(v.relative_performance))
                   .reduce((a, b) => a + b) /
-                data.era_relative_performance.filter((row) => row.era === era).length
+                data.era_relative_performance.filter((row) => row.era === era)
+                  .length
               )
             })
             const localChartData = {
@@ -174,7 +176,8 @@ export default {
                   .filter((row) => row.era === era)
                   .map((v) => parseFloat(v.relative_performance))
                   .reduce((a, b) => a + b) /
-                data.era_relative_performance.filter((row) => row.era === era).length
+                data.era_relative_performance.filter((row) => row.era === era)
+                  .length
               )
             })
             const localChartData = {

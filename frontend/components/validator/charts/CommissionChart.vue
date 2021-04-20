@@ -1,57 +1,17 @@
 <template>
-  <div class="metric h-100">
-    <div class="row mb-4">
-      <div class="col-8">
-        <h5 class="mb-0">
-          Commission
-          <nuxt-link
-            v-b-tooltip.hover
-            to="/help/metrics#commission"
-            title="Evaluate validator commission over time"
-          >
-            <font-awesome-icon
-              icon="question-circle"
-              class="d-inline-block"
-              style="font-size: 1rem"
-            />
-          </nuxt-link>
-        </h5>
-      </div>
-      <div class="col-4 text-right text-success">
-        <Rating key="commission" :rating="rating" />
-      </div>
-    </div>
-    <div class="description">
-      <p v-if="!isNaN(commission)">
-        Current commission is {{ commission.toFixed(2) }}%
-      </p>
-      <line-chart
-        :data="chartData"
-        :options="chartOptions"
-        :height="200"
-        style="background-color: rgba(0, 0, 0, 1)"
-      />
-    </div>
-  </div>
+  <line-chart
+    :data="chartData"
+    :options="chartOptions"
+    :height="200"
+    style="background-color: rgba(0, 0, 0, 1)"
+  />
 </template>
 <script>
-import Rating from '@/components/Rating.vue'
 export default {
-  components: {
-    Rating,
-  },
   props: {
-    commission: {
-      type: Number,
-      default: () => 0,
-    },
     commissionHistory: {
       type: Array,
       default: () => [],
-    },
-    rating: {
-      type: Number,
-      default: () => 0,
     },
   },
   data() {
@@ -63,9 +23,10 @@ export default {
         },
         title: {
           display: true,
-          // text: 'history',
-          fontSize: 24,
+          text: 'commission',
+          fontSize: 18,
           fontColor: '#fff',
+          fontStyle: 'lighter',
         },
         tooltips: {
           backgroundColor: '#000000',
@@ -84,7 +45,7 @@ export default {
               ticks: {
                 beginAtZero: true,
                 suggestedMin: 0,
-                suggestedMax: 100,
+                // suggestedMax: 100,
               },
               gridLines: {
                 display: true,

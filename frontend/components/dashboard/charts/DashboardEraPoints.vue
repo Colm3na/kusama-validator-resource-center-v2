@@ -25,8 +25,9 @@ export default {
         title: {
           display: true,
           text: 'Average era points',
-          fontSize: 24,
+          fontSize: 18,
           fontColor: '#fff',
+          fontStyle: 'lighter',
         },
         tooltips: {
           backgroundColor: '#000000',

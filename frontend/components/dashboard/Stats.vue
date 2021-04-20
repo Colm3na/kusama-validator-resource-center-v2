@@ -1,28 +1,28 @@
 <template>
   <div class="row text-center dashboard-global-stats">
-    <div class="col-md-6 col-lg-3 mb-4">
+    <div class="col-lg-6 col-xl-3 mb-4">
       <div class="box">
-        <h4>Active/Waiting valid.</h4>
+        <h6>Active/waiting val</h6>
         <span class="stat"
           >{{ activeValidatorCount }}/{{ waitingValidatorCount }}</span
         >
       </div>
     </div>
-    <div class="col-md-6 col-lg-3 mb-4">
+    <div class="col-lg-6 col-xl-3 mb-4">
       <div class="box">
-        <h4>Current era</h4>
+        <h6>Current era</h6>
         <span class="stat">{{ formatNumber(currentEra) }}</span>
       </div>
     </div>
-    <div class="col-md-6 col-lg-3 mb-4">
+    <div class="col-lg-6 col-xl-3 mb-4">
       <div class="box">
-        <h4>Nominators</h4>
+        <h6>Nominators</h6>
         <span class="stat">{{ formatNumber(nominatorCount) }}</span>
       </div>
     </div>
-    <div class="col-md-6 col-lg-3 mb-4">
+    <div class="col-lg-6 col-xl-3 mb-4">
       <div class="box">
-        <h4>Minimum stake</h4>
+        <h6>Minimum stake</h6>
         <span class="stat">{{ formatAmount(minimumStake, 2) }}</span>
       </div>
     </div>
