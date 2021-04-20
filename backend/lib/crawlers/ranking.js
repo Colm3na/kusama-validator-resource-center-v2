@@ -3,7 +3,7 @@ const { BigNumber } = require('bignumber.js');
 const { ApiPromise, WsProvider } = require('@polkadot/api');
 const pino = require('pino');
 const axios = require('axios').default;
-const { wait } = require('../utils.js');
+const { wait, dbInsert, dbParamInsert } = require('../utils.js');
 
 const logger = pino();
 const loggerOptions = {
@@ -173,7 +173,7 @@ function getClusterInfo(hasSubIdentity, validators, validatorIdentity) {
   };
 }
 
-// taken from https://stackoverflow.com/questions/19269545/how-to-get-a-number-of-random-elements-from-an-array
+// from https://stackoverflow.com/questions/19269545/how-to-get-a-number-of-random-elements-from-an-array
 function getRandom(arr, n) {
   const shuffled = [...arr].sort(() => 0.5 - Math.random());
   return shuffled.slice(0, n);
@@ -189,6 +189,20 @@ module.exports = {
     const startTime = new Date().getTime();
     const wsProvider = new WsProvider(wsProviderUrl);
     const clusters = [];
+    const stakingQueryFlags = {
+      withDestination: false,
+      withExposure: true,
+      withLedger: true,
+      withNominations: false,
+      withPrefs: true,
+    };
+    const minMaxEraPerformance = [];
+    const participateInGovernance = [];
+    let validators = [];
+    let intentions = [];
+    let erasExposure = [];
+    let maxPerformance = 0;
+    let minPerformance = 0;
 
     //
     // data collection
@@ -211,20 +225,6 @@ module.exports = {
         Math.max(erasHistoric.length - config.historySize, 0),
       );
       const { maxNominatorRewardedPerValidator } = api.consts.staking;
-
-      const stakingQueryFlags = {
-        withDestination: false,
-        withExposure: true,
-        withLedger: true,
-        withNominations: false,
-        withPrefs: true,
-      };
-
-      let validators = [];
-      let intentions = [];
-      let maxPerformance = 0;
-      let minPerformance = 0;
-
       const [
         { block },
         validatorAddresses,
@@ -251,16 +251,12 @@ module.exports = {
         api.derive.democracy.proposals(),
         api.derive.democracy.referendums(),
       ]);
-
-      // get total stake by era
-      let erasExposure = [];
       // eslint-disable-next-line no-restricted-syntax
       for (const eraIndex of eraIndexes) {
         // eslint-disable-next-line no-await-in-loop
         const eraExposure = await api.derive.staking.eraExposure(eraIndex);
         erasExposure = erasExposure.concat(eraExposure);
       }
-
       validators = await Promise.all(
         validatorAddresses.map(
           (authorityId) => api.derive.staking.query(authorityId, stakingQueryFlags),
@@ -301,7 +297,6 @@ module.exports = {
         0,
       );
       const eraPointsAverage = eraPointsHistoryTotalsSum / numActiveValidators;
-      const minMaxEraPerformance = []; // needed to calculate rel. performance per era
 
       // dashboard metrics
       const activeValidatorCount = validatorAddresses.length;
@@ -309,7 +304,7 @@ module.exports = {
       const nominatorCount = nominators.length;
       const currentEra = chainCurrentEra.toString();
 
-      // get minimun stake
+      // minimun stake
       const nominatorStakes = [];
       // eslint-disable-next-line
       for (const validator of validators){
@@ -368,7 +363,6 @@ module.exports = {
           targets,
         };
       });
-      const participateInGovernance = [];
       proposals.forEach(({ seconds, proposer }) => {
         participateInGovernance.push(proposer.toString());
         seconds.forEach((accountId) => participateInGovernance.push(accountId.toString()));
@@ -642,7 +636,7 @@ module.exports = {
 
           const showClusterMember = true;
 
-          // total rating
+          // VRC score
           const totalRating = activeRating
             + addressCreationRating
             + identityRating
@@ -785,7 +779,7 @@ module.exports = {
       logger.info(loggerOptions, `Found ${ranking.filter(({ dominated }) => dominated).length} dominated validators in ${((dominatedEnd - dominatedStart) / 1000).toFixed(3)}s`);
 
       // cluster categorization
-      logger.info(loggerOptions, 'Random selection of validators to show from a cluster based on cluster size');
+      logger.info(loggerOptions, 'Random selection of validators based on cluster size');
       let validatorsToHide = [];
       // eslint-disable-next-line no-restricted-syntax
       for (const cluster of clusters) {
@@ -824,127 +818,107 @@ module.exports = {
       logger.info(loggerOptions, 'Storing era stats in db...');
       // eslint-disable-next-line no-restricted-syntax
       for (const validator of ranking) {
-        try {
-          const sql = `INSERT INTO era_vrc_score (
+        let sql = `INSERT INTO era_vrc_score (
+          stash_address,
+          era,
+          vrc_score
+        ) VALUES (
+          $1,
+          $2,
+          $3
+        )
+        ON CONFLICT ON CONSTRAINT era_vrc_score_pkey 
+        DO NOTHING;`;
+        let data = [
+          `${validator.stashAddress}`,
+          `${currentEra}`,
+          `${validator.totalRating}`,
+        ];
+        // eslint-disable-next-line no-await-in-loop
+        await dbParamInsert(pool, sql, data, loggerOptions);
+        // eslint-disable-next-line no-restricted-syntax
+        for (const commissionHistoryItem of validator.commissionHistory) {
+          sql = `INSERT INTO era_commission (
             stash_address,
             era,
-            vrc_score
+            commission
           ) VALUES (
             $1,
             $2,
             $3
           )
-          ON CONFLICT ON CONSTRAINT era_vrc_score_pkey 
+          ON CONFLICT ON CONSTRAINT era_commission_pkey 
           DO NOTHING;`;
-          const data = [
+          data = [
             `${validator.stashAddress}`,
-            `${currentEra}`,
-            `${validator.totalRating}`,
+            `${commissionHistoryItem.era}`,
+            `${commissionHistoryItem.commission || 0}`,
           ];
           // eslint-disable-next-line no-await-in-loop
-          await pool.query(sql, data);
-        } catch (error) {
-          logger.error(loggerOptions, `Error inserting data in era_vrc_score table: ${JSON.stringify(error)}`);
-        }
-        // eslint-disable-next-line no-restricted-syntax
-        for (const commissionHistoryItem of validator.commissionHistory) {
-          try {
-            const sql = `INSERT INTO era_commission (
-              stash_address,
-              era,
-              commission
-            ) VALUES (
-              $1,
-              $2,
-              $3
-            )
-            ON CONFLICT ON CONSTRAINT era_commission_pkey 
-            DO NOTHING;`;
-            const data = [
-              `${validator.stashAddress}`,
-              `${commissionHistoryItem.era}`,
-              `${commissionHistoryItem.commission || 0}`,
-            ];
-            // eslint-disable-next-line no-await-in-loop
-            await pool.query(sql, data);
-          } catch (error) {
-            logger.error(loggerOptions, `Error inserting row in era_commission table: ${JSON.stringify(error)}`);
-          }
+          await dbParamInsert(pool, sql, data, loggerOptions);
         }
         // eslint-disable-next-line no-restricted-syntax
         for (const perfHistoryItem of validator.relativePerformanceHistory) {
-          try {
-            const sql = `INSERT INTO era_relative_performance (
-              stash_address,
-              era,
-              relative_performance
-            ) VALUES (
-              $1,
-              $2,
-              $3
-            )
-            ON CONFLICT ON CONSTRAINT era_relative_performance_pkey 
-            DO NOTHING;`;
-            const data = [
-              `${validator.stashAddress}`,
-              `${perfHistoryItem.era}`,
-              `${perfHistoryItem.relativePerformance}`,
-            ];
-            // eslint-disable-next-line no-await-in-loop
-            await pool.query(sql, data);
-          } catch (error) {
-            logger.error(loggerOptions, `Error inserting row in era_relative_performance table: ${JSON.stringify(error)}`);
-          }
+          sql = `INSERT INTO era_relative_performance (
+            stash_address,
+            era,
+            relative_performance
+          ) VALUES (
+            $1,
+            $2,
+            $3
+          )
+          ON CONFLICT ON CONSTRAINT era_relative_performance_pkey 
+          DO NOTHING;`;
+          data = [
+            `${validator.stashAddress}`,
+            `${perfHistoryItem.era}`,
+            `${perfHistoryItem.relativePerformance}`,
+          ];
+          // eslint-disable-next-line no-await-in-loop
+          await dbParamInsert(pool, sql, data, loggerOptions);
         }
         // eslint-disable-next-line no-restricted-syntax
         for (const stakefHistoryItem of validator.stakeHistory) {
-          try {
-            const sql = `INSERT INTO era_self_stake (
-              stash_address,
-              era,
-              self_stake
-            ) VALUES (
-              $1,
-              $2,
-              $3
-            )
-            ON CONFLICT ON CONSTRAINT era_self_stake_pkey 
-            DO NOTHING;`;
-            const data = [
-              `${validator.stashAddress}`,
-              `${stakefHistoryItem.era}`,
-              `${stakefHistoryItem.self}`,
-            ];
-            // eslint-disable-next-line no-await-in-loop
-            await pool.query(sql, data);
-          } catch (error) {
-            logger.error(loggerOptions, `Error inserting row in era_self_stake table: ${JSON.stringify(error)}`);
-          }
+          sql = `INSERT INTO era_self_stake (
+            stash_address,
+            era,
+            self_stake
+          ) VALUES (
+            $1,
+            $2,
+            $3
+          )
+          ON CONFLICT ON CONSTRAINT era_self_stake_pkey 
+          DO NOTHING;`;
+          data = [
+            `${validator.stashAddress}`,
+            `${stakefHistoryItem.era}`,
+            `${stakefHistoryItem.self}`,
+          ];
+          // eslint-disable-next-line no-await-in-loop
+          await dbParamInsert(pool, sql, data, loggerOptions);
         }
         // eslint-disable-next-line no-restricted-syntax
         for (const eraPointsHistoryItem of validator.eraPointsHistory) {
-          try {
-            const sql = `INSERT INTO era_points (
-              stash_address,
-              era,
-              points
-            ) VALUES (
-              $1,
-              $2,
-              $3
-            )
-            ON CONFLICT ON CONSTRAINT era_points_pkey 
-            DO NOTHING;`;
-            const data = [
-              `${validator.stashAddress}`,
-              `${eraPointsHistoryItem.era}`,
-              `${eraPointsHistoryItem.points}`,
-            ];
-            // eslint-disable-next-line no-await-in-loop
-            await pool.query(sql, data);
-          } catch (error) {
-            logger.error(loggerOptions, `Error inserting row in era_points table: ${JSON.stringify(error)}`);
-          }
+          sql = `INSERT INTO era_points (
+            stash_address,
+            era,
+            points
+          ) VALUES (
+            $1,
+            $2,
+            $3
+          )
+          ON CONFLICT ON CONSTRAINT era_points_pkey 
+          DO NOTHING;`;
+          data = [
+            `${validator.stashAddress}`,
+            `${eraPointsHistoryItem.era}`,
+            `${eraPointsHistoryItem.points}`,
+          ];
+          // eslint-disable-next-line no-await-in-loop
+          await dbParamInsert(pool, sql, data, loggerOptions);
         }
       }
       logger.info(loggerOptions, 'Storing era stats averages in db...');
@@ -958,7 +932,7 @@ module.exports = {
           if (res.rows[0].commission_avg) {
             sql = `INSERT INTO era_commission_avg (era, commission_avg) VALUES ('${era}', '${res.rows[0].commission_avg}') ON CONFLICT ON CONSTRAINT era_commission_avg_pkey DO NOTHING;`;
             // eslint-disable-next-line no-await-in-loop
-            await pool.query(sql);
+            await dbInsert(pool, sql, loggerOptions);
           }
         }
         sql = `SELECT AVG(self_stake) AS self_stake_avg FROM era_self_stake WHERE era = '${era}'`;
@@ -969,7 +943,7 @@ module.exports = {
             const selfStakeAvg = res.rows[0].self_stake_avg.toString(10).split('.')[0];
             sql = `INSERT INTO era_self_stake_avg (era, self_stake_avg) VALUES ('${era}', '${selfStakeAvg}') ON CONFLICT ON CONSTRAINT era_self_stake_avg_pkey DO NOTHING;`;
             // eslint-disable-next-line no-await-in-loop
-            await pool.query(sql);
+            await dbInsert(pool, sql, loggerOptions);
           }
         }
         sql = `SELECT AVG(relative_performance) AS relative_performance_avg FROM era_relative_performance WHERE era = '${era}'`;
@@ -979,7 +953,7 @@ module.exports = {
           if (res.rows[0].relative_performance_avg) {
             sql = `INSERT INTO era_relative_performance_avg (era, relative_performance_avg) VALUES ('${era}', '${res.rows[0].relative_performance_avg}') ON CONFLICT ON CONSTRAINT era_relative_performance_avg_pkey DO NOTHING;`;
             // eslint-disable-next-line no-await-in-loop
-            await pool.query(sql);
+            await dbInsert(pool, sql, loggerOptions);
           }
         }
         sql = `SELECT AVG(points) AS points_avg FROM era_points WHERE era = '${era}'`;
@@ -989,7 +963,7 @@ module.exports = {
           if (res.rows[0].points_avg) {
             sql = `INSERT INTO era_points_avg (era, points_avg) VALUES ('${era}', '${res.rows[0].points_avg}') ON CONFLICT ON CONSTRAINT era_points_avg_pkey DO NOTHING;`;
             // eslint-disable-next-line no-await-in-loop
-            await pool.query(sql);
+            await dbInsert(pool, sql, loggerOptions);
           }
         }
       }
@@ -1148,12 +1122,8 @@ module.exports = {
           `${validator.dominated}`,
           `${startTime}`,
         ];
-        try {
-          // eslint-disable-next-line no-await-in-loop
-          await pool.query(sql, data);
-        } catch (error) {
-          logger.error(loggerOptions, `Error inserting data in ranking table: ${JSON.stringify(error)}`);
-        }
+        // eslint-disable-next-line no-await-in-loop
+        await dbParamInsert(pool, sql, data, loggerOptions);
       }
       logger.info(loggerOptions, 'Cleaning old data');
       const sql = `DELETE FROM ranking WHERE block_height != '${blockHeight}';`;

@@ -9,6 +9,20 @@ module.exports = {
   wait: async (ms) => new Promise((resolve) => {
     setTimeout(resolve, ms);
   }),
+  dbInsert: async (pool, sql, loggerOptions) => {
+    try {
+      await pool.query(sql);
+    } catch (error) {
+      logger.error(loggerOptions, `SQL: ${sql} Error: ${JSON.stringify(error)}`);
+    }
+  },
+  dbParamInsert: async (pool, sql, data, loggerOptions) => {
+    try {
+      await pool.query(sql, data);
+    } catch (error) {
+      logger.error(loggerOptions, `SQL: ${sql} Error: ${JSON.stringify(error)}`);
+    }
+  },
   storeExtrinsics: async (pool, blockNumber, extrinsics, blockEvents, timestamp, loggerOptions) => {
     const startTime = new Date().getTime();
     extrinsics.forEach(async (extrinsic, index) => {
