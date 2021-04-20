@@ -82,21 +82,21 @@ export default {
     $subscribe: {
       validator: {
         query: gql`
-          subscription era_stats {
-            era_stats(order_by: { era: asc }) {
+          subscription era_commission_avg {
+            era_commission_avg(order_by: { era: asc }) {
               era
-              commission
+              commission_avg
             }
           }
         `,
         result({ data }) {
-          this.rows = data.era_stats
+          this.rows = data.era_commission_avg
           this.chartData = {
-            labels: this.getLabels(),
+            labels: [...this.rows.map((row) => row.era)],
             datasets: [
               {
-                label: 'network avg',
-                data: this.getNetworkAvgData(),
+                label: 'network avg commission',
+                data: [...this.rows.map((row) => row.commission_avg)],
                 backgroundColor: 'rgba(255, 255, 255, 0.8)',
                 borderColor: 'rgba(23, 162, 184, 0.8)',
                 hoverBackgroundColor: 'rgba(255, 255, 255, 0.8)',

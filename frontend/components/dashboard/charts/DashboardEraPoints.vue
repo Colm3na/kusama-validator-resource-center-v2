@@ -82,21 +82,21 @@ export default {
     $subscribe: {
       validator: {
         query: gql`
-          subscription era_points {
-            era_points(order_by: { era: asc }) {
+          subscription era_points_avg {
+            era_points_avg(order_by: { era: asc }) {
               era
-              points
+              points_avg
             }
           }
         `,
         result({ data }) {
-          this.rows = data.era_points
+          this.rows = data.era_points_avg
           this.chartData = {
-            labels: this.getLabels(),
+            labels: [...this.rows.map((row) => row.era)],
             datasets: [
               {
-                label: 'network avg',
-                data: this.getNetworkAvgData(),
+                label: 'network avg era points',
+                data: [...this.rows.map((row) => row.points_avg)],
                 backgroundColor: 'rgba(255, 255, 255, 0.8)',
                 borderColor: 'rgba(23, 162, 184, 0.8)',
                 hoverBackgroundColor: 'rgba(255, 255, 255, 0.8)',

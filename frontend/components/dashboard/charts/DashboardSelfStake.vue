@@ -8,6 +8,7 @@
 </template>
 
 <script>
+import { BigNumber } from 'bignumber.js'
 import gql from 'graphql-tag'
 import { config } from '@/config.js'
 import commonMixin from '@/mixins/commonMixin.js'
@@ -45,7 +46,6 @@ export default {
               ticks: {
                 beginAtZero: true,
                 suggestedMin: 0,
-                suggestedMax: 25,
               },
               gridLines: {
                 display: true,
@@ -82,21 +82,27 @@ export default {
     $subscribe: {
       validator: {
         query: gql`
-          subscription era_stats {
-            era_stats(order_by: { era: asc }) {
+          subscription era_self_stake_avg {
+            era_self_stake_avg(order_by: { era: asc }) {
               era
-              self_stake
+              self_stake_avg
             }
           }
         `,
         result({ data }) {
-          this.rows = data.era_stats
+          this.rows = data.era_self_stake_avg
           this.chartData = {
-            labels: this.getLabels(),
+            labels: [...this.rows.map((row) => row.era)],
             datasets: [
               {
-                label: 'network avg',
-                data: this.getNetworkAvgData(),
+                label: 'network avg self stake',
+                data: [
+                  ...this.rows.map((row) =>
+                    new BigNumber(row.self_stake_avg)
+                      .div(new BigNumber(10).pow(config.tokenDecimals))
+                      .toNumber()
+                  ),
+                ],
                 backgroundColor: 'rgba(255, 255, 255, 0.8)',
                 borderColor: 'rgba(23, 162, 184, 0.8)',
                 hoverBackgroundColor: 'rgba(255, 255, 255, 0.8)',

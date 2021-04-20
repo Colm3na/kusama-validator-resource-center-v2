@@ -72,7 +72,7 @@ export default {
         (era) =>
           this.rows
             .filter((row) => row.era === era)
-            .map((v) => parseFloat(v.total_rating))
+            .map((v) => parseFloat(v.vrc_score))
             .reduce((a, b) => a + b) /
           this.rows.filter((row) => row.era === era).length
       )
@@ -82,20 +82,20 @@ export default {
     $subscribe: {
       validator: {
         query: gql`
-          subscription era_stats {
-            era_stats(order_by: { era: asc }) {
+          subscription era_vrc_score {
+            era_vrc_score(order_by: { era: asc }) {
               era
-              total_rating
+              vrc_score
             }
           }
         `,
         result({ data }) {
-          this.rows = data.era_stats
+          this.rows = data.era_vrc_score
           this.chartData = {
             labels: this.getLabels(),
             datasets: [
               {
-                label: 'network avg',
+                label: 'network avg VRC score',
                 data: this.getNetworkAvgData(),
                 backgroundColor: 'rgba(255, 255, 255, 0.8)',
                 borderColor: 'rgba(23, 162, 184, 0.8)',

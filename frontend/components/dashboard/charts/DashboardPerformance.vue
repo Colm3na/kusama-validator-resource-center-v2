@@ -82,21 +82,21 @@ export default {
     $subscribe: {
       era_relative_performance: {
         query: gql`
-          subscription era_relative_performance {
-            era_relative_performance(order_by: { era: asc }) {
+          subscription era_relative_performance_avg {
+            era_relative_performance_avg(order_by: { era: asc }) {
               era
-              relative_performance
+              relative_performance_avg
             }
           }
         `,
         result({ data }) {
-          this.rows = data.era_relative_performance
+          this.rows = data.era_relative_performance_avg
           this.chartData = {
-            labels: this.getLabels(),
+            labels: [...this.rows.map((row) => row.era)],
             datasets: [
               {
-                label: 'network avg',
-                data: this.getNetworkAvgData(),
+                label: 'network avg rel. performance',
+                data: [...this.rows.map((row) => row.relative_performance_avg)],
                 backgroundColor: 'rgba(255, 255, 255, 0.8)',
                 borderColor: 'rgba(23, 162, 184, 0.8)',
                 hoverBackgroundColor: 'rgba(255, 255, 255, 0.8)',
