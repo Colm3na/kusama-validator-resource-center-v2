@@ -155,7 +155,7 @@ CREATE TABLE IF NOT EXISTS era_points (
 
 CREATE TABLE IF NOT EXISTS era_points_avg (
   era INT NOT NULL,
-  points_avg INT NOT NULL,
+  points_avg FLOAT NOT NULL,
   PRIMARY KEY ( era )
 );
 
