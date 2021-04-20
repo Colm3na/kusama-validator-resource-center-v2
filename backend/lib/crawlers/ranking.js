@@ -986,7 +986,7 @@ module.exports = {
         res = await pool.query(sql);
         if (res.rows.length > 0) {
           if (res.rows[0].points_avg) {
-            sql = `INSERT INTO era_points_avg (era, points_avg) VALUES ('${era}', '${res.rows[0].points_avg}') ON CONFLICT ON CONSTRAINT era_points_avg_pkey DO NOTHING;`;
+            sql = `INSERT INTO era_points_avg (era, points_avg) VALUES ('${era}', '${new BigNumber(res.rows[0].points_avg).decimalPlaces(0).toString(10)}') ON CONFLICT ON CONSTRAINT era_points_avg_pkey DO NOTHING;`;
             // eslint-disable-next-line no-await-in-loop
             await pool.query(sql);
           }
