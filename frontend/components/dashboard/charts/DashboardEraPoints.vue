@@ -122,7 +122,7 @@ export default {
         },
         result({ data }) {
           if (data.era_points.length > 0) {
-            const dataset = this.eras.map((era) => {
+            const items = this.eras.map((era) => {
               return (
                 data.era_points
                   .filter((row) => row.era === era)
@@ -134,15 +134,28 @@ export default {
             const localChartData = {
               ...this.chartData,
             }
-            localChartData.datasets.push({
+            const dataset = {
+              id: 'chain',
               label: 'on-chain validators',
-              data: dataset,
+              data: items,
               backgroundColor: 'rgba(255, 255, 255, 0.8)',
               borderColor: 'rgba(184, 162, 23, 0.8)',
               hoverBackgroundColor: 'rgba(255, 255, 255, 0.8)',
               fill: false,
               showLine: true,
-            })
+            }
+            if (localChartData?.datasets) {
+              if (localChartData.datasets.find(({ id }) => id === 'chain')) {
+                const datasetIndex = localChartData.datasets.findIndex(
+                  ({ id }) => id === 'chain'
+                )
+                localChartData.datasets[datasetIndex] = dataset
+              } else {
+                localChartData.datasets.push(dataset)
+              }
+            } else {
+              localChartData.datasets.push(dataset)
+            }
             this.chartData = localChartData
           }
         },
@@ -169,7 +182,7 @@ export default {
         },
         result({ data }) {
           if (data.era_points.length > 0) {
-            const dataset = this.eras.map((era) => {
+            const items = this.eras.map((era) => {
               return (
                 data.era_points
                   .filter((row) => row.era === era)
@@ -181,15 +194,28 @@ export default {
             const localChartData = {
               ...this.chartData,
             }
-            localChartData.datasets.push({
+            const dataset = {
+              id: 'selected',
               label: 'selected validators',
-              data: dataset,
+              data: items,
               backgroundColor: 'rgba(255, 255, 255, 0.8)',
               borderColor: 'rgba(184, 23, 102, 0.8)',
               hoverBackgroundColor: 'rgba(255, 255, 255, 0.8)',
               fill: false,
               showLine: true,
-            })
+            }
+            if (localChartData?.datasets) {
+              if (localChartData.datasets.find(({ id }) => id === 'selected')) {
+                const datasetIndex = localChartData.datasets.findIndex(
+                  ({ id }) => id === 'selected'
+                )
+                localChartData.datasets[datasetIndex] = dataset
+              } else {
+                localChartData.datasets.push(dataset)
+              }
+            } else {
+              localChartData.datasets.push(dataset)
+            }
             this.chartData = localChartData
           }
         },
