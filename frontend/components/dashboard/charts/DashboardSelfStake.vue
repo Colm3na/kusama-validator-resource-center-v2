@@ -127,6 +127,9 @@ export default {
           return !this.chartData || this.chainValidatorAddresses.lenght === 0
         },
         result({ data }) {
+          const localChartData = {
+            ...this.chartData,
+          }
           if (data.era_self_stake.length > 0) {
             const items = this.eras.map((era) => {
               return (
@@ -137,9 +140,6 @@ export default {
                 data.era_self_stake.filter((row) => row.era === era).length
               )
             })
-            const localChartData = {
-              ...this.chartData,
-            }
             const dataset = {
               id: 'chain',
               label: 'on-chain validators',
@@ -168,8 +168,15 @@ export default {
             } else {
               localChartData.datasets.push(dataset)
             }
-            this.chartData = localChartData
+          } else if (localChartData?.datasets) {
+            if (localChartData.datasets.find(({ id }) => id === 'chain')) {
+              const datasetIndex = localChartData.datasets.findIndex(
+                ({ id }) => id === 'chain'
+              )
+              localChartData.datasets.splice(datasetIndex, 1)
+            }
           }
+          this.chartData = localChartData
         },
       },
       selected_self_stake_avg: {
@@ -193,6 +200,9 @@ export default {
           return !this.chartData || this.selectedValidatorAddresses.lenght === 0
         },
         result({ data }) {
+          const localChartData = {
+            ...this.chartData,
+          }
           if (data.era_self_stake.length > 0) {
             const items = this.eras.map((era) => {
               return (
@@ -203,9 +213,6 @@ export default {
                 data.era_self_stake.filter((row) => row.era === era).length
               )
             })
-            const localChartData = {
-              ...this.chartData,
-            }
             const dataset = {
               id: 'selected',
               label: 'selected validators',
@@ -234,8 +241,15 @@ export default {
             } else {
               localChartData.datasets.push(dataset)
             }
-            this.chartData = localChartData
+          } else if (localChartData?.datasets) {
+            if (localChartData.datasets.find(({ id }) => id === 'selected')) {
+              const datasetIndex = localChartData.datasets.findIndex(
+                ({ id }) => id === 'selected'
+              )
+              localChartData.datasets.splice(datasetIndex, 1)
+            }
           }
+          this.chartData = localChartData
         },
       },
     },

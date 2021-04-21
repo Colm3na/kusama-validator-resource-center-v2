@@ -60,17 +60,16 @@ export default {
   },
   computed: {
     chartData() {
-      // eslint-disable-next-line no-console
-      console.log(this.stakeHistory)
       return {
         labels: this.stakeHistory.map(({ era }) => era),
         datasets: [
           {
             labels: 'elected own stake',
-            data: this.stakeHistory.map(({ self }) => new BigNumber(self)
-                      .div(new BigNumber(10).pow(config.tokenDecimals))
-                      .toNumber()
-                  ),
+            data: this.stakeHistory.map(({ self }) =>
+              new BigNumber(self)
+                .div(new BigNumber(10).pow(config.tokenDecimals))
+                .toNumber()
+            ),
             backgroundColor: 'rgba(255, 255, 255, 0.8)',
             borderColor: 'rgba(230, 0, 122, 0.8)',
             hoverBackgroundColor: 'rgba(255, 255, 255, 0.8)',
