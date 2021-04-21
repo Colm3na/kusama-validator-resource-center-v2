@@ -160,26 +160,34 @@
         </b-tab>
         <b-tab title="Charts">
           <div class="row">
-            <div class="col-md-6 pb-4">
+            <div class="col-xl-6 pb-4">
+              <RelativePerformanceChart
+                :relative-performance-history="
+                  validator.relativePerformanceHistory
+                "
+              />
+            </div>
+            <div class="col-xl-6 pb-4">
               <EraPointsChart
                 :era-points-history="validator.eraPointsHistory"
               />
             </div>
-            <div class="col-md-6 pb-4">
+          </div>
+          <div class="row">
+            <div class="col-xl-6 pb-4">
+              <PayoutsChart :payout-history="validator.payoutHistory" />
+            </div>
+            <div class="col-xl-6 pb-4">
+              <StakeChart :stake-history="validator.stakeHistory" />
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-xl-6 pb-4">
               <CommissionChart
                 :commission-history="validator.commissionHistory"
               />
             </div>
-          </div>
-          <div class="row">
-            <div class="col-md-6 pb-4">
-              <PayoutsChart :payout-history="validator.payoutHistory" />
-            </div>
-            <div class="col-md-6 pb-4">
-              <!-- <CommissionChart
-                :commission-history="validator.commissionHistory"
-              /> -->
-            </div>
+            <div class="col-xl-6 pb-4"></div>
           </div>
         </b-tab>
       </b-tabs>
@@ -276,7 +284,9 @@ export default {
               performance
               rank
               relative_performance
+              relative_performance_history
               self_stake
+              stake_history
               slash_rating
               slashed
               slashes
@@ -332,7 +342,11 @@ export default {
             performance: parseFloat(validator.performance),
             rank: validator.rank,
             relativePerformance: parseFloat(validator.relative_performance),
+            relativePerformanceHistory: JSON.parse(
+              validator.relative_performance_history
+            ),
             selfStake: validator.self_stake,
+            stakeHistory: JSON.parse(validator.stake_history),
             slashRating: validator.slash_rating,
             slashed: validator.slashed,
             slashes: JSON.parse(validator.slashes),
