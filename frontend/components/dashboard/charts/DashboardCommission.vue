@@ -119,7 +119,7 @@ export default {
           }
         },
         skip() {
-          return !this.chartData || this.chainValidatorAddresses.lenght === 0
+          return !this.chartData || this.chainValidatorAddresses.length === 0
         },
         result({ data }) {
           const localChartData = {
@@ -186,7 +186,7 @@ export default {
           }
         },
         skip() {
-          return !this.chartData || this.selectedValidatorAddresses.lenght === 0
+          return !this.chartData || this.selectedValidatorAddresses.length === 0
         },
         result({ data }) {
           const localChartData = {

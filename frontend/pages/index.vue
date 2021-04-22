@@ -29,6 +29,7 @@
       </b-alert>
       <h1 class="mb-4">Dashboard</h1>
       <Stats />
+      <Suggestions :validators="selectedValidatorAddresses" />
       <DashboardVRCScore />
       <div class="row">
         <div class="col-md-6">
@@ -58,71 +59,6 @@ export default {
   data() {
     return {
       config,
-      scoreChartOptions: {
-        responsive: true,
-        legend: {
-          display: false,
-        },
-        title: {
-          display: true,
-          text: 'VRC score',
-          fontSize: 24,
-          fontColor: '#fff',
-        },
-        tooltips: {
-          backgroundColor: '#000000',
-        },
-        scales: {
-          xAxes: [
-            {
-              gridLines: {
-                display: true,
-                color: 'rgba(255, 255, 255, 0.1)',
-              },
-            },
-          ],
-          yAxes: [
-            {
-              ticks: {
-                beginAtZero: true,
-                suggestedMin: 0,
-                suggestedMax: 25,
-              },
-              gridLines: {
-                display: true,
-                color: 'rgba(255, 255, 255, 0.1)',
-              },
-            },
-          ],
-        },
-      },
-      scoreChartData: {
-        labels: [...Array(84).keys()].map((n) => n + 1),
-        datasets: [
-          {
-            labels: 'current set',
-            data: [...Array(84)].map(
-              (n) => Math.floor(Math.random() * (20 - 0)) + 0
-            ),
-            backgroundColor: 'rgba(255, 255, 255, 0.8)',
-            borderColor: 'rgba(230, 0, 122, 0.8)',
-            hoverBackgroundColor: 'rgba(255, 255, 255, 0.8)',
-            fill: false,
-            showLine: true,
-          },
-          {
-            labels: 'selected set',
-            data: [...Array(84)].map(
-              (n) => Math.floor(Math.random() * (20 - 0)) + 0
-            ),
-            backgroundColor: 'rgba(255, 255, 255, 0.8)',
-            borderColor: 'rgba(23, 162, 184, 0.8)',
-            hoverBackgroundColor: 'rgba(255, 255, 255, 0.8)',
-            fill: false,
-            showLine: true,
-          },
-        ],
-      },
     }
   },
   head() {
@@ -136,6 +72,17 @@ export default {
         },
       ],
     }
+  },
+  computed: {
+    eras() {
+      return this.rows.map((row) => row.era)
+    },
+    selectedValidatorAddresses() {
+      return this.$store.state.ranking.selectedAddresses
+    },
+    chainValidatorAddresses() {
+      return this.$store.state.ranking.chainValidatorAddresses
+    },
   },
 }
 </script>
