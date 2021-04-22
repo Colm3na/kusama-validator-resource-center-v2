@@ -84,14 +84,14 @@ export default {
               const pendingPayouts = payoutHistory.filter(
                 (payout) => payout.status === 'pending'
               ).length
-              // true when the validator has rewards next to expire in the next era
+              // true when the validator has rewards next to expire in the next 24h
               const payoutAlert =
                 payoutHistory
                   .slice(0, config.erasPerDay)
                   .filter((payout) => payout.status === 'pending').length > 0
               if (payoutAlert) {
                 localSuggestions.push(
-                  `Validator ${validatorAddress}, which is included in your current on-chain set, has ${pendingPayouts} pending rewards and some of them are next to expire in the next era`
+                  `Validator ${validatorAddress}, which is included in your current on-chain set, has ${pendingPayouts} pending rewards and some of them are next to expire in the next 24h`
                 )
               }
             })
