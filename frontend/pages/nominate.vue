@@ -13,93 +13,31 @@
         not found, please install it and import your account/s before proceed
       </b-alert>
     </div>
-    <div v-else-if="noAccountsFound">
-      <b-alert variant="warning" show>
-        <i class="fa fa-frown-o"></i> No accounts found, open Polkadot JS
-        extension and import your account/s before proceed
-      </b-alert>
-    </div>
     <div v-else-if="onGoingElection">
       <b-alert variant="warning" show>
         <i class="fa fa-frown-o"></i> There is currently an ongoing election for
         new validator candidates. As such staking operations are not permitted
       </b-alert>
     </div>
+    <div v-else-if="!selectedAddress">
+      <b-alert variant="warning" show>
+        <i class="fa fa-frown-o"></i> Please, connect your extension account by
+        clicking in the Connect button placed top right
+      </b-alert>
+    </div>
+    <div v-else-if="selectedAddresses.length === 0">
+      <b-alert variant="warning" show>
+        <i class="fa fa-frown-o"></i> Please, add validators to your set before
+        nominate
+      </b-alert>
+    </div>
     <div v-else>
       <b-form class="mt-2" @submit="onSubmit">
         <b-form-group
           id="input-group-from"
-          label="Select your controller address:"
           label-for="input-from"
           class="w-100 pt-4"
         >
-          <b-dropdown
-            block
-            menu-class="w-100"
-            class="py-2"
-            :state="validateState('selectedAddress')"
-            aria-describedby="selectedAddress-feedback"
-            :text="selectedAddress"
-            @change="getAccountInfo(selectedAddress)"
-          >
-            <b-dropdown-item
-              v-for="accountId in extensionAddresses"
-              :key="accountId"
-              @click="
-                selectAddress(accountId)
-                getAccountInfo(selectedAddress)
-              "
-            >
-              <div>
-                <Identicon :address="accountId" />
-                {{ accountId }}
-              </div>
-            </b-dropdown-item>
-          </b-dropdown>
-          <div class="controller-address-validation">
-            <p
-              v-if="tranferableBalance"
-              class="ml-2 mb-0 mt-1"
-              :class="{
-                'text-danger': !(tranferableBalance > 0),
-                'text-success': tranferableBalance > 0,
-              }"
-            >
-              Transferable balance:
-              {{ formatAmount(tranferableBalance) }}
-              <span v-if="tranferableBalance > 0">
-                <font-awesome-icon icon="check" />
-              </span>
-            </p>
-            <p
-              v-if="addressRole"
-              class="ml-2 mb-0 mt-1"
-              :class="{
-                'text-danger':
-                  addressRole !== 'controller' &&
-                  addressRole !== 'stash/controller',
-                'text-success':
-                  addressRole === 'controller' ||
-                  addressRole === 'stash/controller',
-              }"
-            >
-              <span v-if="addressRole === 'none'">
-                Address is not a controller
-              </span>
-              <span v-else>
-                Address is a
-                {{ addressRole }}
-              </span>
-              <span
-                v-if="
-                  addressRole === 'controller' ||
-                  addressRole === 'stash/controller'
-                "
-              >
-                <font-awesome-icon icon="check" />
-              </span>
-            </p>
-          </div>
           <b-form-invalid-feedback id="selectedAddress-feedback"
             >Please install Polkadot JS extension
           </b-form-invalid-feedback>
@@ -177,13 +115,7 @@
           type="submit"
           variant="outline-primary2"
           class="btn-block mt-3"
-          :disabled="
-            noAccountsFound ||
-            !tranferableBalance > 0 ||
-            !(
-              addressRole === 'controller' || addressRole === 'stash/controller'
-            )
-          "
+          :disabled="!selectedAddress || selectedAddresses.length === 0"
         >
           Nominate
         </b-button>
@@ -202,7 +134,6 @@ import {
 import { ApiPromise, WsProvider } from '@polkadot/api'
 import { encodeAddress } from '@polkadot/keyring'
 import { validationMixin } from 'vuelidate'
-import { required } from 'vuelidate/lib/validators'
 import { Promised } from 'vue-promised'
 import commonMixin from '@/mixins/commonMixin.js'
 import { config } from '@/config.js'
@@ -218,7 +149,6 @@ export default {
       extensionAccounts: [],
       extensionAddresses: [],
       selectedAccount: null,
-      selectedAddress: null,
       tranferableBalance: 0,
       api: null,
       enableWeb3: false,
@@ -267,13 +197,11 @@ export default {
       })
       return list
     },
+    selectedAddress() {
+      return this.$store.state.ranking.selectedAddress
+    },
     selectedAddresses() {
       return this.$store.state.ranking.selectedAddresses
-    },
-  },
-  validations: {
-    selectedAddress: {
-      required,
     },
   },
   async created() {
@@ -282,31 +210,12 @@ export default {
     )
       .then(() => {
         web3Accounts()
-          .then((accounts) => {
+          .then(() => {
             const wsProvider = new WsProvider(config.nodeWs)
             ApiPromise.create({ provider: wsProvider }).then((api) => {
               this.api = api
               this.getElectionStatus()
-              if (accounts.length > 0) {
-                this.detectedExtension = true
-                this.extensionAccounts = accounts
-                accounts.forEach((account) =>
-                  this.extensionAddresses.push(
-                    encodeAddress(account.address, config.addressPrefix)
-                  )
-                )
-                if (
-                  this.extensionAccounts.length > 0 &&
-                  this.extensionAddresses.length > 0
-                ) {
-                  this.selectedAccount = this.extensionAccounts[0]
-                  this.selectedAddress = this.extensionAddresses[0]
-                  this.getAccountInfo(this.selectedAddress)
-                  this.noAccountsFound = false
-                } else {
-                  this.noAccountsFound = true
-                }
-              }
+              this.detectedExtension = true
             })
           })
           .catch((error) => {
@@ -326,10 +235,6 @@ export default {
     },
     onSubmit(evt) {
       evt.preventDefault()
-      this.$v.$touch()
-      if (this.$v.$invalid) {
-        return
-      }
       this.nominate()
     },
     async getAccountInfo(address) {
@@ -357,28 +262,30 @@ export default {
       return number
     },
     async getElectionStatus() {
-      const eraElectionStatus = await this.api.query.staking.eraElectionStatus()
-      this.onGoingElection = eraElectionStatus.isOpen
+      const chainElectionStatus = await this.api.query.electionProviderMultiPhase.currentPhase()
+      this.onGoingElection =
+        Object.getOwnPropertyNames(chainElectionStatus.toJSON())[0] !== 'off'
     },
     nominate() {
       this.selectedAccount = encodeAddress(this.selectedAddress, 42)
-      web3FromAddress(this.selectedAccount)
+      const vm = this
+      web3FromAddress(this.selectedAddress)
         .then(async (injector) => {
           this.api.setSigner(injector.signer)
           const { nonce } = await this.api.query.system.account(
             this.selectedAddress
           )
           await this.api.tx.staking
-            .nominate(this.selectedAddresses)
+            .nominate(vm.selectedAddresses)
             .signAndSend(
-              this.selectedAccount,
+              vm.selectedAccount,
               { nonce },
               ({ events = [], status }) => {
-                this.extrinsicStatus = status.type
+                vm.extrinsicStatus = status.type
                 if (status.isInBlock) {
-                  this.extrinsicHash = status.asInBlock.toHex()
+                  vm.extrinsicHash = status.asInBlock.toHex()
                 } else if (status.isFinalized) {
-                  this.blockHash = status.asFinalized.toHex()
+                  vm.blockHash = status.asFinalized.toHex()
                 }
               }
             )
@@ -390,9 +297,6 @@ export default {
     },
     remove(accountId) {
       this.$store.dispatch('ranking/toggleSelected', { accountId })
-    },
-    selectAddress(accountId) {
-      this.selectedAddress = accountId
     },
   },
 }
