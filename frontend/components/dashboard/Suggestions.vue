@@ -58,7 +58,6 @@ export default {
               const validator = data.ranking.find(
                 (validator) => validator.stash_address === validatorAddress
               )
-              console.log(validator)
               const commissionHistory =
                 JSON.parse(validator.commission_history).filter(
                   ({ commission }) => commission
@@ -71,17 +70,9 @@ export default {
                 parseFloat(firstCommission.commission)
               ) {
                 localSuggestions.push(
-                  `Validator ${validatorAddress} increased its commission from ${firstCommission.commission}% to ${lastCommission.commission}%`
+                  `Validator ${validatorAddress}, which is included in your current on-chain set, increased its commission from ${firstCommission.commission}% to ${lastCommission.commission}%`
                 )
               }
-              // if (
-              //   parseFloat(lastCommission.commission) <
-              //   parseFloat(firstCommission.commission)
-              // ) {
-              //   this.suggestions.push(
-              //     `Validator ${validatorAddress} reduced its commission from ${firstCommission.commission}% to ${lastCommission.commission}%`
-              //   )
-              // }
 
               // payouts
               const payoutHistory =
@@ -100,11 +91,10 @@ export default {
                   .filter((payout) => payout.status === 'pending').length > 0
               if (payoutAlert) {
                 localSuggestions.push(
-                  `Validator ${validatorAddress} has ${pendingPayouts} pending rewards and some of them are next to expire in the next era`
+                  `Validator ${validatorAddress}, which is included in your current on-chain set, has ${pendingPayouts} pending rewards and some of them are next to expire in the next era`
                 )
               }
             })
-            console.log(localSuggestions)
             this.suggestions = localSuggestions
           }
         },

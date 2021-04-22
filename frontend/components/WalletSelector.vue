@@ -123,8 +123,6 @@ export default {
     async importChainValidatorAddresses(address) {
       const chainStaking = await this.api.query.staking.nominators(address)
       const staking = JSON.parse(JSON.stringify(chainStaking))
-      // eslint-disable-next-line no-console
-      console.log(staking)
       if (staking?.targets.length > 0) {
         await this.$store.dispatch(
           'ranking/importChainValidatorAddresses',
