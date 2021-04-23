@@ -39,6 +39,8 @@ export default {
               name
               commission_history
               payout_history
+              slashed
+              relative_performance
             }
           }
         `,
@@ -91,7 +93,27 @@ export default {
                   .filter((payout) => payout.status === 'pending').length > 0
               if (payoutAlert) {
                 localSuggestions.push(
-                  `Validator ${validatorAddress}, which is included in your current on-chain set, has ${pendingPayouts} pending rewards and some of them are next to expire in the next 24h`
+                  `Validator ${
+                    validator.name + ' '
+                  }${validatorAddress}, which is included in your current on-chain set, has ${pendingPayouts} pending rewards and some of them are next to expire in the next 24h`
+                )
+              }
+
+              // slashes
+              if (validator.slashed) {
+                localSuggestions.push(
+                  `Validator ${
+                    validator.name + ' '
+                  }${validatorAddress}, which is included in your current on-chain set, was slashed in the last 84 eras`
+                )
+              }
+
+              // performance
+              if (validator.relative_performance < 0.5) {
+                localSuggestions.push(
+                  `Validator ${
+                    validator.name + ' '
+                  }${validatorAddress}, which is included in your current on-chain set, performs below network average`
                 )
               }
             })
