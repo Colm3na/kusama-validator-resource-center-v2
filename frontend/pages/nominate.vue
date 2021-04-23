@@ -4,19 +4,13 @@
     <div v-if="loading">
       <Loading />
     </div>
-    <div v-else-if="!detectedExtension">
+    <div v-else-if="!isWeb3Injected">
       <b-alert variant="warning" show>
         <i class="fa fa-frown-o"></i>
         <a href="https://github.com/polkadot-js/extension" target="_blank"
           >Polkadot JS extension</a
         >
         not found, please install it and import your account/s before proceed
-      </b-alert>
-    </div>
-    <div v-else-if="onGoingElection">
-      <b-alert variant="warning" show>
-        <i class="fa fa-frown-o"></i> There is currently an ongoing election for
-        new validator candidates. As such staking operations are not permitted
       </b-alert>
     </div>
     <div v-else-if="!selectedAddress">
@@ -32,15 +26,19 @@
       </b-alert>
     </div>
     <div v-else>
+      <div v-if="onGoingElection">
+        <b-alert variant="warning" show>
+          <i class="fa fa-frown-o"></i> There is currently an ongoing election
+          for new validator candidates. Your nomination will be effective in the
+          next era
+        </b-alert>
+      </div>
       <b-form class="mt-2" @submit="onSubmit">
         <b-form-group
           id="input-group-from"
           label-for="input-from"
           class="w-100 pt-4"
         >
-          <b-form-invalid-feedback id="selectedAddress-feedback"
-            >Please install Polkadot JS extension
-          </b-form-invalid-feedback>
           <p class="pt-4">Target validators:</p>
           <div
             v-for="validator in list"
@@ -102,6 +100,7 @@
           class="text-center"
           fade
           show
+          dismissible
         >
           <h4>Transaction hash {{ extrinsicHash }}</h4>
           <p>Transaction status: {{ extrinsicStatus }}</p>
@@ -125,41 +124,31 @@
 </template>
 
 <script>
-import { BigNumber } from 'bignumber.js'
 import {
-  web3Accounts,
+  isWeb3Injected,
   web3Enable,
   web3FromAddress,
 } from '@polkadot/extension-dapp'
 import { ApiPromise, WsProvider } from '@polkadot/api'
 import { encodeAddress } from '@polkadot/keyring'
-import { validationMixin } from 'vuelidate'
 import { Promised } from 'vue-promised'
 import commonMixin from '@/mixins/commonMixin.js'
 import { config } from '@/config.js'
 
 export default {
   components: { Promised },
-  mixins: [commonMixin, validationMixin],
+  mixins: [commonMixin],
   data() {
     return {
       config,
-      favorites: [],
-      detectedExtension: false,
-      extensionAccounts: [],
-      extensionAddresses: [],
-      selectedAccount: null,
-      tranferableBalance: 0,
+      isWeb3Injected: false,
+      allInjected: null,
       api: null,
-      enableWeb3: false,
       error: null,
-      amount: 0,
       extrinsicHash: null,
       extrinsicStatus: null,
       blockHash: null,
       success: null,
-      noAccountsFound: true,
-      addressRole: null,
       onGoingElection: false,
       clusterAlert: false,
     }
@@ -205,57 +194,18 @@ export default {
     },
   },
   async created() {
-    this.enableWeb3 = await web3Enable(
+    this.allInjected = await web3Enable(
       `${config.title} for ${this.capitalize(config.name)}`
     )
-      .then(() => {
-        web3Accounts()
-          .then(() => {
-            const wsProvider = new WsProvider(config.nodeWs)
-            ApiPromise.create({ provider: wsProvider }).then((api) => {
-              this.api = api
-              this.getElectionStatus()
-              this.detectedExtension = true
-            })
-          })
-          .catch((error) => {
-            // eslint-disable-next-line
-            console.log('Error: ', error)
-          })
-      })
-      .catch((error) => {
-        // eslint-disable-next-line
-        console.log('Error: ', error)
-      })
+    this.isWeb3Injected = isWeb3Injected
+    const wsProvider = new WsProvider(config.nodeWs)
+    this.api = await ApiPromise.create({ provider: wsProvider })
+    await this.getElectionStatus()
   },
   methods: {
-    validateState(name) {
-      const { $dirty, $error } = this.$v[name]
-      return $dirty ? !$error : null
-    },
     onSubmit(evt) {
       evt.preventDefault()
       this.nominate()
-    },
-    async getAccountInfo(address) {
-      const { availableBalance } = await this.api.derive.balances.all(address)
-      this.tranferableBalance = new BigNumber(availableBalance)
-      this.addressRole = await this.getAddressRole(address)
-    },
-    async getAddressRole(address) {
-      const bonded = await this.api.query.staking.bonded(address)
-      if (bonded.toString() && bonded.toString() === address) {
-        return `stash/controller`
-      } else if (bonded.toString() && bonded.toString() !== address) {
-        return `stash`
-      } else {
-        const stakingLedger = await this.api.query.staking.ledger(address)
-        if (stakingLedger.toString()) {
-          return `controller`
-        } else {
-          return `none`
-        }
-      }
     },
     async getBlockNumber(hash) {
       const { number } = await this.api.rpc.chain.getHeader(hash)
@@ -267,7 +217,7 @@ export default {
         Object.getOwnPropertyNames(chainElectionStatus.toJSON())[0] !== 'off'
     },
     nominate() {
-      this.selectedAccount = encodeAddress(this.selectedAddress, 42)
+      const encodedAddress = encodeAddress(this.selectedAddress, 42)
       const vm = this
       web3FromAddress(this.selectedAddress)
         .then(async (injector) => {
@@ -278,7 +228,7 @@ export default {
           await this.api.tx.staking
             .nominate(vm.selectedAddresses)
             .signAndSend(
-              vm.selectedAccount,
+              encodedAddress,
               { nonce },
               ({ events = [], status }) => {
                 vm.extrinsicStatus = status.type

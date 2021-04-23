@@ -1,13 +1,12 @@
 export const config = {
   name: 'kusama',
   title: 'Validator Resource Center and Ranking',
-  nodeWs: 'wss://kusama.api.onfinality.io/public-ws',
+  nodeWs: 'wss://kusama-rpc.polkadot.io',
   denom: 'KSM',
   addressPrefix: 2,
   tokenDecimals: 12,
   historySize: 84, // 21 days
   erasPerDay: 4,
-  polkascanAPI: 'https://explorer-31.polkascan.io/kusama/api/v1', // no trailing slash
   theme: '@/assets/scss/themes/kusama.scss',
   identiconTheme: 'polkadot',
   logo: 'img/logo/kusama.svg',

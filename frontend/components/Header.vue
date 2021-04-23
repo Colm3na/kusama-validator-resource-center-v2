@@ -85,9 +85,6 @@ export default {
       this.$refs.selectedValidators.hide(true)
     },
   },
-  created() {
-    this.$store.dispatch('ranking/loadSelected')
-  },
   methods: {
     toggleSidebar() {
       this.collapsed = !this.collapsed

@@ -123,6 +123,10 @@ export const mutations = {
   },
   importValidatorSet(state, validators) {
     state.selectedAddresses = validators
+    state.list = state.list.map((validator) => {
+      validator.selected = validators.includes(validator.stashAddress)
+      return validator
+    })
   },
   importChainValidatorAddresses(state, validators) {
     state.chainValidatorAddresses = validators

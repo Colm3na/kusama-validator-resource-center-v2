@@ -18,6 +18,7 @@ export default {
     }
   },
   async created() {
+    this.$store.dispatch('ranking/loadSelected')
     if (this.$store.state.ranking.list.length === 0) {
       await this.$store.dispatch('ranking/updateList')
     }
