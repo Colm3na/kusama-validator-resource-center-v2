@@ -920,7 +920,7 @@ module.exports = {
       // eslint-disable-next-line no-restricted-syntax
       for (const eraIndex of eraIndexes) {
         const era = new BigNumber(eraIndex.toString()).toString(10);
-        let sql = `SELECT AVG(commission) AS commission_avg FROM era_commission WHERE era = '${era}'`;
+        let sql = `SELECT AVG(commission) AS commission_avg FROM era_commission WHERE era = '${era}' AND commission != 100`;
         // eslint-disable-next-line no-await-in-loop
         let res = await pool.query(sql);
         if (res.rows.length > 0) {
