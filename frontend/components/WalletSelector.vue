@@ -1,11 +1,13 @@
 <template>
   <div class="wallet-selector">
-    <h2 class="text-center d-block">Select your address</h2>
+    <h2 class="text-center d-block">Select your account</h2>
     <hr />
+    <p class="text-center mb-4">
+      Connect your account to get alerts and suggestions<br />
+      for your current on-chain validator set
+    </p>
     <div v-if="loading">
-      <p class="py-4 text-center d-block">
-        Loading addresses from extension...
-      </p>
+      <p class="py-4 text-center d-block">Loading accounts from extension...</p>
     </div>
     <div v-else>
       <b-table
@@ -16,12 +18,19 @@
       >
         <template #cell(address)="data">
           <Identicon :address="data.item.address" :size="24" />
-          {{ shortAddress(data.item.address) }}
+          <span v-if="data.item.name">
+            {{ data.item.name }}<br />{{ shortAddress(data.item.address) }}
+          </span>
+          <span v-else>
+            {{ shortAddress(data.item.address) }}
+          </span>
         </template>
         <template #cell(selected)="data">
-          <b-button variant="info" @click="selectAddress(data.item.address)"
-            >SELECT</b-button
-          >
+          <p class="text-right mb-0">
+            <b-button variant="info" @click="selectAddress(data.item.address)"
+              >SELECT</b-button
+            >
+          </p>
         </template>
       </b-table>
     </div>
@@ -86,12 +95,19 @@ export default {
                     config.addressPrefix
                   )
                   const balances = await this.getAccountBalances(address)
-                  this.extensionAccounts.push({
-                    address,
-                    role: await this.getAddressRole(address),
-                    available: this.formatAmount(balances.availableBalance),
-                    selected: false,
-                  })
+                  const role = await this.getAddressRole(address)
+                  if (
+                    balances.availableBalance.gte(0) &&
+                    role.includes('controller')
+                  ) {
+                    this.extensionAccounts.push({
+                      address,
+                      name: account.meta.name,
+                      role,
+                      available: this.formatAmount(balances.availableBalance),
+                      selected: false,
+                    })
+                  }
                 }
                 if (
                   this.extensionAccounts.length > 0 &&

@@ -4,7 +4,7 @@
       <h1 class="mb-4">Import validator set</h1>
       <div v-if="loading">
         <p class="py-4 text-center d-block">
-          Loading addresses from extension...
+          Loading accounts from extension...
         </p>
       </div>
       <div v-else>
@@ -12,7 +12,12 @@
           <div class="row mx-0 mb-4" style="border: 1px solid gray">
             <div class="col-md-4 p-3">
               <Identicon :address="account.address" :size="24" />
-              {{ shortAddress(account.address) }}
+              <span v-if="account.address">
+                {{ account.name }} ({{ shortAddress(account.address) }})
+              </span>
+              <span v-else>
+                {{ shortAddress(account.address) }}
+              </span>
             </div>
             <div class="col-md-4 p-3">
               {{ account.role }}
@@ -103,6 +108,7 @@ export default {
                     const balances = await this.getAccountBalances(address)
                     this.extensionAccounts.push({
                       address,
+                      name: account.meta.name,
                       role,
                       staking,
                       available: this.formatAmount(balances.availableBalance),
