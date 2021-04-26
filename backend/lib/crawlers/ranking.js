@@ -565,11 +565,7 @@ module.exports = {
                   (eraExposure) => eraExposure.era === era,
                 ).validators[stashAddress].own,
               );
-              const eraOthersStake = new BigNumber(
-                erasExposure.find(
-                  (eraExposure) => eraExposure.era === era,
-                ).validators[stashAddress].others,
-              );
+              const eraOthersStake = eraTotalStake.minus(eraSelfStake);
               stakeHistory.push({
                 era: new BigNumber(era.toString()).toString(10),
                 self: eraSelfStake.toString(10),
