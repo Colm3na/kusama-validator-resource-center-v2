@@ -118,7 +118,7 @@ export default {
           }
         },
         skip() {
-          return !this.chartData || this.chainValidatorAddresses.length === 0
+          return !this.chartData
         },
         result({ data }) {
           const localChartData = {
@@ -185,7 +185,7 @@ export default {
           }
         },
         skip() {
-          return !this.chartData || this.selectedValidatorAddresses.length === 0
+          return !this.chartData
         },
         result({ data }) {
           const localChartData = {

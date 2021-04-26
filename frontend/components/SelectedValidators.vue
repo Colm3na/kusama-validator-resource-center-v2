@@ -49,11 +49,19 @@
         </a>
       </div>
     </div>
-    <p v-if="list.length > 0" class="mt-3 mb-0">
-      <b-button variant="primary2" class="btn-block" to="/nominate"
-        >Nominate</b-button
-      >
-    </p>
+    <div v-if="list.length > 0" class="row mt-3 mb-0">
+      <div class="col-4">
+        <b-button variant="danger" class="btn-block" @click="clean()">
+          <font-awesome-icon icon="trash-alt" />
+          Clear
+        </b-button>
+      </div>
+      <div class="col-8">
+        <b-button variant="primary2" class="btn-block" to="/nominate"
+          >Nominate</b-button
+        >
+      </div>
+    </div>
   </div>
 </template>
 
@@ -88,6 +96,9 @@ export default {
     },
     remove(accountId) {
       this.$store.dispatch('ranking/toggleSelected', { accountId })
+    },
+    clean() {
+      this.$store.dispatch('ranking/importValidatorSet', [])
     },
   },
 }
