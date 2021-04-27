@@ -40,6 +40,10 @@ export default {
                 display: true,
                 color: 'rgba(255, 255, 255, 0.1)',
               },
+              scaleLabel: {
+                display: true,
+                labelString: 'era',
+              },
             },
           ],
           yAxes: [
@@ -51,6 +55,10 @@ export default {
               gridLines: {
                 display: true,
                 color: 'rgba(255, 255, 255, 0.1)',
+              },
+              scaleLabel: {
+                display: true,
+                labelString: 'avg. elected self stake',
               },
             },
           ],
@@ -85,7 +93,7 @@ export default {
         result({ data }) {
           this.rows = data.era_self_stake_avg
           this.chartData = {
-            labels: [...this.eras],
+            labels: this.eras.map((era) => era),
             datasets: [
               {
                 label: 'network',

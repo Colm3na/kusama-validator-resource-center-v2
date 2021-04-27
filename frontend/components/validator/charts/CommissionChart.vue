@@ -60,7 +60,7 @@ export default {
   computed: {
     chartData() {
       return {
-        labels: this.commissionHistory.map(({ era }) => era),
+        labels: this.commissionHistory.map(({ era }) => `Era ${era}`),
         datasets: [
           {
             labels: 'commission',

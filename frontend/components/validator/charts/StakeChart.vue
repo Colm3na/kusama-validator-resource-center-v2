@@ -61,7 +61,7 @@ export default {
   computed: {
     chartData() {
       return {
-        labels: this.stakeHistory.map(({ era }) => era),
+        labels: this.stakeHistory.map(({ era }) => `Era ${era}`),
         datasets: [
           {
             labels: 'elected own stake',

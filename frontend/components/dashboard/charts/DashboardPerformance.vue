@@ -39,6 +39,10 @@ export default {
                 display: true,
                 color: 'rgba(255, 255, 255, 0.1)',
               },
+              scaleLabel: {
+                display: true,
+                labelString: 'era',
+              },
             },
           ],
           yAxes: [
@@ -51,6 +55,10 @@ export default {
               gridLines: {
                 display: true,
                 color: 'rgba(255, 255, 255, 0.1)',
+              },
+              scaleLabel: {
+                display: true,
+                labelString: 'avg. performance',
               },
             },
           ],
@@ -85,7 +93,7 @@ export default {
         result({ data }) {
           this.rows = data.era_relative_performance_avg
           this.chartData = {
-            labels: [...this.rows.map((row) => row.era)],
+            labels: this.rows.map(({ era }) => era),
             datasets: [
               {
                 label: 'network',

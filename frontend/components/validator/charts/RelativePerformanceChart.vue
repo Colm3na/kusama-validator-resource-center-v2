@@ -59,7 +59,7 @@ export default {
   computed: {
     chartData() {
       return {
-        labels: this.relativePerformanceHistory.map(({ era }) => era),
+        labels: this.relativePerformanceHistory.map(({ era }) => `Era ${era}`),
         datasets: [
           {
             labels: 'relative performance',

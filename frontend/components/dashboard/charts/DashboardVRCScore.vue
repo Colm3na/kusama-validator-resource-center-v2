@@ -39,6 +39,10 @@ export default {
                 display: true,
                 color: 'rgba(255, 255, 255, 0.1)',
               },
+              scaleLabel: {
+                display: true,
+                labelString: 'era',
+              },
             },
           ],
           yAxes: [
@@ -46,11 +50,14 @@ export default {
               ticks: {
                 beginAtZero: true,
                 suggestedMin: 0,
-                suggestedMax: 25,
               },
               gridLines: {
                 display: true,
                 color: 'rgba(255, 255, 255, 0.1)',
+              },
+              scaleLabel: {
+                display: true,
+                labelString: 'avg. VRC score',
               },
             },
           ],

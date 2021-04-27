@@ -62,7 +62,7 @@ export default {
   computed: {
     chartData() {
       return {
-        labels: this.payoutHistory.map(({ era }) => era),
+        labels: this.payoutHistory.map(({ era }) => `Era ${era}`),
         datasets: [
           {
             labels: 'payments',
