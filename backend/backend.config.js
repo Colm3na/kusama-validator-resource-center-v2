@@ -36,7 +36,7 @@ module.exports = {
         pollingTime:
           parseInt(process.env.CRAWLER_RANKING_POLLING_TIME_MS, 10)
           || 5 * 60 * 1000,
-        historySize: 83,
+        historySize: 84,
         erasPerDay: 4,
         tokenDecimals: 12,
       },
