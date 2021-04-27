@@ -586,9 +586,9 @@ module.exports = {
               });
               stakeHistory.push({
                 era: new BigNumber(era.toString()).toString(10),
-                self: 0,
-                others: 0,
-                total: 0,
+                self: null,
+                others: null,
+                total: null,
               });
               performanceHistory.push({
                 era: new BigNumber(era.toString()).toString(10),
@@ -825,9 +825,9 @@ module.exports = {
         ON CONFLICT ON CONSTRAINT era_vrc_score_pkey 
         DO NOTHING;`;
         let data = [
-          `${validator.stashAddress}`,
-          `${currentEra}`,
-          `${validator.totalRating}`,
+          validator.stashAddress,
+          currentEra,
+          validator.totalRating,
         ];
         // eslint-disable-next-line no-await-in-loop
         await dbParamInsert(pool, sql, data, loggerOptions);
@@ -845,9 +845,9 @@ module.exports = {
           ON CONFLICT ON CONSTRAINT era_commission_pkey 
           DO NOTHING;`;
           data = [
-            `${validator.stashAddress}`,
-            `${commissionHistoryItem.era}`,
-            `${commissionHistoryItem.commission || 0}`,
+            validator.stashAddress,
+            commissionHistoryItem.era,
+            commissionHistoryItem.commission,
           ];
           // eslint-disable-next-line no-await-in-loop
           await dbParamInsert(pool, sql, data, loggerOptions);
@@ -866,9 +866,9 @@ module.exports = {
           ON CONFLICT ON CONSTRAINT era_relative_performance_pkey 
           DO NOTHING;`;
           data = [
-            `${validator.stashAddress}`,
-            `${perfHistoryItem.era}`,
-            `${perfHistoryItem.relativePerformance}`,
+            validator.stashAddress,
+            perfHistoryItem.era,
+            perfHistoryItem.relativePerformance,
           ];
           // eslint-disable-next-line no-await-in-loop
           await dbParamInsert(pool, sql, data, loggerOptions);
@@ -887,9 +887,9 @@ module.exports = {
           ON CONFLICT ON CONSTRAINT era_self_stake_pkey 
           DO NOTHING;`;
           data = [
-            `${validator.stashAddress}`,
-            `${stakefHistoryItem.era}`,
-            `${stakefHistoryItem.self}`,
+            validator.stashAddress,
+            stakefHistoryItem.era,
+            stakefHistoryItem.self,
           ];
           // eslint-disable-next-line no-await-in-loop
           await dbParamInsert(pool, sql, data, loggerOptions);
@@ -908,9 +908,9 @@ module.exports = {
           ON CONFLICT ON CONSTRAINT era_points_pkey 
           DO NOTHING;`;
           data = [
-            `${validator.stashAddress}`,
-            `${eraPointsHistoryItem.era}`,
-            `${eraPointsHistoryItem.points}`,
+            validator.stashAddress,
+            eraPointsHistoryItem.era,
+            eraPointsHistoryItem.points,
           ];
           // eslint-disable-next-line no-await-in-loop
           await dbParamInsert(pool, sql, data, loggerOptions);
@@ -920,7 +920,7 @@ module.exports = {
       // eslint-disable-next-line no-restricted-syntax
       for (const eraIndex of eraIndexes) {
         const era = new BigNumber(eraIndex.toString()).toString(10);
-        let sql = `SELECT AVG(commission) AS commission_avg FROM era_commission WHERE era = '${era}' AND commission != 100`;
+        let sql = `SELECT AVG(commission) AS commission_avg FROM era_commission WHERE era = '${era}' AND commission IS NOT NULL AND commission != 100`;
         // eslint-disable-next-line no-await-in-loop
         let res = await pool.query(sql);
         if (res.rows.length > 0) {
@@ -930,7 +930,7 @@ module.exports = {
             await dbInsert(pool, sql, loggerOptions);
           }
         }
-        sql = `SELECT AVG(self_stake) AS self_stake_avg FROM era_self_stake WHERE era = '${era}'`;
+        sql = `SELECT AVG(self_stake) AS self_stake_avg FROM era_self_stake WHERE era = '${era}' AND self_stake IS NOT NULL`;
         // eslint-disable-next-line no-await-in-loop
         res = await pool.query(sql);
         if (res.rows.length > 0) {
@@ -951,7 +951,7 @@ module.exports = {
             await dbInsert(pool, sql, loggerOptions);
           }
         }
-        sql = `SELECT AVG(points) AS points_avg FROM era_points WHERE era = '${era}'`;
+        sql = `SELECT AVG(points) AS points_avg FROM era_points WHERE era = '${era}' AND points IS NOT NULL`;
         // eslint-disable-next-line no-await-in-loop
         res = await pool.query(sql);
         if (res.rows.length > 0) {
