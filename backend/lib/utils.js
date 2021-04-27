@@ -9,7 +9,7 @@ module.exports = {
   wait: async (ms) => new Promise((resolve) => {
     setTimeout(resolve, ms);
   }),
-  dbInsert: async (pool, sql, loggerOptions) => {
+  dbQuery: async (pool, sql, loggerOptions) => {
     try {
       await pool.query(sql);
     } catch (error) {

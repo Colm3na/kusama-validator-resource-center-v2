@@ -174,6 +174,7 @@ INSERT INTO total (name, count) VALUES
   ('waiting_validator_count', 0),
   ('nominator_count', 0),
   ('current_era', 0),
+  ('active_era', 0),
   ('minimum_stake', 0);
 
 CREATE INDEX IF NOT EXISTS extrinsic_section_idx ON extrinsic (section);

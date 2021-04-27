@@ -3,7 +3,7 @@ const { BigNumber } = require('bignumber.js');
 const { ApiPromise, WsProvider } = require('@polkadot/api');
 const pino = require('pino');
 const axios = require('axios').default;
-const { wait, dbInsert, dbParamInsert } = require('../utils.js');
+const { wait, dbQuery, dbParamInsert } = require('../utils.js');
 
 const logger = pino();
 const loggerOptions = {
@@ -221,6 +221,7 @@ module.exports = {
       const withActive = false;
       const erasHistoric = await api.derive.staking.erasHistoric(withActive);
       const chainCurrentEra = await api.query.staking.currentEra();
+      const chainActiveEra = await api.query.staking.activeEra();
       const eraIndexes = erasHistoric.slice(
         Math.max(erasHistoric.length - config.historySize, 0),
       );
@@ -282,10 +283,12 @@ module.exports = {
       );
       const dataCollectionEndTime = new Date().getTime();
       const dataCollectionTime = dataCollectionEndTime - startTime;
+      logger.info(loggerOptions, 'Done!');
 
       //
       // data processing
       //
+      logger.info(loggerOptions, 'Processing data ...');
       const blockHeight = parseInt(block.header.number.toString(), 10);
       const numActiveValidators = validatorAddresses.length;
       const eraPointsHistoryTotals = [];
@@ -303,6 +306,7 @@ module.exports = {
       const waitingValidatorCount = waitingInfo.info.length;
       const nominatorCount = nominators.length;
       const currentEra = chainCurrentEra.toString();
+      const activeEra = JSON.parse(JSON.stringify(chainActiveEra)).index;
 
       // minimun stake
       const nominatorStakes = [];
@@ -320,37 +324,38 @@ module.exports = {
       logger.info(loggerOptions, `${waitingValidatorCount} waiting validators`);
       logger.info(loggerOptions, `${nominatorCount} nominators`);
       logger.info(loggerOptions, `Current era is ${currentEra}`);
+      logger.info(loggerOptions, `Active era is ${activeEra}`);
       logger.info(loggerOptions, `Minimum amount to stake is ${minimumStake}`);
-      try {
-        const sql = `UPDATE total SET count = '${activeValidatorCount}' WHERE name = 'active_validator_count'`;
-        await pool.query(sql);
-      } catch (error) {
-        logger.error(loggerOptions, `Error updating total: ${JSON.stringify(error)}`);
-      }
-      try {
-        const sql = `UPDATE total SET count = '${waitingValidatorCount}' WHERE name = 'waiting_validator_count'`;
-        await pool.query(sql);
-      } catch (error) {
-        logger.error(loggerOptions, `Error updating total: ${JSON.stringify(error)}`);
-      }
-      try {
-        const sql = `UPDATE total SET count = '${nominatorCount}' WHERE name = 'nominator_count'`;
-        await pool.query(sql);
-      } catch (error) {
-        logger.error(loggerOptions, `Error updating total: ${JSON.stringify(error)}`);
-      }
-      try {
-        const sql = `UPDATE total SET count = '${currentEra}' WHERE name = 'current_era'`;
-        await pool.query(sql);
-      } catch (error) {
-        logger.error(loggerOptions, `Error updating total: ${JSON.stringify(error)}`);
-      }
-      try {
-        const sql = `UPDATE total SET count = '${minimumStake}' WHERE name = 'minimum_stake'`;
-        await pool.query(sql);
-      } catch (error) {
-        logger.error(loggerOptions, `Error updating total: ${JSON.stringify(error)}`);
-      }
+      await dbQuery(
+        pool,
+        `UPDATE total SET count = '${activeValidatorCount}' WHERE name = 'active_validator_count'`,
+        loggerOptions,
+      );
+      await dbQuery(
+        pool,
+        `UPDATE total SET count = '${waitingValidatorCount}' WHERE name = 'waiting_validator_count'`,
+        loggerOptions,
+      );
+      await dbQuery(
+        pool,
+        `UPDATE total SET count = '${nominatorCount}' WHERE name = 'nominator_count'`,
+        loggerOptions,
+      );
+      await dbQuery(
+        pool,
+        `UPDATE total SET count = '${currentEra}' WHERE name = 'current_era'`,
+        loggerOptions,
+      );
+      await dbQuery(
+        pool,
+        `UPDATE total SET count = '${activeEra}' WHERE name = 'active_era'`,
+        loggerOptions,
+      );
+      await dbQuery(
+        pool,
+        `UPDATE total SET count = '${minimumStake}' WHERE name = 'minimum_stake'`,
+        loggerOptions,
+      );
 
       // eslint-disable-next-line
       const nominations = nominators.map(([key, nominations]) => {
@@ -826,7 +831,7 @@ module.exports = {
         DO NOTHING;`;
         let data = [
           validator.stashAddress,
-          currentEra,
+          activeEra,
           validator.totalRating,
         ];
         // eslint-disable-next-line no-await-in-loop
@@ -935,7 +940,7 @@ module.exports = {
           if (res.rows[0].commission_avg) {
             sql = `INSERT INTO era_commission_avg (era, commission_avg) VALUES ('${era}', '${res.rows[0].commission_avg}') ON CONFLICT ON CONSTRAINT era_commission_avg_pkey DO NOTHING;`;
             // eslint-disable-next-line no-await-in-loop
-            await dbInsert(pool, sql, loggerOptions);
+            await dbQuery(pool, sql, loggerOptions);
           }
         }
         sql = `SELECT AVG(self_stake) AS self_stake_avg FROM era_self_stake WHERE era = '${era}'`;
@@ -946,7 +951,7 @@ module.exports = {
             const selfStakeAvg = res.rows[0].self_stake_avg.toString(10).split('.')[0];
             sql = `INSERT INTO era_self_stake_avg (era, self_stake_avg) VALUES ('${era}', '${selfStakeAvg}') ON CONFLICT ON CONSTRAINT era_self_stake_avg_pkey DO NOTHING;`;
             // eslint-disable-next-line no-await-in-loop
-            await dbInsert(pool, sql, loggerOptions);
+            await dbQuery(pool, sql, loggerOptions);
           }
         }
         sql = `SELECT AVG(relative_performance) AS relative_performance_avg FROM era_relative_performance WHERE era = '${era}'`;
@@ -956,7 +961,7 @@ module.exports = {
           if (res.rows[0].relative_performance_avg) {
             sql = `INSERT INTO era_relative_performance_avg (era, relative_performance_avg) VALUES ('${era}', '${res.rows[0].relative_performance_avg}') ON CONFLICT ON CONSTRAINT era_relative_performance_avg_pkey DO NOTHING;`;
             // eslint-disable-next-line no-await-in-loop
-            await dbInsert(pool, sql, loggerOptions);
+            await dbQuery(pool, sql, loggerOptions);
           }
         }
         sql = `SELECT AVG(points) AS points_avg FROM era_points WHERE era = '${era}'`;
@@ -966,7 +971,7 @@ module.exports = {
           if (res.rows[0].points_avg) {
             sql = `INSERT INTO era_points_avg (era, points_avg) VALUES ('${era}', '${res.rows[0].points_avg}') ON CONFLICT ON CONSTRAINT era_points_avg_pkey DO NOTHING;`;
             // eslint-disable-next-line no-await-in-loop
-            await dbInsert(pool, sql, loggerOptions);
+            await dbQuery(pool, sql, loggerOptions);
           }
         }
       }
