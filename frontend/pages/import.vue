@@ -1,15 +1,13 @@
 <template>
   <div class="page container-fluid pt-3">
     <div>
-      <h1 class="mb-4">Import validator set</h1>
-      <p class="mb-4">
+      <h1 class="mb-4 text-center">Import validator set</h1>
+      <p class="mb-4 text-center">
         Import the validator set of any of your extension accounts to use as a
         base to customize your next validator set
       </p>
       <div v-if="loading">
-        <p class="py-4 text-center d-block">
-          Loading accounts from extension...
-        </p>
+        <Loading color="#fff" />
       </div>
       <div v-else>
         <div v-for="account in extensionAccounts" :key="account.address">

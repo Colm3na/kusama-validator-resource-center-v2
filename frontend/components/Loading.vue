@@ -1,17 +1,25 @@
 <template>
-  <div>
-    <text-typing
-      :texts="['Fetching data from backend...']"
-      :speed="100"
-      :delay="3000"
-      fixed-text-class="text-white"
-      dynamic-text-class="text-teal-200"
-      caret-class="text-white"
-      class="pt-3 text-center"
-    >
-    </text-typing>
+  <div class="text-center py-4">
+    <trinity-rings-spinner
+      :animation-duration="1500"
+      :size="66"
+      :color="color"
+      style="margin: 0 auto"
+    />
+    <p class="text-center">loading data ...</p>
   </div>
 </template>
 <script>
-export default {}
+import { TrinityRingsSpinner } from 'epic-spinners'
+export default {
+  components: {
+    TrinityRingsSpinner,
+  },
+  props: {
+    color: {
+      type: String,
+      default: () => '#fff',
+    },
+  },
+}
 </script>

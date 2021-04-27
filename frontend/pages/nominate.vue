@@ -1,11 +1,11 @@
 <template>
   <b-container fluid class="page py-5">
-    <h1 class="mb-4">Nominate selected</h1>
+    <h1 class="mb-4 text-center">Nominate</h1>
     <div v-if="loading">
       <Loading />
     </div>
     <div v-else-if="!isWeb3Injected">
-      <b-alert variant="warning" show>
+      <b-alert variant="warning" class="text-center" show>
         <i class="fa fa-frown-o"></i>
         <a href="https://github.com/polkadot-js/extension" target="_blank"
           >Polkadot JS extension</a
@@ -14,20 +14,20 @@
       </b-alert>
     </div>
     <div v-else-if="!selectedAddress">
-      <b-alert variant="warning" show>
+      <b-alert variant="warning" class="text-center" show>
         <i class="fa fa-frown-o"></i> Please, connect your extension account by
         clicking in the Connect button placed top right
       </b-alert>
     </div>
     <div v-else-if="selectedAddresses.length === 0">
-      <b-alert variant="warning" show>
+      <b-alert variant="warning" class="text-center" show>
         <i class="fa fa-frown-o"></i> Please, add validators to your set before
         nominate
       </b-alert>
     </div>
     <div v-else>
       <div v-if="onGoingElection">
-        <b-alert variant="warning" show>
+        <b-alert variant="warning" class="text-center" show>
           <i class="fa fa-frown-o"></i> There is currently an ongoing election
           for new validator candidates. Your nomination will be effective in the
           next era

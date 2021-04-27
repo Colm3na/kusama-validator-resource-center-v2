@@ -27,7 +27,7 @@
           validator set.
         </p>
       </b-alert>
-      <h1 class="mb-4">Dashboard</h1>
+
       <Stats />
       <Suggestions :validators="chainValidatorAddresses" />
       <DashboardVRCScore />

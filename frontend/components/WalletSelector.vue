@@ -7,7 +7,7 @@
       for your current on-chain validator set
     </p>
     <div v-if="loading">
-      <p class="py-4 text-center d-block">Loading accounts from extension...</p>
+      <Loading color="gray" />
     </div>
     <div v-else>
       <b-table
@@ -28,7 +28,7 @@
         <template #cell(selected)="data">
           <p class="text-right mb-0">
             <b-button variant="info" @click="selectAddress(data.item.address)"
-              >SELECT</b-button
+              >CONNECT</b-button
             >
           </p>
         </template>
@@ -60,7 +60,7 @@ export default {
       fields: [
         {
           key: 'address',
-          label: 'Address',
+          label: 'Account',
         },
         {
           key: 'role',
