@@ -123,7 +123,7 @@ CREATE TABLE IF NOT EXISTS era_commission_avg (
 CREATE TABLE IF NOT EXISTS era_self_stake (  
   stash_address TEXT NOT NULL,
   era INT NOT NULL,
-  self_stake NULL,
+  self_stake BIGINT NULL,
   PRIMARY KEY ( stash_address, era )
 );
 
