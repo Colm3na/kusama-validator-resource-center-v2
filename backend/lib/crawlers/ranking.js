@@ -856,7 +856,7 @@ module.exports = {
         }
         // eslint-disable-next-line no-restricted-syntax
         for (const perfHistoryItem of validator.relativePerformanceHistory) {
-          if (perfHistoryItem.relativePerformance) {
+          if (perfHistoryItem.relativePerformance && perfHistoryItem.relativePerformance !== 0) {
             sql = `INSERT INTO era_relative_performance (
               stash_address,
               era,
