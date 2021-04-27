@@ -582,7 +582,7 @@ module.exports = {
               // validator was not active in that era
               eraPointsHistory.push({
                 era: new BigNumber(era.toString()).toString(10),
-                points: 0,
+                points: null,
               });
               stakeHistory.push({
                 era: new BigNumber(era.toString()).toString(10),
@@ -592,7 +592,7 @@ module.exports = {
               });
               performanceHistory.push({
                 era: new BigNumber(era.toString()).toString(10),
-                performance: 0,
+                performance: null,
               });
             }
             payoutHistory.push({
@@ -833,94 +833,102 @@ module.exports = {
         await dbParamInsert(pool, sql, data, loggerOptions);
         // eslint-disable-next-line no-restricted-syntax
         for (const commissionHistoryItem of validator.commissionHistory) {
-          sql = `INSERT INTO era_commission (
-            stash_address,
-            era,
-            commission
-          ) VALUES (
-            $1,
-            $2,
-            $3
-          )
-          ON CONFLICT ON CONSTRAINT era_commission_pkey 
-          DO NOTHING;`;
-          data = [
-            validator.stashAddress,
-            commissionHistoryItem.era,
-            commissionHistoryItem.commission,
-          ];
-          // eslint-disable-next-line no-await-in-loop
-          await dbParamInsert(pool, sql, data, loggerOptions);
+          if (commissionHistoryItem.commission) {
+            sql = `INSERT INTO era_commission (
+              stash_address,
+              era,
+              commission
+            ) VALUES (
+              $1,
+              $2,
+              $3
+            )
+            ON CONFLICT ON CONSTRAINT era_commission_pkey 
+            DO NOTHING;`;
+            data = [
+              validator.stashAddress,
+              commissionHistoryItem.era,
+              commissionHistoryItem.commission,
+            ];
+            // eslint-disable-next-line no-await-in-loop
+            await dbParamInsert(pool, sql, data, loggerOptions);
+          }
         }
         // eslint-disable-next-line no-restricted-syntax
         for (const perfHistoryItem of validator.relativePerformanceHistory) {
-          sql = `INSERT INTO era_relative_performance (
-            stash_address,
-            era,
-            relative_performance
-          ) VALUES (
-            $1,
-            $2,
-            $3
-          )
-          ON CONFLICT ON CONSTRAINT era_relative_performance_pkey 
-          DO NOTHING;`;
-          data = [
-            validator.stashAddress,
-            perfHistoryItem.era,
-            perfHistoryItem.relativePerformance,
-          ];
-          // eslint-disable-next-line no-await-in-loop
-          await dbParamInsert(pool, sql, data, loggerOptions);
+          if (perfHistoryItem.relativePerformance) {
+            sql = `INSERT INTO era_relative_performance (
+              stash_address,
+              era,
+              relative_performance
+            ) VALUES (
+              $1,
+              $2,
+              $3
+            )
+            ON CONFLICT ON CONSTRAINT era_relative_performance_pkey 
+            DO NOTHING;`;
+            data = [
+              validator.stashAddress,
+              perfHistoryItem.era,
+              perfHistoryItem.relativePerformance,
+            ];
+            // eslint-disable-next-line no-await-in-loop
+            await dbParamInsert(pool, sql, data, loggerOptions);
+          }
         }
         // eslint-disable-next-line no-restricted-syntax
         for (const stakefHistoryItem of validator.stakeHistory) {
-          sql = `INSERT INTO era_self_stake (
-            stash_address,
-            era,
-            self_stake
-          ) VALUES (
-            $1,
-            $2,
-            $3
-          )
-          ON CONFLICT ON CONSTRAINT era_self_stake_pkey 
-          DO NOTHING;`;
-          data = [
-            validator.stashAddress,
-            stakefHistoryItem.era,
-            stakefHistoryItem.self,
-          ];
-          // eslint-disable-next-line no-await-in-loop
-          await dbParamInsert(pool, sql, data, loggerOptions);
+          if (stakefHistoryItem.self) {
+            sql = `INSERT INTO era_self_stake (
+              stash_address,
+              era,
+              self_stake
+            ) VALUES (
+              $1,
+              $2,
+              $3
+            )
+            ON CONFLICT ON CONSTRAINT era_self_stake_pkey 
+            DO NOTHING;`;
+            data = [
+              validator.stashAddress,
+              stakefHistoryItem.era,
+              stakefHistoryItem.self,
+            ];
+            // eslint-disable-next-line no-await-in-loop
+            await dbParamInsert(pool, sql, data, loggerOptions);
+          }
         }
         // eslint-disable-next-line no-restricted-syntax
         for (const eraPointsHistoryItem of validator.eraPointsHistory) {
-          sql = `INSERT INTO era_points (
-            stash_address,
-            era,
-            points
-          ) VALUES (
-            $1,
-            $2,
-            $3
-          )
-          ON CONFLICT ON CONSTRAINT era_points_pkey 
-          DO NOTHING;`;
-          data = [
-            validator.stashAddress,
-            eraPointsHistoryItem.era,
-            eraPointsHistoryItem.points,
-          ];
-          // eslint-disable-next-line no-await-in-loop
-          await dbParamInsert(pool, sql, data, loggerOptions);
+          if (eraPointsHistoryItem.points) {
+            sql = `INSERT INTO era_points (
+              stash_address,
+              era,
+              points
+            ) VALUES (
+              $1,
+              $2,
+              $3
+            )
+            ON CONFLICT ON CONSTRAINT era_points_pkey 
+            DO NOTHING;`;
+            data = [
+              validator.stashAddress,
+              eraPointsHistoryItem.era,
+              eraPointsHistoryItem.points,
+            ];
+            // eslint-disable-next-line no-await-in-loop
+            await dbParamInsert(pool, sql, data, loggerOptions);
+          }
         }
       }
       logger.info(loggerOptions, 'Storing era stats averages in db...');
       // eslint-disable-next-line no-restricted-syntax
       for (const eraIndex of eraIndexes) {
         const era = new BigNumber(eraIndex.toString()).toString(10);
-        let sql = `SELECT AVG(commission) AS commission_avg FROM era_commission WHERE era = '${era}' AND commission IS NOT NULL AND commission != 100`;
+        let sql = `SELECT AVG(commission) AS commission_avg FROM era_commission WHERE era = '${era}' AND commission != 100`;
         // eslint-disable-next-line no-await-in-loop
         let res = await pool.query(sql);
         if (res.rows.length > 0) {
@@ -930,7 +938,7 @@ module.exports = {
             await dbInsert(pool, sql, loggerOptions);
           }
         }
-        sql = `SELECT AVG(self_stake) AS self_stake_avg FROM era_self_stake WHERE era = '${era}' AND self_stake IS NOT NULL`;
+        sql = `SELECT AVG(self_stake) AS self_stake_avg FROM era_self_stake WHERE era = '${era}'`;
         // eslint-disable-next-line no-await-in-loop
         res = await pool.query(sql);
         if (res.rows.length > 0) {
@@ -951,7 +959,7 @@ module.exports = {
             await dbInsert(pool, sql, loggerOptions);
           }
         }
-        sql = `SELECT AVG(points) AS points_avg FROM era_points WHERE era = '${era}' AND points IS NOT NULL`;
+        sql = `SELECT AVG(points) AS points_avg FROM era_points WHERE era = '${era}'`;
         // eslint-disable-next-line no-await-in-loop
         res = await pool.query(sql);
         if (res.rows.length > 0) {

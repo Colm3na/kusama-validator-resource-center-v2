@@ -110,7 +110,7 @@ CREATE TABLE IF NOT EXISTS era_vrc_score (
 CREATE TABLE IF NOT EXISTS era_commission (  
   stash_address TEXT NOT NULL,
   era INT NOT NULL,
-  commission FLOAT NULL,
+  commission FLOAT NOT NULL,
   PRIMARY KEY ( stash_address, era )
 );
 
@@ -123,7 +123,7 @@ CREATE TABLE IF NOT EXISTS era_commission_avg (
 CREATE TABLE IF NOT EXISTS era_self_stake (  
   stash_address TEXT NOT NULL,
   era INT NOT NULL,
-  self_stake BIGINT NULL,
+  self_stake BIGINT NOT NULL,
   PRIMARY KEY ( stash_address, era )
 );
 
@@ -149,7 +149,7 @@ CREATE TABLE IF NOT EXISTS era_relative_performance_avg (
 CREATE TABLE IF NOT EXISTS era_points (  
   stash_address TEXT NOT NULL,
   era INT NOT NULL,
-  points INT NULL,
+  points INT NOT NULL,
   PRIMARY KEY ( stash_address, era )
 );
 
