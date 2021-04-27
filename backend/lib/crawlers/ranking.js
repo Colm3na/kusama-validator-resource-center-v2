@@ -587,17 +587,17 @@ module.exports = {
               // validator was not active in that era
               eraPointsHistory.push({
                 era: new BigNumber(era.toString()).toString(10),
-                points: null,
+                points: 0,
               });
               stakeHistory.push({
                 era: new BigNumber(era.toString()).toString(10),
-                self: null,
-                others: null,
-                total: null,
+                self: 0,
+                others: 0,
+                total: 0,
               });
               performanceHistory.push({
                 era: new BigNumber(era.toString()).toString(10),
-                performance: null,
+                performance: 0,
               });
             }
             payoutHistory.push({
@@ -884,7 +884,7 @@ module.exports = {
         }
         // eslint-disable-next-line no-restricted-syntax
         for (const stakefHistoryItem of validator.stakeHistory) {
-          if (stakefHistoryItem.self) {
+          if (stakefHistoryItem.self && stakefHistoryItem.self !== 0) {
             sql = `INSERT INTO era_self_stake (
               stash_address,
               era,
@@ -907,7 +907,7 @@ module.exports = {
         }
         // eslint-disable-next-line no-restricted-syntax
         for (const eraPointsHistoryItem of validator.eraPointsHistory) {
-          if (eraPointsHistoryItem.points) {
+          if (eraPointsHistoryItem.points && eraPointsHistoryItem.points !== 0) {
             sql = `INSERT INTO era_points (
               stash_address,
               era,
