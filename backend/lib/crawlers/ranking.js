@@ -748,7 +748,7 @@ module.exports = {
             / (eraMaxPerformance - eraMinPerformance)).toFixed(6);
             relativePerformanceHistory.push({
               era: performance.era,
-              relativePerformance,
+              relativePerformance: parseFloat(relativePerformance),
             });
           });
           // dominated validator logic
@@ -861,7 +861,7 @@ module.exports = {
         }
         // eslint-disable-next-line no-restricted-syntax
         for (const perfHistoryItem of validator.relativePerformanceHistory) {
-          if (perfHistoryItem.relativePerformance && perfHistoryItem.relativePerformance !== 0) {
+          if (perfHistoryItem.relativePerformance && perfHistoryItem.relativePerformance > 0) {
             sql = `INSERT INTO era_relative_performance (
               stash_address,
               era,
