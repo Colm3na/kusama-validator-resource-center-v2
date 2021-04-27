@@ -2,7 +2,9 @@
   <b-container fluid class="page py-5">
     <h1 class="mb-4 text-center">Nominate</h1>
     <div class="row">
-      <div class="col-sm-10 offset-sm-1 col-md-10 offset-md-1 col-lg-8 offset-lg-2 col-xl-6 offset-xl-3">
+      <div
+        class="col-sm-10 offset-sm-1 col-md-10 offset-md-1 col-lg-8 offset-lg-2 col-xl-6 offset-xl-3"
+      >
         <div v-if="loading">
           <Loading />
         </div>
