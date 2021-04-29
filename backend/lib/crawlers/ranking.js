@@ -202,7 +202,7 @@ async function addNewFeaturedValidator(pool, ranking, config) {
   const featured = ranking.find((validator) => validator.rank === randomRank);
   await dbQuery(
     pool,
-    `INSERT INTO featured (stash_address, name, timestamp) VALUES ('${featured.stashAddress}', '${featured.name}', '${new Date().getTime()}', )`,
+    `INSERT INTO featured (stash_address, name, timestamp) VALUES ('${featured.stashAddress}', '${featured.name}', '${new Date().getTime()}')`,
     loggerOptions,
   );
   logger.info(loggerOptions, `New featured validator added: ${featured.name} ${featured.stashAddress}`);
