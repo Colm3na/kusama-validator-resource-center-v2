@@ -179,6 +179,35 @@ function getRandom(arr, n) {
   return shuffled.slice(0, n);
 }
 
+async function addNewFeaturedValidator(pool, ranking, config) {
+  // rules:
+  // - maximum commission is 10%
+  // - at least 20 KSM own stake
+  // - no previously featured
+
+  // get previously featured
+  const alreadyFeatured = [];
+  const sql = 'SELECT stash_address, timestamp FROM featured';
+  const res = await pool.query(sql);
+  res.rows.forEach((validator) => alreadyFeatured.push(validator.stash_address));
+  // get candidates that meet the rules
+  const featuredCandidates = ranking
+    .filter((validator) => validator.commission <= 10
+      && validator.selfStake.div(10 ** config.tokenDecimals).gte(20)
+      && !validator.active && !alreadyFeatured.includes(validator.stashAddress))
+    .map(({ rank }) => rank);
+  // get random featured validator of the week
+  const shuffled = [...featuredCandidates].sort(() => 0.5 - Math.random());
+  const randomRank = shuffled[0];
+  const featured = ranking.find((validator) => validator.rank === randomRank);
+  await dbQuery(
+    pool,
+    `INSERT INTO featured (stash_address, name, timestamp) VALUES ('${featured.stashAddress}', '${featured.name}', '${new Date().getTime()}', )`,
+    loggerOptions,
+  );
+  logger.info(loggerOptions, `New featured validator added: ${featured.name} ${featured.stashAddress}`);
+}
+
 module.exports = {
   start: async (wsProviderUrl, pool, config, delayedStart = true) => {
     if (delayedStart) {
@@ -1134,12 +1163,27 @@ module.exports = {
         await dbParamInsert(pool, sql, data, loggerOptions);
       }
       logger.info(loggerOptions, 'Cleaning old data');
-      const sql = `DELETE FROM ranking WHERE block_height != '${blockHeight}';`;
-      try {
-        await pool.query(sql);
-      } catch (error) {
-        logger.error(loggerOptions, `Error deleting old data ranking table: ${JSON.stringify(error)}`);
+      await dbQuery(
+        pool,
+        `DELETE FROM ranking WHERE block_height != '${blockHeight}';`,
+        loggerOptions,
+      );
+
+      // featured validator
+      const timespan = 60 * 60 * 24 * 7; // 1 week
+      const sql = 'SELECT stash_address, timestamp FROM featured ORDER BY timestamp DESC LIMIT 1';
+      const res = await pool.query(sql);
+      if (res.rows.length > 0) {
+        await addNewFeaturedValidator(pool, ranking, config);
+      } else {
+        const currentFeatured = res.rows[0];
+        const currentTimestamp = new Date().getTime();
+        if (currentTimestamp - currentFeatured.timestamp > timespan) {
+          // timespan passed, let's add a new featured validator
+          await addNewFeaturedValidator(pool, ranking, config);
+        }
       }
+
       logger.info(loggerOptions, 'Disconnecting from API');
       await api.disconnect().catch((error) => logger.error(loggerOptions, `Disconnect error: ${JSON.stringify(error)}`));
       const endTime = new Date().getTime();
