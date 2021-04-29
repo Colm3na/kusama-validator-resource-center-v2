@@ -1173,7 +1173,7 @@ module.exports = {
       const timespan = 60 * 60 * 24 * 7; // 1 week
       const sql = 'SELECT stash_address, timestamp FROM featured ORDER BY timestamp DESC LIMIT 1';
       const res = await pool.query(sql);
-      if (res.rows.length > 0) {
+      if (res.rows.length === 0) {
         await addNewFeaturedValidator(pool, ranking, config);
       } else {
         const currentFeatured = res.rows[0];
