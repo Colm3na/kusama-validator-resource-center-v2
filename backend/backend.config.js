@@ -39,6 +39,7 @@ module.exports = {
         historySize: 84,
         erasPerDay: 4,
         tokenDecimals: 12,
+        featuredTimespan: 60 * 60 * 24 * 7 * 2, // 2 weeks
       },
     },
   ],

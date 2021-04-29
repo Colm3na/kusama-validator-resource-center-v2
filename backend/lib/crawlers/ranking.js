@@ -1170,7 +1170,6 @@ module.exports = {
       );
 
       // featured validator
-      const timespan = 60 * 60 * 24 * 7; // 1 week
       const sql = 'SELECT stash_address, timestamp FROM featured ORDER BY timestamp DESC LIMIT 1';
       const res = await pool.query(sql);
       if (res.rows.length === 0) {
@@ -1178,7 +1177,7 @@ module.exports = {
       } else {
         const currentFeatured = res.rows[0];
         const currentTimestamp = new Date().getTime();
-        if (currentTimestamp - currentFeatured.timestamp > timespan) {
+        if (currentTimestamp - currentFeatured.timestamp > config.featuredTimespan) {
           // timespan passed, let's add a new featured validator
           await addNewFeaturedValidator(pool, ranking, config);
         }
