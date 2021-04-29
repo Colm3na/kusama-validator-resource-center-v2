@@ -159,6 +159,13 @@ CREATE TABLE IF NOT EXISTS era_points_avg (
   PRIMARY KEY ( era )
 );
 
+CREATE TABLE IF NOT EXISTS featured (  
+  stash_address TEXT NOT NULL,
+  name TEXT NOT NULL,
+  timestamp BIGINT NOT NULL,
+  PRIMARY KEY ( stash_address )
+);
+
 CREATE TABLE IF NOT EXISTS total (  
   name TEXT,
   count BIGINT NOT NULL,
@@ -199,5 +206,5 @@ GRANT ALL PRIVILEGES ON TABLE era_relative_performance TO vrc;
 GRANT ALL PRIVILEGES ON TABLE era_relative_performance_avg TO vrc;
 GRANT ALL PRIVILEGES ON TABLE era_points TO vrc;
 GRANT ALL PRIVILEGES ON TABLE era_points_avg TO vrc;
-
+GRANT ALL PRIVILEGES ON TABLE featured TO vrc;
 GRANT ALL PRIVILEGES ON TABLE total TO vrc;
