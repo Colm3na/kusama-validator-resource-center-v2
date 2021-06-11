@@ -41,7 +41,7 @@ services:
     # DB Version: 13
     # OS Type: linux
     # DB Type: dw
-    # Total Memory (RAM): 128 GB
+    # Total Memory (RAM): 96 GB
     # CPUs num: 16
     # Connections num: 200
     # Data Storage: ssd
@@ -51,9 +51,9 @@ services:
       - "-c"
       - "max_connections=200"
       - "-c"
-      - "shared_buffers=32GB"
+      - "shared_buffers=24GB"
       - "-c"
-      - "effective_cache_size=96GB"
+      - "effective_cache_size=72GB"
       - "-c"
       - "maintenance_work_mem=2GB"
       - "-c"
@@ -67,7 +67,7 @@ services:
       - "-c"
       - "effective_io_concurrency=200"
       - "-c"
-      - "work_mem=10485kB"
+      - "work_mem=7864kB"
       - "-c"
       - "min_wal_size=4GB"
       - "-c"
