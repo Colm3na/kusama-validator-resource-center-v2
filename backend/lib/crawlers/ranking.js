@@ -477,7 +477,7 @@ const insertEraValidatorStats = async (pool, validator, activeEra) => {
 
 const getAddressCreation = async (pool, address) => {
   const sql = "SELECT block_number FROM event WHERE method = 'NewAccount' AND data LIKE '%$1%'";
-  const res = await pool.query(sql, [address]);
+  const res = await pool.query(sql, [`%${address}%`]);
   if (res.rows.length > 0) {
     if (res.rows[0].block_number) {
       return res.rows[0].block_number;
