@@ -360,8 +360,120 @@ const insertRankingValidator = async (pool, validator, blockHeight, startTime) =
     `${validator.dominated}`,
     `${startTime}`,
   ];
+  await dbParamInsert(pool, sql, data, loggerOptions);
+};
+
+const insertEraValidatorStats = async (pool, validator, activeEra) => {
+  let sql = `INSERT INTO era_vrc_score (
+    stash_address,
+    era,
+    vrc_score
+  ) VALUES (
+    $1,
+    $2,
+    $3
+  )
+  ON CONFLICT ON CONSTRAINT era_vrc_score_pkey 
+  DO NOTHING;`;
+  let data = [
+    validator.stashAddress,
+    activeEra,
+    validator.totalRating,
+  ];
   // eslint-disable-next-line no-await-in-loop
   await dbParamInsert(pool, sql, data, loggerOptions);
+  // eslint-disable-next-line no-restricted-syntax
+  for (const commissionHistoryItem of validator.commissionHistory) {
+    if (commissionHistoryItem.commission) {
+      sql = `INSERT INTO era_commission (
+        stash_address,
+        era,
+        commission
+      ) VALUES (
+        $1,
+        $2,
+        $3
+      )
+      ON CONFLICT ON CONSTRAINT era_commission_pkey 
+      DO NOTHING;`;
+      data = [
+        validator.stashAddress,
+        commissionHistoryItem.era,
+        commissionHistoryItem.commission,
+      ];
+      // eslint-disable-next-line no-await-in-loop
+      await dbParamInsert(pool, sql, data, loggerOptions);
+    }
+  }
+  // eslint-disable-next-line no-restricted-syntax
+  for (const perfHistoryItem of validator.relativePerformanceHistory) {
+    if (perfHistoryItem.relativePerformance && perfHistoryItem.relativePerformance > 0) {
+      sql = `INSERT INTO era_relative_performance (
+        stash_address,
+        era,
+        relative_performance
+      ) VALUES (
+        $1,
+        $2,
+        $3
+      )
+      ON CONFLICT ON CONSTRAINT era_relative_performance_pkey 
+      DO NOTHING;`;
+      data = [
+        validator.stashAddress,
+        perfHistoryItem.era,
+        perfHistoryItem.relativePerformance,
+      ];
+      // eslint-disable-next-line no-await-in-loop
+      await dbParamInsert(pool, sql, data, loggerOptions);
+    }
+  }
+  // eslint-disable-next-line no-restricted-syntax
+  for (const stakefHistoryItem of validator.stakeHistory) {
+    if (stakefHistoryItem.self && stakefHistoryItem.self !== 0) {
+      sql = `INSERT INTO era_self_stake (
+        stash_address,
+        era,
+        self_stake
+      ) VALUES (
+        $1,
+        $2,
+        $3
+      )
+      ON CONFLICT ON CONSTRAINT era_self_stake_pkey 
+      DO NOTHING;`;
+      data = [
+        validator.stashAddress,
+        stakefHistoryItem.era,
+        stakefHistoryItem.self,
+      ];
+      // eslint-disable-next-line no-await-in-loop
+      await dbParamInsert(pool, sql, data, loggerOptions);
+    }
+  }
+  // eslint-disable-next-line no-restricted-syntax
+  for (const eraPointsHistoryItem of validator.eraPointsHistory) {
+    if (eraPointsHistoryItem.points && eraPointsHistoryItem.points !== 0) {
+      sql = `INSERT INTO era_points (
+        stash_address,
+        era,
+        points
+      ) VALUES (
+        $1,
+        $2,
+        $3
+      )
+      ON CONFLICT ON CONSTRAINT era_points_pkey 
+      DO NOTHING;`;
+      data = [
+        validator.stashAddress,
+        eraPointsHistoryItem.era,
+        eraPointsHistoryItem.points,
+      ];
+      // eslint-disable-next-line no-await-in-loop
+      await dbParamInsert(pool, sql, data, loggerOptions);
+    }
+  }
 };
 
 module.exports = {
@@ -1000,120 +1112,125 @@ module.exports = {
           return modValidator;
         });
       logger.info(loggerOptions, `Finished, ${validatorsToHide.length} validators hided!`);
+
       logger.info(loggerOptions, 'Storing era stats in db...');
-      // eslint-disable-next-line no-restricted-syntax
-      for (const validator of ranking) {
-        let sql = `INSERT INTO era_vrc_score (
-          stash_address,
-          era,
-          vrc_score
-        ) VALUES (
-          $1,
-          $2,
-          $3
-        )
-        ON CONFLICT ON CONSTRAINT era_vrc_score_pkey 
-        DO NOTHING;`;
-        let data = [
-          validator.stashAddress,
-          activeEra,
-          validator.totalRating,
-        ];
-        // eslint-disable-next-line no-await-in-loop
-        await dbParamInsert(pool, sql, data, loggerOptions);
-        // eslint-disable-next-line no-restricted-syntax
-        for (const commissionHistoryItem of validator.commissionHistory) {
-          if (commissionHistoryItem.commission) {
-            sql = `INSERT INTO era_commission (
-              stash_address,
-              era,
-              commission
-            ) VALUES (
-              $1,
-              $2,
-              $3
-            )
-            ON CONFLICT ON CONSTRAINT era_commission_pkey 
-            DO NOTHING;`;
-            data = [
-              validator.stashAddress,
-              commissionHistoryItem.era,
-              commissionHistoryItem.commission,
-            ];
-            // eslint-disable-next-line no-await-in-loop
-            await dbParamInsert(pool, sql, data, loggerOptions);
-          }
-        }
-        // eslint-disable-next-line no-restricted-syntax
-        for (const perfHistoryItem of validator.relativePerformanceHistory) {
-          if (perfHistoryItem.relativePerformance && perfHistoryItem.relativePerformance > 0) {
-            sql = `INSERT INTO era_relative_performance (
-              stash_address,
-              era,
-              relative_performance
-            ) VALUES (
-              $1,
-              $2,
-              $3
-            )
-            ON CONFLICT ON CONSTRAINT era_relative_performance_pkey 
-            DO NOTHING;`;
-            data = [
-              validator.stashAddress,
-              perfHistoryItem.era,
-              perfHistoryItem.relativePerformance,
-            ];
-            // eslint-disable-next-line no-await-in-loop
-            await dbParamInsert(pool, sql, data, loggerOptions);
-          }
-        }
-        // eslint-disable-next-line no-restricted-syntax
-        for (const stakefHistoryItem of validator.stakeHistory) {
-          if (stakefHistoryItem.self && stakefHistoryItem.self !== 0) {
-            sql = `INSERT INTO era_self_stake (
-              stash_address,
-              era,
-              self_stake
-            ) VALUES (
-              $1,
-              $2,
-              $3
-            )
-            ON CONFLICT ON CONSTRAINT era_self_stake_pkey 
-            DO NOTHING;`;
-            data = [
-              validator.stashAddress,
-              stakefHistoryItem.era,
-              stakefHistoryItem.self,
-            ];
-            // eslint-disable-next-line no-await-in-loop
-            await dbParamInsert(pool, sql, data, loggerOptions);
-          }
-        }
-        // eslint-disable-next-line no-restricted-syntax
-        for (const eraPointsHistoryItem of validator.eraPointsHistory) {
-          if (eraPointsHistoryItem.points && eraPointsHistoryItem.points !== 0) {
-            sql = `INSERT INTO era_points (
-              stash_address,
-              era,
-              points
-            ) VALUES (
-              $1,
-              $2,
-              $3
-            )
-            ON CONFLICT ON CONSTRAINT era_points_pkey 
-            DO NOTHING;`;
-            data = [
-              validator.stashAddress,
-              eraPointsHistoryItem.era,
-              eraPointsHistoryItem.points,
-            ];
-            // eslint-disable-next-line no-await-in-loop
-            await dbParamInsert(pool, sql, data, loggerOptions);
-          }
-        }
-      }
+      await Promise.all(
+        ranking.map((validator) => insertEraValidatorStats(pool, validator, activeEra)),
+      );
+      // // eslint-disable-next-line no-restricted-syntax
+      // for (const validator of ranking) {
+      //   let sql = `INSERT INTO era_vrc_score (
+      //     stash_address,
+      //     era,
+      //     vrc_score
+      //   ) VALUES (
+      //     $1,
+      //     $2,
+      //     $3
+      //   )
+      //   ON CONFLICT ON CONSTRAINT era_vrc_score_pkey 
+      //   DO NOTHING;`;
+      //   let data = [
+      //     validator.stashAddress,
+      //     activeEra,
+      //     validator.totalRating,
+      //   ];
+      //   // eslint-disable-next-line no-await-in-loop
+      //   await dbParamInsert(pool, sql, data, loggerOptions);
+      //   // eslint-disable-next-line no-restricted-syntax
+      //   for (const commissionHistoryItem of validator.commissionHistory) {
+      //     if (commissionHistoryItem.commission) {
+      //       sql = `INSERT INTO era_commission (
+      //         stash_address,
+      //         era,
+      //         commission
+      //       ) VALUES (
+      //         $1,
+      //         $2,
+      //         $3
+      //       )
+      //       ON CONFLICT ON CONSTRAINT era_commission_pkey 
+      //       DO NOTHING;`;
+      //       data = [
+      //         validator.stashAddress,
+      //         commissionHistoryItem.era,
+      //         commissionHistoryItem.commission,
+      //       ];
+      //       // eslint-disable-next-line no-await-in-loop
+      //       await dbParamInsert(pool, sql, data, loggerOptions);
+      //     }
+      //   }
+      //   // eslint-disable-next-line no-restricted-syntax
+      //   for (const perfHistoryItem of validator.relativePerformanceHistory) {
+      //     if (perfHistoryItem.relativePerformance && perfHistoryItem.relativePerformance > 0) {
+      //       sql = `INSERT INTO era_relative_performance (
+      //         stash_address,
+      //         era,
+      //         relative_performance
+      //       ) VALUES (
+      //         $1,
+      //         $2,
+      //         $3
+      //       )
+      //       ON CONFLICT ON CONSTRAINT era_relative_performance_pkey 
+      //       DO NOTHING;`;
+      //       data = [
+      //         validator.stashAddress,
+      //         perfHistoryItem.era,
+      //         perfHistoryItem.relativePerformance,
+      //       ];
+      //       // eslint-disable-next-line no-await-in-loop
+      //       await dbParamInsert(pool, sql, data, loggerOptions);
+      //     }
+      //   }
+      //   // eslint-disable-next-line no-restricted-syntax
+      //   for (const stakefHistoryItem of validator.stakeHistory) {
+      //     if (stakefHistoryItem.self && stakefHistoryItem.self !== 0) {
+      //       sql = `INSERT INTO era_self_stake (
+      //         stash_address,
+      //         era,
+      //         self_stake
+      //       ) VALUES (
+      //         $1,
+      //         $2,
+      //         $3
+      //       )
+      //       ON CONFLICT ON CONSTRAINT era_self_stake_pkey 
+      //       DO NOTHING;`;
+      //       data = [
+      //         validator.stashAddress,
+      //         stakefHistoryItem.era,
+      //         stakefHistoryItem.self,
+      //       ];
+      //       // eslint-disable-next-line no-await-in-loop
+      //       await dbParamInsert(pool, sql, data, loggerOptions);
+      //     }
+      //   }
+      //   // eslint-disable-next-line no-restricted-syntax
+      //   for (const eraPointsHistoryItem of validator.eraPointsHistory) {
+      //     if (eraPointsHistoryItem.points && eraPointsHistoryItem.points !== 0) {
+      //       sql = `INSERT INTO era_points (
+      //         stash_address,
+      //         era,
+      //         points
+      //       ) VALUES (
+      //         $1,
+      //         $2,
+      //         $3
+      //       )
+      //       ON CONFLICT ON CONSTRAINT era_points_pkey 
+      //       DO NOTHING;`;
+      //       data = [
+      //         validator.stashAddress,
+      //         eraPointsHistoryItem.era,
+      //         eraPointsHistoryItem.points,
+      //       ];
+      //       // eslint-disable-next-line no-await-in-loop
+      //       await dbParamInsert(pool, sql, data, loggerOptions);
+      //     }
+      //   }
+      // }
+
       logger.info(loggerOptions, 'Storing era stats averages in db...');
       // eslint-disable-next-line no-restricted-syntax
       for (const eraIndex of eraIndexes) {
@@ -1160,167 +1277,11 @@ module.exports = {
           }
         }
       }
+
       logger.info(loggerOptions, `Storing ${ranking.length} validators in db...`);
       await Promise.all(
         ranking.map((validator) => insertRankingValidator(pool, validator, blockHeight, startTime)),
       );
-      // // eslint-disable-next-line no-restricted-syntax
-      // for (const validator of ranking) {
-      //   const sql = `INSERT INTO ranking (
-      //     block_height,
-      //     rank,
-      //     active,
-      //     active_rating,
-      //     name,
-      //     identity,
-      //     has_sub_identity,
-      //     sub_accounts_rating,
-      //     verified_identity,
-      //     identity_rating,
-      //     stash_address,
-      //     stash_address_creation_block,
-      //     stash_parent_address_creation_block,
-      //     address_creation_rating,
-      //     controller_address,
-      //     included_thousand_validators,
-      //     thousand_validator,
-      //     part_of_cluster,
-      //     cluster_name,
-      //     cluster_members,
-      //     show_cluster_member,
-      //     nominators,
-      //     nominators_rating,
-      //     commission,
-      //     commission_history,
-      //     commission_rating,
-      //     active_eras,
-      //     era_points_history,
-      //     era_points_percent,
-      //     era_points_rating,
-      //     performance,
-      //     performance_history,
-      //     relative_performance,
-      //     relative_performance_history,
-      //     slashed,
-      //     slash_rating,
-      //     slashes,
-      //     council_backing,
-      //     active_in_governance,
-      //     governance_rating,
-      //     payout_history,
-      //     payout_rating,
-      //     self_stake,
-      //     other_stake,
-      //     total_stake,
-      //     stake_history,
-      //     total_rating,
-      //     dominated,
-      //     timestamp
-      //   ) VALUES (
-      //     $1,
-      //     $2,
-      //     $3,
-      //     $4,
-      //     $5,
-      //     $6,
-      //     $7,
-      //     $8,
-      //     $9,
-      //     $10,
-      //     $11,
-      //     $12,
-      //     $13,
-      //     $14,
-      //     $15,
-      //     $16,
-      //     $17,
-      //     $18,
-      //     $19,
-      //     $20,
-      //     $21,
-      //     $22,
-      //     $23,
-      //     $24,
-      //     $25,
-      //     $26,
-      //     $27,
-      //     $28,
-      //     $29,
-      //     $30,
-      //     $31,
-      //     $32,
-      //     $33,
-      //     $34,
-      //     $35,
-      //     $36,
-      //     $37,
-      //     $38,
-      //     $39,
-      //     $40,
-      //     $41,
-      //     $42,
-      //     $43,
-      //     $44,
-      //     $45,
-      //     $46,
-      //     $47,
-      //     $48,
-      //     $49
-      //   )`;
-      //   const data = [
-      //     `${blockHeight}`,
-      //     `${validator.rank}`,
-      //     `${validator.active}`,
-      //     `${validator.activeRating}`,
-      //     `${validator.name}`,
-      //     `${JSON.stringify(validator.identity)}`,
-      //     `${validator.hasSubIdentity}`,
-      //     `${validator.subAccountsRating}`,
-      //     `${validator.verifiedIdentity}`,
-      //     `${validator.identityRating}`,
-      //     `${validator.stashAddress}`,
-      //     `${validator.stashCreatedAtBlock}`,
-      //     `${validator.stashParentCreatedAtBlock}`,
-      //     `${validator.addressCreationRating}`,
-      //     `${validator.controllerAddress}`,
-      //     `${validator.includedThousandValidators}`,
-      //     `${JSON.stringify(validator.thousandValidator)}`,
-      //     `${validator.partOfCluster}`,
-      //     `${validator.clusterName}`,
-      //     `${validator.clusterMembers}`,
-      //     `${validator.showClusterMember}`,
-      //     `${validator.nominators}`,
-      //     `${validator.nominatorsRating}`,
-      //     `${validator.commission}`,
-      //     `${JSON.stringify(validator.commissionHistory)}`,
-      //     `${validator.commissionRating}`,
-      //     `${validator.activeEras}`,
-      //     `${JSON.stringify(validator.eraPointsHistory)}`,
-      //     `${validator.eraPointsPercent}`,
-      //     `${validator.eraPointsRating}`,
-      //     `${validator.performance}`,
-      //     `${JSON.stringify(validator.performanceHistory)}`,
-      //     `${validator.relativePerformance}`,
-      //     `${JSON.stringify(validator.relativePerformanceHistory)}`,
-      //     `${validator.slashed}`,
-      //     `${validator.slashRating}`,
-      //     `${JSON.stringify(validator.slashes)}`,
-      //     `${validator.councilBacking}`,
-      //     `${validator.activeInGovernance}`,
-      //     `${validator.governanceRating}`,
-      //     `${JSON.stringify(validator.payoutHistory)}`,
-      //     `${validator.payoutRating}`,
-      //     `${validator.selfStake}`,
-      //     `${validator.otherStake}`,
-      //     `${validator.totalStake}`,
-      //     `${JSON.stringify(validator.stakeHistory)}`,
-      //     `${validator.totalRating}`,
-      //     `${validator.dominated}`,
-      //     `${startTime}`,
-      //   ];
-      //   // eslint-disable-next-line no-await-in-loop
-      //   await dbParamInsert(pool, sql, data, loggerOptions);
-      // }
 
       logger.info(loggerOptions, 'Cleaning old data');
       await dbQuery(
