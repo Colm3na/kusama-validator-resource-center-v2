@@ -23,6 +23,14 @@ module.exports = {
       logger.error(loggerOptions, `SQL: ${sql} Error: ${JSON.stringify(error)}`);
     }
   },
+  dbParamSelect: async (pool, sql, data, loggerOptions) => {
+    try {
+      return await pool.query(sql, data);
+    } catch (error) {
+      logger.error(loggerOptions, `SQL: ${sql} Error: ${JSON.stringify(error)}`);
+    }
+    return null;
+  },
   storeExtrinsics: async (pool, blockNumber, extrinsics, blockEvents, timestamp, loggerOptions) => {
     const startTime = new Date().getTime();
     extrinsics.forEach(async (extrinsic, index) => {

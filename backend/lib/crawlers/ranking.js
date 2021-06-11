@@ -3,7 +3,7 @@ const { BigNumber } = require('bignumber.js');
 const { ApiPromise, WsProvider } = require('@polkadot/api');
 const pino = require('pino');
 const axios = require('axios').default;
-const { wait, dbQuery, dbParamInsert } = require('../utils.js');
+const { wait, dbQuery, dbParamInsert, dbParamSelect } = require('../utils.js');
 
 const logger = pino();
 const loggerOptions = {
@@ -476,11 +476,13 @@ const insertEraValidatorStats = async (pool, validator, activeEra) => {
 };
 
 const getAddressCreation = async (pool, address) => {
-  const sql = "SELECT block_number FROM event WHERE method = 'NewAccount' AND data LIKE '%$1%'";
-  const res = await pool.query(sql, [`%${address}%`]);
-  if (res.rows.length > 0) {
-    if (res.rows[0].block_number) {
-      return res.rows[0].block_number;
+  const query = "SELECT block_number FROM event WHERE method = 'NewAccount' AND data LIKE $1";
+  const res = await dbParamSelect(pool, query, [`%${address}%`], loggerOptions);
+  if (res) {
+    if (res.rows.length > 0) {
+      if (res.rows[0].block_number) {
+        return res.rows[0].block_number;
+      }
     }
   }
   // if not found we assume that it's included in genesis
