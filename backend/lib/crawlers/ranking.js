@@ -4,7 +4,6 @@ const { ApiPromise, WsProvider } = require('@polkadot/api');
 const pino = require('pino');
 const axios = require('axios').default;
 const { wait, dbQuery, dbParamInsert } = require('../utils.js');
-const { Pool } = require('pg');
 
 const logger = pino();
 const loggerOptions = {
@@ -476,6 +475,18 @@ const insertEraValidatorStats = async (pool, validator, activeEra) => {
   }
 };
 
+const getAddressCreation = async (pool, address) => {
+  const sql = "SELECT block_number FROM event WHERE method = 'NewAccount' AND data LIKE '%$1%'";
+  const res = await pool.query(sql, [address]);
+  if (res.rows.length > 0) {
+    if (res.rows[0].block_number) {
+      return res.rows[0].block_number;
+    }
+  }
+  // if not found we assume that it's included in genesis
+  return 0;
+};
+
 module.exports = {
   start: async (wsProviderUrl, pool, config, delayedStart = true) => {
     if (delayedStart) {
@@ -671,39 +682,23 @@ module.exports = {
       referendums.forEach(({ votes }) => {
         votes.forEach(({ accountId }) => participateInGovernance.push(accountId.toString()));
       });
+
+      // TODO: debug & filter duplicates
       validators = validators.concat(intentions);
 
-      // stash address creation block
+      // stash & identity parent address creation block
       const stashAddressesCreation = [];
       // eslint-disable-next-line no-restricted-syntax
       for (const validator of validators) {
-        // check stash
         const stashAddress = validator.stashId.toString();
-        let sql = `SELECT block_number FROM event WHERE method = 'NewAccount' AND data LIKE '%${stashAddress}%'`;
         // eslint-disable-next-line no-await-in-loop
-        let res = await pool.query(sql);
-        if (res.rows.length > 0) {
-          if (res.rows[0].block_number) {
-            stashAddressesCreation[stashAddress] = res.rows[0].block_number;
-          }
-        } else {
-          // if not found we assume that it's included in genesis
-          stashAddressesCreation[stashAddress] = 0;
-        }
-        // check stash identity parent address
+        stashAddressesCreation[stashAddress] = await getAddressCreation(pool, stashAddress);
         if (validator.identity.parent) {
           const stashParentAddress = validator.identity.parent.toString();
-          sql = `SELECT block_number FROM event WHERE method = 'NewAccount' AND data LIKE '%${stashParentAddress}%'`;
           // eslint-disable-next-line no-await-in-loop
-          res = await pool.query(sql);
-          if (res.rows.length > 0) {
-            if (res.rows[0].block_number) {
-              stashAddressesCreation[stashParentAddress] = res.rows[0].block_number;
-            }
-          } else {
-            // if not found we assume that it's included in genesis
-            stashAddressesCreation[stashParentAddress] = 0;
-          }
+          stashAddressesCreation[stashParentAddress] = await getAddressCreation(
+            pool, stashParentAddress,
+          );
         }
       }
 
@@ -1117,119 +1112,6 @@ module.exports = {
       await Promise.all(
         ranking.map((validator) => insertEraValidatorStats(pool, validator, activeEra)),
       );
-      // // eslint-disable-next-line no-restricted-syntax
-      // for (const validator of ranking) {
-      //   let sql = `INSERT INTO era_vrc_score (
-      //     stash_address,
-      //     era,
-      //     vrc_score
-      //   ) VALUES (
-      //     $1,
-      //     $2,
-      //     $3
-      //   )
-      //   ON CONFLICT ON CONSTRAINT era_vrc_score_pkey 
-      //   DO NOTHING;`;
-      //   let data = [
-      //     validator.stashAddress,
-      //     activeEra,
-      //     validator.totalRating,
-      //   ];
-      //   // eslint-disable-next-line no-await-in-loop
-      //   await dbParamInsert(pool, sql, data, loggerOptions);
-      //   // eslint-disable-next-line no-restricted-syntax
-      //   for (const commissionHistoryItem of validator.commissionHistory) {
-      //     if (commissionHistoryItem.commission) {
-      //       sql = `INSERT INTO era_commission (
-      //         stash_address,
-      //         era,
-      //         commission
-      //       ) VALUES (
-      //         $1,
-      //         $2,
-      //         $3
-      //       )
-      //       ON CONFLICT ON CONSTRAINT era_commission_pkey 
-      //       DO NOTHING;`;
-      //       data = [
-      //         validator.stashAddress,
-      //         commissionHistoryItem.era,
-      //         commissionHistoryItem.commission,
-      //       ];
-      //       // eslint-disable-next-line no-await-in-loop
-      //       await dbParamInsert(pool, sql, data, loggerOptions);
-      //     }
-      //   }
-      //   // eslint-disable-next-line no-restricted-syntax
-      //   for (const perfHistoryItem of validator.relativePerformanceHistory) {
-      //     if (perfHistoryItem.relativePerformance && perfHistoryItem.relativePerformance > 0) {
-      //       sql = `INSERT INTO era_relative_performance (
-      //         stash_address,
-      //         era,
-      //         relative_performance
-      //       ) VALUES (
-      //         $1,
-      //         $2,
-      //         $3
-      //       )
-      //       ON CONFLICT ON CONSTRAINT era_relative_performance_pkey 
-      //       DO NOTHING;`;
-      //       data = [
-      //         validator.stashAddress,
-      //         perfHistoryItem.era,
-      //         perfHistoryItem.relativePerformance,
-      //       ];
-      //       // eslint-disable-next-line no-await-in-loop
-      //       await dbParamInsert(pool, sql, data, loggerOptions);
-      //     }
-      //   }
-      //   // eslint-disable-next-line no-restricted-syntax
-      //   for (const stakefHistoryItem of validator.stakeHistory) {
-      //     if (stakefHistoryItem.self && stakefHistoryItem.self !== 0) {
-      //       sql = `INSERT INTO era_self_stake (
-      //         stash_address,
-      //         era,
-      //         self_stake
-      //       ) VALUES (
-      //         $1,
-      //         $2,
-      //         $3
-      //       )
-      //       ON CONFLICT ON CONSTRAINT era_self_stake_pkey 
-      //       DO NOTHING;`;
-      //       data = [
-      //         validator.stashAddress,
-      //         stakefHistoryItem.era,
-      //         stakefHistoryItem.self,
-      //       ];
-      //       // eslint-disable-next-line no-await-in-loop
-      //       await dbParamInsert(pool, sql, data, loggerOptions);
-      //     }
-      //   }
-      //   // eslint-disable-next-line no-restricted-syntax
-      //   for (const eraPointsHistoryItem of validator.eraPointsHistory) {
-      //     if (eraPointsHistoryItem.points && eraPointsHistoryItem.points !== 0) {
-      //       sql = `INSERT INTO era_points (
-      //         stash_address,
-      //         era,
-      //         points
-      //       ) VALUES (
-      //         $1,
-      //         $2,
-      //         $3
-      //       )
-      //       ON CONFLICT ON CONSTRAINT era_points_pkey 
-      //       DO NOTHING;`;
-      //       data = [
-      //         validator.stashAddress,
-      //         eraPointsHistoryItem.era,
-      //         eraPointsHistoryItem.points,
-      //       ];
-      //       // eslint-disable-next-line no-await-in-loop
-      //       await dbParamInsert(pool, sql, data, loggerOptions);
-      //     }
-      //   }
-      // }
 
       logger.info(loggerOptions, 'Storing era stats averages in db...');
       // eslint-disable-next-line no-restricted-syntax
