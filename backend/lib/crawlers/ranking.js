@@ -4,13 +4,14 @@ const { ApiPromise, WsProvider } = require('@polkadot/api');
 const pino = require('pino');
 const axios = require('axios').default;
 const { wait, dbQuery, dbParamInsert } = require('../utils.js');
+const { Pool } = require('pg');
 
 const logger = pino();
 const loggerOptions = {
   crawler: 'ranking',
 };
 
-async function getThousandValidators() {
+const getThousandValidators = async () => {
   try {
     const response = await axios.get('https://kusama.w3f.community/candidates');
     return response.data;
@@ -18,18 +19,18 @@ async function getThousandValidators() {
     logger.error(loggerOptions, `Error fetching Thousand Validator Program stats: ${JSON.stringify(error)}`);
     return [];
   }
-}
+};
 
-function isVerifiedIdentity(identity) {
+const isVerifiedIdentity = (identity) => {
   if (identity.judgements.length === 0) {
     return false;
   }
   return identity.judgements
     .filter(([, judgement]) => !judgement.isFeePaid)
     .some(([, judgement]) => judgement.isKnownGood || judgement.isReasonable);
-}
+};
 
-function getName(identity) {
+const getName = (identity) => {
   if (
     identity.displayParent
     && identity.displayParent !== ''
@@ -39,13 +40,11 @@ function getName(identity) {
     return `${identity.displayParent}/${identity.display}`;
   }
   return identity.display || '';
-}
+};
 
-function getClusterName(identity) {
-  return identity.displayParent || '';
-}
+const getClusterName = (identity) => identity.displayParent || '';
 
-function subIdentity(identity) {
+const subIdentity = (identity) => {
   if (
     identity.displayParent
     && identity.displayParent !== ''
@@ -55,9 +54,9 @@ function subIdentity(identity) {
     return true;
   }
   return false;
-}
+};
 
-function getIdentityRating(name, verifiedIdentity, hasAllFields) {
+const getIdentityRating = (name, verifiedIdentity, hasAllFields) => {
   if (verifiedIdentity && hasAllFields) {
     return 3;
   } if (verifiedIdentity && !hasAllFields) {
@@ -66,9 +65,9 @@ function getIdentityRating(name, verifiedIdentity, hasAllFields) {
     return 1;
   }
   return 0;
-}
+};
 
-function parseIdentity(identity) {
+const parseIdentity = (identity) => {
   const verifiedIdentity = isVerifiedIdentity(identity);
   const hasSubIdentity = subIdentity(identity);
   const name = getName(identity);
@@ -85,9 +84,9 @@ function parseIdentity(identity) {
     name,
     identityRating,
   };
-}
+};
 
-function getCommissionHistory(accountId, erasPreferences) {
+const getCommissionHistory = (accountId, erasPreferences) => {
   const commissionHistory = [];
   erasPreferences.forEach(({ era, validators }) => {
     if (validators[accountId]) {
@@ -103,9 +102,9 @@ function getCommissionHistory(accountId, erasPreferences) {
     }
   });
   return commissionHistory;
-}
+};
 
-function getCommissionRating(commission, commissionHistory) {
+const getCommissionRating = (commission, commissionHistory) => {
   if (commission !== 100 && commission !== 0) {
     if (commission > 10) {
       return 1;
@@ -124,9 +123,9 @@ function getCommissionRating(commission, commissionHistory) {
     }
   }
   return 0;
-}
+};
 
-function getPayoutRating(payoutHistory, config) {
+const getPayoutRating = (payoutHistory, config) => {
   const pendingEras = payoutHistory.filter((era) => era.status === 'pending').length;
   if (pendingEras <= config.erasPerDay) {
     return 3;
@@ -136,9 +135,9 @@ function getPayoutRating(payoutHistory, config) {
     return 1;
   }
   return 0;
-}
+};
 
-function getClusterInfo(hasSubIdentity, validators, validatorIdentity) {
+const getClusterInfo = (hasSubIdentity, validators, validatorIdentity) => {
   if (!hasSubIdentity) {
     // string detection
     // samples: DISC-SOFT-01, BINANCE_KSM_9, SNZPool-1
@@ -171,15 +170,15 @@ function getClusterInfo(hasSubIdentity, validators, validatorIdentity) {
     clusterName,
     clusterMembers,
   };
-}
+};
 
 // from https://stackoverflow.com/questions/19269545/how-to-get-a-number-of-random-elements-from-an-array
-function getRandom(arr, n) {
+const getRandom = (arr, n) => {
   const shuffled = [...arr].sort(() => 0.5 - Math.random());
   return shuffled.slice(0, n);
-}
+};
 
-async function addNewFeaturedValidator(pool, ranking, config) {
+const addNewFeaturedValidator = async (pool, ranking, config) => {
   // rules:
   // - maximum commission is 10%
   // - at least 20 KSM own stake
@@ -206,7 +205,164 @@ async function addNewFeaturedValidator(pool, ranking, config) {
     loggerOptions,
   );
   logger.info(loggerOptions, `New featured validator added: ${featured.name} ${featured.stashAddress}`);
-}
+};
+
+const insertRankingValidator = async (pool, validator, blockHeight, startTime) => {
+  const sql = `INSERT INTO ranking (
+    block_height,
+    rank,
+    active,
+    active_rating,
+    name,
+    identity,
+    has_sub_identity,
+    sub_accounts_rating,
+    verified_identity,
+    identity_rating,
+    stash_address,
+    stash_address_creation_block,
+    stash_parent_address_creation_block,
+    address_creation_rating,
+    controller_address,
+    included_thousand_validators,
+    thousand_validator,
+    part_of_cluster,
+    cluster_name,
+    cluster_members,
+    show_cluster_member,
+    nominators,
+    nominators_rating,
+    commission,
+    commission_history,
+    commission_rating,
+    active_eras,
+    era_points_history,
+    era_points_percent,
+    era_points_rating,
+    performance,
+    performance_history,
+    relative_performance,
+    relative_performance_history,
+    slashed,
+    slash_rating,
+    slashes,
+    council_backing,
+    active_in_governance,
+    governance_rating,
+    payout_history,
+    payout_rating,
+    self_stake,
+    other_stake,
+    total_stake,
+    stake_history,
+    total_rating,
+    dominated,
+    timestamp
+  ) VALUES (
+    $1,
+    $2,
+    $3,
+    $4,
+    $5,
+    $6,
+    $7,
+    $8,
+    $9,
+    $10,
+    $11,
+    $12,
+    $13,
+    $14,
+    $15,
+    $16,
+    $17,
+    $18,
+    $19,
+    $20,
+    $21,
+    $22,
+    $23,
+    $24,
+    $25,
+    $26,
+    $27,
+    $28,
+    $29,
+    $30,
+    $31,
+    $32,
+    $33,
+    $34,
+    $35,
+    $36,
+    $37,
+    $38,
+    $39,
+    $40,
+    $41,
+    $42,
+    $43,
+    $44,
+    $45,
+    $46,
+    $47,
+    $48,
+    $49
+  )`;
+  const data = [
+    `${blockHeight}`,
+    `${validator.rank}`,
+    `${validator.active}`,
+    `${validator.activeRating}`,
+    `${validator.name}`,
+    `${JSON.stringify(validator.identity)}`,
+    `${validator.hasSubIdentity}`,
+    `${validator.subAccountsRating}`,
+    `${validator.verifiedIdentity}`,
+    `${validator.identityRating}`,
+    `${validator.stashAddress}`,
+    `${validator.stashCreatedAtBlock}`,
+    `${validator.stashParentCreatedAtBlock}`,
+    `${validator.addressCreationRating}`,
+    `${validator.controllerAddress}`,
+    `${validator.includedThousandValidators}`,
+    `${JSON.stringify(validator.thousandValidator)}`,
+    `${validator.partOfCluster}`,
+    `${validator.clusterName}`,
+    `${validator.clusterMembers}`,
+    `${validator.showClusterMember}`,
+    `${validator.nominators}`,
+    `${validator.nominatorsRating}`,
+    `${validator.commission}`,
+    `${JSON.stringify(validator.commissionHistory)}`,
+    `${validator.commissionRating}`,
+    `${validator.activeEras}`,
+    `${JSON.stringify(validator.eraPointsHistory)}`,
+    `${validator.eraPointsPercent}`,
+    `${validator.eraPointsRating}`,
+    `${validator.performance}`,
+    `${JSON.stringify(validator.performanceHistory)}`,
+    `${validator.relativePerformance}`,
+    `${JSON.stringify(validator.relativePerformanceHistory)}`,
+    `${validator.slashed}`,
+    `${validator.slashRating}`,
+    `${JSON.stringify(validator.slashes)}`,
+    `${validator.councilBacking}`,
+    `${validator.activeInGovernance}`,
+    `${validator.governanceRating}`,
+    `${JSON.stringify(validator.payoutHistory)}`,
+    `${validator.payoutRating}`,
+    `${validator.selfStake}`,
+    `${validator.otherStake}`,
+    `${validator.totalStake}`,
+    `${JSON.stringify(validator.stakeHistory)}`,
+    `${validator.totalRating}`,
+    `${validator.dominated}`,
+    `${startTime}`,
+  ];
+  // eslint-disable-next-line no-await-in-loop
+  await dbParamInsert(pool, sql, data, loggerOptions);
+};
 
 module.exports = {
   start: async (wsProviderUrl, pool, config, delayedStart = true) => {
@@ -1005,163 +1161,167 @@ module.exports = {
         }
       }
       logger.info(loggerOptions, `Storing ${ranking.length} validators in db...`);
-      // eslint-disable-next-line no-restricted-syntax
-      for (const validator of ranking) {
-        const sql = `INSERT INTO ranking (
-          block_height,
-          rank,
-          active,
-          active_rating,
-          name,
-          identity,
-          has_sub_identity,
-          sub_accounts_rating,
-          verified_identity,
-          identity_rating,
-          stash_address,
-          stash_address_creation_block,
-          stash_parent_address_creation_block,
-          address_creation_rating,
-          controller_address,
-          included_thousand_validators,
-          thousand_validator,
-          part_of_cluster,
-          cluster_name,
-          cluster_members,
-          show_cluster_member,
-          nominators,
-          nominators_rating,
-          commission,
-          commission_history,
-          commission_rating,
-          active_eras,
-          era_points_history,
-          era_points_percent,
-          era_points_rating,
-          performance,
-          performance_history,
-          relative_performance,
-          relative_performance_history,
-          slashed,
-          slash_rating,
-          slashes,
-          council_backing,
-          active_in_governance,
-          governance_rating,
-          payout_history,
-          payout_rating,
-          self_stake,
-          other_stake,
-          total_stake,
-          stake_history,
-          total_rating,
-          dominated,
-          timestamp
-        ) VALUES (
-          $1,
-          $2,
-          $3,
-          $4,
-          $5,
-          $6,
-          $7,
-          $8,
-          $9,
-          $10,
-          $11,
-          $12,
-          $13,
-          $14,
-          $15,
-          $16,
-          $17,
-          $18,
-          $19,
-          $20,
-          $21,
-          $22,
-          $23,
-          $24,
-          $25,
-          $26,
-          $27,
-          $28,
-          $29,
-          $30,
-          $31,
-          $32,
-          $33,
-          $34,
-          $35,
-          $36,
-          $37,
-          $38,
-          $39,
-          $40,
-          $41,
-          $42,
-          $43,
-          $44,
-          $45,
-          $46,
-          $47,
-          $48,
-          $49
-        )`;
-        const data = [
-          `${blockHeight}`,
-          `${validator.rank}`,
-          `${validator.active}`,
-          `${validator.activeRating}`,
-          `${validator.name}`,
-          `${JSON.stringify(validator.identity)}`,
-          `${validator.hasSubIdentity}`,
-          `${validator.subAccountsRating}`,
-          `${validator.verifiedIdentity}`,
-          `${validator.identityRating}`,
-          `${validator.stashAddress}`,
-          `${validator.stashCreatedAtBlock}`,
-          `${validator.stashParentCreatedAtBlock}`,
-          `${validator.addressCreationRating}`,
-          `${validator.controllerAddress}`,
-          `${validator.includedThousandValidators}`,
-          `${JSON.stringify(validator.thousandValidator)}`,
-          `${validator.partOfCluster}`,
-          `${validator.clusterName}`,
-          `${validator.clusterMembers}`,
-          `${validator.showClusterMember}`,
-          `${validator.nominators}`,
-          `${validator.nominatorsRating}`,
-          `${validator.commission}`,
-          `${JSON.stringify(validator.commissionHistory)}`,
-          `${validator.commissionRating}`,
-          `${validator.activeEras}`,
-          `${JSON.stringify(validator.eraPointsHistory)}`,
-          `${validator.eraPointsPercent}`,
-          `${validator.eraPointsRating}`,
-          `${validator.performance}`,
-          `${JSON.stringify(validator.performanceHistory)}`,
-          `${validator.relativePerformance}`,
-          `${JSON.stringify(validator.relativePerformanceHistory)}`,
-          `${validator.slashed}`,
-          `${validator.slashRating}`,
-          `${JSON.stringify(validator.slashes)}`,
-          `${validator.councilBacking}`,
-          `${validator.activeInGovernance}`,
-          `${validator.governanceRating}`,
-          `${JSON.stringify(validator.payoutHistory)}`,
-          `${validator.payoutRating}`,
-          `${validator.selfStake}`,
-          `${validator.otherStake}`,
-          `${validator.totalStake}`,
-          `${JSON.stringify(validator.stakeHistory)}`,
-          `${validator.totalRating}`,
-          `${validator.dominated}`,
-          `${startTime}`,
-        ];
-        // eslint-disable-next-line no-await-in-loop
-        await dbParamInsert(pool, sql, data, loggerOptions);
-      }
+      await Promise.all(
+        ranking.map((validator) => insertRankingValidator(pool, validator, blockHeight, startTime)),
+      );
+      // // eslint-disable-next-line no-restricted-syntax
+      // for (const validator of ranking) {
+      //   const sql = `INSERT INTO ranking (
+      //     block_height,
+      //     rank,
+      //     active,
+      //     active_rating,
+      //     name,
+      //     identity,
+      //     has_sub_identity,
+      //     sub_accounts_rating,
+      //     verified_identity,
+      //     identity_rating,
+      //     stash_address,
+      //     stash_address_creation_block,
+      //     stash_parent_address_creation_block,
+      //     address_creation_rating,
+      //     controller_address,
+      //     included_thousand_validators,
+      //     thousand_validator,
+      //     part_of_cluster,
+      //     cluster_name,
+      //     cluster_members,
+      //     show_cluster_member,
+      //     nominators,
+      //     nominators_rating,
+      //     commission,
+      //     commission_history,
+      //     commission_rating,
+      //     active_eras,
+      //     era_points_history,
+      //     era_points_percent,
+      //     era_points_rating,
+      //     performance,
+      //     performance_history,
+      //     relative_performance,
+      //     relative_performance_history,
+      //     slashed,
+      //     slash_rating,
+      //     slashes,
+      //     council_backing,
+      //     active_in_governance,
+      //     governance_rating,
+      //     payout_history,
+      //     payout_rating,
+      //     self_stake,
+      //     other_stake,
+      //     total_stake,
+      //     stake_history,
+      //     total_rating,
+      //     dominated,
+      //     timestamp
+      //   ) VALUES (
+      //     $1,
+      //     $2,
+      //     $3,
+      //     $4,
+      //     $5,
+      //     $6,
+      //     $7,
+      //     $8,
+      //     $9,
+      //     $10,
+      //     $11,
+      //     $12,
+      //     $13,
+      //     $14,
+      //     $15,
+      //     $16,
+      //     $17,
+      //     $18,
+      //     $19,
+      //     $20,
+      //     $21,
+      //     $22,
+      //     $23,
+      //     $24,
+      //     $25,
+      //     $26,
+      //     $27,
+      //     $28,
+      //     $29,
+      //     $30,
+      //     $31,
+      //     $32,
+      //     $33,
+      //     $34,
+      //     $35,
+      //     $36,
+      //     $37,
+      //     $38,
+      //     $39,
+      //     $40,
+      //     $41,
+      //     $42,
+      //     $43,
+      //     $44,
+      //     $45,
+      //     $46,
+      //     $47,
+      //     $48,
+      //     $49
+      //   )`;
+      //   const data = [
+      //     `${blockHeight}`,
+      //     `${validator.rank}`,
+      //     `${validator.active}`,
+      //     `${validator.activeRating}`,
+      //     `${validator.name}`,
+      //     `${JSON.stringify(validator.identity)}`,
+      //     `${validator.hasSubIdentity}`,
+      //     `${validator.subAccountsRating}`,
+      //     `${validator.verifiedIdentity}`,
+      //     `${validator.identityRating}`,
+      //     `${validator.stashAddress}`,
+      //     `${validator.stashCreatedAtBlock}`,
+      //     `${validator.stashParentCreatedAtBlock}`,
+      //     `${validator.addressCreationRating}`,
+      //     `${validator.controllerAddress}`,
+      //     `${validator.includedThousandValidators}`,
+      //     `${JSON.stringify(validator.thousandValidator)}`,
+      //     `${validator.partOfCluster}`,
+      //     `${validator.clusterName}`,
+      //     `${validator.clusterMembers}`,
+      //     `${validator.showClusterMember}`,
+      //     `${validator.nominators}`,
+      //     `${validator.nominatorsRating}`,
+      //     `${validator.commission}`,
+      //     `${JSON.stringify(validator.commissionHistory)}`,
+      //     `${validator.commissionRating}`,
+      //     `${validator.activeEras}`,
+      //     `${JSON.stringify(validator.eraPointsHistory)}`,
+      //     `${validator.eraPointsPercent}`,
+      //     `${validator.eraPointsRating}`,
+      //     `${validator.performance}`,
+      //     `${JSON.stringify(validator.performanceHistory)}`,
+      //     `${validator.relativePerformance}`,
+      //     `${JSON.stringify(validator.relativePerformanceHistory)}`,
+      //     `${validator.slashed}`,
+      //     `${validator.slashRating}`,
+      //     `${JSON.stringify(validator.slashes)}`,
+      //     `${validator.councilBacking}`,
+      //     `${validator.activeInGovernance}`,
+      //     `${validator.governanceRating}`,
+      //     `${JSON.stringify(validator.payoutHistory)}`,
+      //     `${validator.payoutRating}`,
+      //     `${validator.selfStake}`,
+      //     `${validator.otherStake}`,
+      //     `${validator.totalStake}`,
+      //     `${JSON.stringify(validator.stakeHistory)}`,
+      //     `${validator.totalRating}`,
+      //     `${validator.dominated}`,
+      //     `${startTime}`,
+      //   ];
+      //   // eslint-disable-next-line no-await-in-loop
+      //   await dbParamInsert(pool, sql, data, loggerOptions);
+      // }
+
       logger.info(loggerOptions, 'Cleaning old data');
       await dbQuery(
         pool,
