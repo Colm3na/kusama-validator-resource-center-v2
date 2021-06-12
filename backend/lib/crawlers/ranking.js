@@ -1135,7 +1135,7 @@ module.exports = {
         ranking.map((validator) => insertEraValidatorStats(pool, validator, activeEra)),
       );
 
-      if (parseInt(activeEra, 10) > parseInt(lastEraInDb, 10)) {
+      if (parseInt(activeEra, 10) - 1 > parseInt(lastEraInDb, 10)) {
         logger.info(loggerOptions, 'Storing era stats averages in db...');
         // eslint-disable-next-line no-restricted-syntax
         for (const eraIndex of eraIndexes) {
@@ -1183,7 +1183,7 @@ module.exports = {
           }
         }
       } else {
-        logger.info(loggerOptions, `Last era in DB is ${lastEraInDb} and last era on chain is ${activeEra} so not updating era averages!`);
+        logger.info(loggerOptions, 'Updating era averages is not needed!');
       }
 
       logger.info(loggerOptions, `Storing ${ranking.length} validators in db...`);
