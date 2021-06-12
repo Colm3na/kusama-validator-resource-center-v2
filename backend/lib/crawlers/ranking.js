@@ -1130,6 +1130,7 @@ module.exports = {
         });
       logger.info(loggerOptions, `Finished, ${validatorsToHide.length} validators hided!`);
 
+      // We want to store era stats only when there's a new consolidated era in chain history
       if (parseInt(activeEra, 10) - 1 > parseInt(lastEraInDb, 10)) {
         logger.info(loggerOptions, 'Storing era stats in db...');
         await Promise.all(
