@@ -1130,12 +1130,12 @@ module.exports = {
         });
       logger.info(loggerOptions, `Finished, ${validatorsToHide.length} validators hided!`);
 
-      logger.info(loggerOptions, 'Storing era stats in db...');
-      await Promise.all(
-        ranking.map((validator) => insertEraValidatorStats(pool, validator, activeEra)),
-      );
-
       if (parseInt(activeEra, 10) - 1 > parseInt(lastEraInDb, 10)) {
+        logger.info(loggerOptions, 'Storing era stats in db...');
+        await Promise.all(
+          ranking.map((validator) => insertEraValidatorStats(pool, validator, activeEra)),
+        );
+
         logger.info(loggerOptions, 'Storing era stats averages in db...');
         // eslint-disable-next-line no-restricted-syntax
         for (const eraIndex of eraIndexes) {
