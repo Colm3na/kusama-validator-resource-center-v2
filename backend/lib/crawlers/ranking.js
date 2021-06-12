@@ -705,7 +705,15 @@ module.exports = {
         votes.forEach(({ accountId }) => participateInGovernance.push(accountId.toString()));
       });
 
-      // TODO: debug & filter duplicates
+      // Remove duplicate accountIds: we filter intentions that exist in validator list
+      const accountIds = validators.map((v) => v.accountId);
+      const preFilterIntentions = intentions.length;
+      intentions = intentions
+        .filter(({ accountId }) => !accountIds.includes(accountId));
+      const postFilterIntentions = intentions.length;
+      logger.info(loggerOptions, `Removed ${postFilterIntentions - preFilterIntentions} duplicated intentions`);
+
+      // Merge validators and intentions
       validators = validators.concat(intentions);
 
       // stash & identity parent address creation block
