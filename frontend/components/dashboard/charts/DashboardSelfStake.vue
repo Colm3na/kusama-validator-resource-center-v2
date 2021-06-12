@@ -84,7 +84,7 @@ export default {
       self_stake_avg: {
         query: gql`
           subscription era_self_stake_avg {
-            era_self_stake_avg(order_by: { era: asc }) {
+            era_self_stake_avg(order_by: { era: asc }, limit: 84) {
               era
               self_stake_avg
             }
