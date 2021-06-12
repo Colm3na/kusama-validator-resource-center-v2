@@ -3,7 +3,9 @@ const { BigNumber } = require('bignumber.js');
 const { ApiPromise, WsProvider } = require('@polkadot/api');
 const pino = require('pino');
 const axios = require('axios').default;
-const { wait, dbQuery, dbParamInsert, dbParamSelect } = require('../utils.js');
+const {
+  wait, dbQuery, dbParamInsert, dbParamSelect,
+} = require('../utils.js');
 
 const logger = pino();
 const loggerOptions = {
@@ -489,6 +491,21 @@ const getAddressCreation = async (pool, address) => {
   return 0;
 };
 
+const getLastEraInDb = async (pool) => {
+  // TODO: check also:
+  // era_points_avg, era_relative_performance_avg, era_self_stake_avg
+  const query = 'SELECT era FROM era_commission_avg ORDER BY era DESC LIMIT 1';
+  const res = await dbQuery(pool, query, loggerOptions);
+  if (res) {
+    if (res.rows.length > 0) {
+      if (res.rows[0].era) {
+        return res.rows[0].era;
+      }
+    }
+  }
+  return null;
+};
+
 module.exports = {
   start: async (wsProviderUrl, pool, config, delayedStart = true) => {
     if (delayedStart) {
@@ -519,6 +536,9 @@ module.exports = {
     //
 
     try {
+      const lastEraInDb = await getLastEraInDb(pool);
+      logger.info(loggerOptions, `Last era in DB is ${lastEraInDb}`);
+
       // thousand validators program data
       logger.info(loggerOptions, 'Fetching thousand validator program validators');
       const thousandValidators = await getThousandValidators();
@@ -1115,51 +1135,55 @@ module.exports = {
         ranking.map((validator) => insertEraValidatorStats(pool, validator, activeEra)),
       );
 
-      logger.info(loggerOptions, 'Storing era stats averages in db...');
-      // eslint-disable-next-line no-restricted-syntax
-      for (const eraIndex of eraIndexes) {
-        const era = new BigNumber(eraIndex.toString()).toString(10);
-        let sql = `SELECT AVG(commission) AS commission_avg FROM era_commission WHERE era = '${era}' AND commission != 100`;
-        // eslint-disable-next-line no-await-in-loop
-        let res = await pool.query(sql);
-        if (res.rows.length > 0) {
-          if (res.rows[0].commission_avg) {
-            sql = `INSERT INTO era_commission_avg (era, commission_avg) VALUES ('${era}', '${res.rows[0].commission_avg}') ON CONFLICT ON CONSTRAINT era_commission_avg_pkey DO NOTHING;`;
-            // eslint-disable-next-line no-await-in-loop
-            await dbQuery(pool, sql, loggerOptions);
+      if (parseInt(activeEra, 10) > parseInt(lastEraInDb, 10)) {
+        logger.info(loggerOptions, 'Storing era stats averages in db...');
+        // eslint-disable-next-line no-restricted-syntax
+        for (const eraIndex of eraIndexes) {
+          const era = new BigNumber(eraIndex.toString()).toString(10);
+          let sql = `SELECT AVG(commission) AS commission_avg FROM era_commission WHERE era = '${era}' AND commission != 100`;
+          // eslint-disable-next-line no-await-in-loop
+          let res = await pool.query(sql);
+          if (res.rows.length > 0) {
+            if (res.rows[0].commission_avg) {
+              sql = `INSERT INTO era_commission_avg (era, commission_avg) VALUES ('${era}', '${res.rows[0].commission_avg}') ON CONFLICT ON CONSTRAINT era_commission_avg_pkey DO NOTHING;`;
+              // eslint-disable-next-line no-await-in-loop
+              await dbQuery(pool, sql, loggerOptions);
+            }
+          }
+          sql = `SELECT AVG(self_stake) AS self_stake_avg FROM era_self_stake WHERE era = '${era}'`;
+          // eslint-disable-next-line no-await-in-loop
+          res = await pool.query(sql);
+          if (res.rows.length > 0) {
+            if (res.rows[0].self_stake_avg) {
+              const selfStakeAvg = res.rows[0].self_stake_avg.toString(10).split('.')[0];
+              sql = `INSERT INTO era_self_stake_avg (era, self_stake_avg) VALUES ('${era}', '${selfStakeAvg}') ON CONFLICT ON CONSTRAINT era_self_stake_avg_pkey DO NOTHING;`;
+              // eslint-disable-next-line no-await-in-loop
+              await dbQuery(pool, sql, loggerOptions);
+            }
+          }
+          sql = `SELECT AVG(relative_performance) AS relative_performance_avg FROM era_relative_performance WHERE era = '${era}'`;
+          // eslint-disable-next-line no-await-in-loop
+          res = await pool.query(sql);
+          if (res.rows.length > 0) {
+            if (res.rows[0].relative_performance_avg) {
+              sql = `INSERT INTO era_relative_performance_avg (era, relative_performance_avg) VALUES ('${era}', '${res.rows[0].relative_performance_avg}') ON CONFLICT ON CONSTRAINT era_relative_performance_avg_pkey DO NOTHING;`;
+              // eslint-disable-next-line no-await-in-loop
+              await dbQuery(pool, sql, loggerOptions);
+            }
+          }
+          sql = `SELECT AVG(points) AS points_avg FROM era_points WHERE era = '${era}'`;
+          // eslint-disable-next-line no-await-in-loop
+          res = await pool.query(sql);
+          if (res.rows.length > 0) {
+            if (res.rows[0].points_avg) {
+              sql = `INSERT INTO era_points_avg (era, points_avg) VALUES ('${era}', '${res.rows[0].points_avg}') ON CONFLICT ON CONSTRAINT era_points_avg_pkey DO NOTHING;`;
+              // eslint-disable-next-line no-await-in-loop
+              await dbQuery(pool, sql, loggerOptions);
+            }
           }
         }
-        sql = `SELECT AVG(self_stake) AS self_stake_avg FROM era_self_stake WHERE era = '${era}'`;
-        // eslint-disable-next-line no-await-in-loop
-        res = await pool.query(sql);
-        if (res.rows.length > 0) {
-          if (res.rows[0].self_stake_avg) {
-            const selfStakeAvg = res.rows[0].self_stake_avg.toString(10).split('.')[0];
-            sql = `INSERT INTO era_self_stake_avg (era, self_stake_avg) VALUES ('${era}', '${selfStakeAvg}') ON CONFLICT ON CONSTRAINT era_self_stake_avg_pkey DO NOTHING;`;
-            // eslint-disable-next-line no-await-in-loop
-            await dbQuery(pool, sql, loggerOptions);
-          }
-        }
-        sql = `SELECT AVG(relative_performance) AS relative_performance_avg FROM era_relative_performance WHERE era = '${era}'`;
-        // eslint-disable-next-line no-await-in-loop
-        res = await pool.query(sql);
-        if (res.rows.length > 0) {
-          if (res.rows[0].relative_performance_avg) {
-            sql = `INSERT INTO era_relative_performance_avg (era, relative_performance_avg) VALUES ('${era}', '${res.rows[0].relative_performance_avg}') ON CONFLICT ON CONSTRAINT era_relative_performance_avg_pkey DO NOTHING;`;
-            // eslint-disable-next-line no-await-in-loop
-            await dbQuery(pool, sql, loggerOptions);
-          }
-        }
-        sql = `SELECT AVG(points) AS points_avg FROM era_points WHERE era = '${era}'`;
-        // eslint-disable-next-line no-await-in-loop
-        res = await pool.query(sql);
-        if (res.rows.length > 0) {
-          if (res.rows[0].points_avg) {
-            sql = `INSERT INTO era_points_avg (era, points_avg) VALUES ('${era}', '${res.rows[0].points_avg}') ON CONFLICT ON CONSTRAINT era_points_avg_pkey DO NOTHING;`;
-            // eslint-disable-next-line no-await-in-loop
-            await dbQuery(pool, sql, loggerOptions);
-          }
-        }
+      } else {
+        logger.info(loggerOptions, `Last era in DB is ${lastEraInDb} and last era on chain is ${activeEra} so not updating era averages!`);
       }
 
       logger.info(loggerOptions, `Storing ${ranking.length} validators in db...`);

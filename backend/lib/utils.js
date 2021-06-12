@@ -11,10 +11,11 @@ module.exports = {
   }),
   dbQuery: async (pool, sql, loggerOptions) => {
     try {
-      await pool.query(sql);
+      return await pool.query(sql);
     } catch (error) {
       logger.error(loggerOptions, `SQL: ${sql} Error: ${JSON.stringify(error)}`);
     }
+    return null;
   },
   dbParamInsert: async (pool, sql, data, loggerOptions) => {
     try {
