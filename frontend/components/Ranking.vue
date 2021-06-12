@@ -17,7 +17,10 @@
             <template #button-content>
               <span v-if="loading">Selected</span>
               <span v-else>
-                {{ selectedValidatorAddresses.length }}/16 selected
+                {{ selectedValidatorAddresses.length }}/{{
+                  config.validatorSetSize
+                }}
+                selected
               </span>
               <font-awesome-icon icon="hand-paper" />
             </template>

@@ -7,6 +7,7 @@ export const config = {
   tokenDecimals: 12,
   historySize: 84, // 21 days
   erasPerDay: 4,
+  validatorSetSize: 24,
   theme: '@/assets/scss/themes/kusama.scss',
   identiconTheme: 'polkadot',
   logo: 'img/logo/kusama.svg',

@@ -57,7 +57,7 @@ export const mutations = {
         ({ stashAddress }) => accountId === stashAddress
       )
       validator.selected = false
-    } else if (selectedAddresses.length < 16) {
+    } else if (selectedAddresses.length < config.validatorSetSize) {
       // check if a member of the same cluster is already in the set
       const validator = state.list.find(
         ({ stashAddress }) => accountId === stashAddress
@@ -104,7 +104,7 @@ export const mutations = {
       bootStrapToaster.$bvToast.toast(
         'Please remove before selecting a new one',
         {
-          title: 'Select up to 16 validators',
+          title: `Select up to ${this.config.validatorSetSize} validators`,
           variant: 'danger',
           autoHideDelay: 5000,
           appendToast: false,
