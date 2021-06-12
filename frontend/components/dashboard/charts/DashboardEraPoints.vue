@@ -84,7 +84,7 @@ export default {
       era_points_avg: {
         query: gql`
           subscription era_points_avg {
-            era_points_avg(order_by: { era: asc }, limit: 84) {
+            era_points_avg(order_by: { era: asc }) {
               era
               points_avg
             }

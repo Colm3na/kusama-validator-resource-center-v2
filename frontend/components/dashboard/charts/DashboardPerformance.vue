@@ -84,7 +84,7 @@ export default {
       era_relative_performance_avg: {
         query: gql`
           subscription era_relative_performance_avg {
-            era_relative_performance_avg(order_by: { era: asc }, limit: 84) {
+            era_relative_performance_avg(order_by: { era: asc }) {
               era
               relative_performance_avg
             }

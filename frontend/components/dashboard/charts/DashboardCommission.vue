@@ -84,7 +84,7 @@ export default {
       network_commission_avg: {
         query: gql`
           subscription era_commission_avg {
-            era_commission_avg(order_by: { era: asc }, limit: 84) {
+            era_commission_avg(order_by: { era: asc }) {
               era
               commission_avg
             }
