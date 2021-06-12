@@ -66,9 +66,15 @@
 </template>
 
 <script>
+import { config } from '@/config.js'
 import commonMixin from '@/mixins/commonMixin.js'
 export default {
   mixins: [commonMixin],
+  data() {
+    return {
+      config,
+    }
+  },
   computed: {
     loading() {
       return this.$store.state.ranking.loading
