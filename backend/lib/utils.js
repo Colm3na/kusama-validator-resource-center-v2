@@ -13,7 +13,7 @@ module.exports = {
     try {
       return await pool.query(sql);
     } catch (error) {
-      logger.error(loggerOptions, `SQL: ${sql} Error: ${JSON.stringify(error)}`);
+      logger.error(loggerOptions, `SQL: ${sql} ERROR: ${JSON.stringify(error)}`);
     }
     return null;
   },
@@ -21,14 +21,14 @@ module.exports = {
     try {
       await pool.query(sql, data);
     } catch (error) {
-      logger.error(loggerOptions, `SQL: ${sql} Error: ${JSON.stringify(error)}`);
+      logger.error(loggerOptions, `SQL: ${sql} PARAM: ${JSON.stringify(data)} ERROR: ${JSON.stringify(error)}`);
     }
   },
   dbParamSelect: async (pool, sql, data, loggerOptions) => {
     try {
       return await pool.query(sql, data);
     } catch (error) {
-      logger.error(loggerOptions, `SQL: ${sql} Error: ${JSON.stringify(error)}`);
+      logger.error(loggerOptions, `SQL: ${sql} PARAM: ${JSON.stringify(data)} ERROR: ${JSON.stringify(error)}`);
     }
     return null;
   },
