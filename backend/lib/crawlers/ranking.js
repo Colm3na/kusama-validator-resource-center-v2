@@ -540,18 +540,22 @@ module.exports = {
       logger.info(loggerOptions, `Last era in DB is ${lastEraInDb}`);
 
       // thousand validators program data
-      logger.info(loggerOptions, 'Fetching thousand validator program validators');
+      logger.info(loggerOptions, 'Fetching thousand validator program validators ...');
       const thousandValidators = await getThousandValidators();
       logger.info(loggerOptions, `Got info from ${thousandValidators.length} validators of thousand validator program!`);
 
       // chain data
-      logger.info(loggerOptions, 'Fetching data from chain');
+      logger.info(loggerOptions, 'Fetching chain data ...');
       const api = await ApiPromise.create({ provider: wsProvider });
       await api.isReady;
       const withActive = false;
-      const erasHistoric = await api.derive.staking.erasHistoric(withActive);
-      const chainCurrentEra = await api.query.staking.currentEra();
-      const chainActiveEra = await api.query.staking.activeEra();
+
+      const [erasHistoric, chainCurrentEra, chainActiveEra] = await Promise.all([
+        api.derive.staking.erasHistoric(withActive),
+        api.query.staking.currentEra(),
+        api.query.staking.activeEra,
+      ]);
+
       const eraIndexes = erasHistoric.slice(
         Math.max(erasHistoric.length - config.historySize, 0),
       );
@@ -717,20 +721,30 @@ module.exports = {
       validators = validators.concat(intentions);
 
       // stash & identity parent address creation block
-      const stashAddressesCreation = [];
-      // eslint-disable-next-line no-restricted-syntax
-      for (const validator of validators) {
-        const stashAddress = validator.stashId.toString();
-        // eslint-disable-next-line no-await-in-loop
-        stashAddressesCreation[stashAddress] = await getAddressCreation(pool, stashAddress);
-        if (validator.identity.parent) {
-          const stashParentAddress = validator.identity.parent.toString();
-          // eslint-disable-next-line no-await-in-loop
-          stashAddressesCreation[stashParentAddress] = await getAddressCreation(
-            pool, stashParentAddress,
-          );
-        }
-      }
+      let stashAddressesCreation = await Promise.all(
+        validators.map(({ stashId }) => getAddressCreation(pool, stashId.toString())),
+      );
+      const stashParentAddressesCreation = await Promise.all(
+        validators
+          .filter(({ identity }) => identity.parent)
+          .map(({ identity }) => getAddressCreation(pool, identity.parent.toString())),
+      );
+      stashAddressesCreation = stashAddressesCreation.concat(stashParentAddressesCreation);
+
+      // const stashAddressesCreation = [];
+      // // eslint-disable-next-line no-restricted-syntax
+      // for (const validator of validators) {
+      //   const stashAddress = validator.stashId.toString();
+      //   // eslint-disable-next-line no-await-in-loop
+      //   stashAddressesCreation[stashAddress] = await getAddressCreation(pool, stashAddress);
+      //   if (validator.identity.parent) {
+      //     const stashParentAddress = validator.identity.parent.toString();
+      //     // eslint-disable-next-line no-await-in-loop
+      //     stashAddressesCreation[stashParentAddress] = await getAddressCreation(
+      //       pool, stashParentAddress,
+      //     );
+      //   }
+      // }
 
       let ranking = validators
         .map((validator) => {
