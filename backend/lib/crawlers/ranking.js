@@ -553,7 +553,7 @@ module.exports = {
       const [erasHistoric, chainCurrentEra, chainActiveEra] = await Promise.all([
         api.derive.staking.erasHistoric(withActive),
         api.query.staking.currentEra(),
-        api.query.staking.activeEra,
+        api.query.staking.activeEra(),
       ]);
 
       const eraIndexes = erasHistoric.slice(
