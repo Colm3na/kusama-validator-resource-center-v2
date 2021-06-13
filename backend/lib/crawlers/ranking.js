@@ -721,30 +721,20 @@ module.exports = {
       validators = validators.concat(intentions);
 
       // stash & identity parent address creation block
-      let stashAddressesCreation = await Promise.all(
-        validators.map(({ stashId }) => getAddressCreation(pool, stashId.toString())),
-      );
-      const stashParentAddressesCreation = await Promise.all(
-        validators
-          .filter(({ identity }) => identity.parent)
-          .map(({ identity }) => getAddressCreation(pool, identity.parent.toString())),
-      );
-      stashAddressesCreation = stashAddressesCreation.concat(stashParentAddressesCreation);
-
-      // const stashAddressesCreation = [];
-      // // eslint-disable-next-line no-restricted-syntax
-      // for (const validator of validators) {
-      //   const stashAddress = validator.stashId.toString();
-      //   // eslint-disable-next-line no-await-in-loop
-      //   stashAddressesCreation[stashAddress] = await getAddressCreation(pool, stashAddress);
-      //   if (validator.identity.parent) {
-      //     const stashParentAddress = validator.identity.parent.toString();
-      //     // eslint-disable-next-line no-await-in-loop
-      //     stashAddressesCreation[stashParentAddress] = await getAddressCreation(
-      //       pool, stashParentAddress,
-      //     );
-      //   }
-      // }
+      const stashAddressesCreation = [];
+      // eslint-disable-next-line no-restricted-syntax
+      for (const validator of validators) {
+        const stashAddress = validator.stashId.toString();
+        // eslint-disable-next-line no-await-in-loop
+        stashAddressesCreation[stashAddress] = await getAddressCreation(pool, stashAddress);
+        if (validator.identity.parent) {
+          const stashParentAddress = validator.identity.parent.toString();
+          // eslint-disable-next-line no-await-in-loop
+          stashAddressesCreation[stashParentAddress] = await getAddressCreation(
+            pool, stashParentAddress,
+          );
+        }
+      }
 
       let ranking = validators
         .map((validator) => {
