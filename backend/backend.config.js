@@ -5,10 +5,10 @@ module.exports = {
   substrateNetwork: process.env.SUBSTRATE_NETWORK || 'kusama',
   wsProviderUrl: process.env.WS_PROVIDER_URL || 'ws://substrate-node:9944',
   postgresConnParams: {
-    user: process.env.POSTGRES_USER || 'vrc',
+    user: process.env.POSTGRES_USER || 'polkastats',
     host: process.env.POSTGRES_HOST || 'postgres',
-    database: process.env.POSTGRES_DATABASE || 'vrc',
-    password: process.env.POSTGRES_PASSWORD || 'vrc',
+    database: process.env.POSTGRES_DATABASE || 'polkastats',
+    password: process.env.POSTGRES_PASSWORD || 'polkastats',
     port: parseInt(process.env.POSTGRES_PORT, 10) || 5432,
   },
   logLevel: process.env.LOG_LEVEL || 'info', // Use 'debug' to see DEBUG level messages
