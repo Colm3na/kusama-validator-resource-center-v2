@@ -1,4 +1,4 @@
-GRANT ALL PRIVILEGES ON DATABASE vrc TO vrc;
+GRANT ALL PRIVILEGES ON DATABASE polkastats TO polkastats;
 
 CREATE TABLE IF NOT EXISTS block (  
   block_number BIGINT NOT NULL,
@@ -231,24 +231,24 @@ CREATE INDEX IF NOT EXISTS event_block_number_idx ON event (block_number);
 CREATE INDEX IF NOT EXISTS event_section_idx ON event (section);
 CREATE INDEX IF NOT EXISTS event_method_idx ON event (method);
 
-GRANT ALL PRIVILEGES ON TABLE block TO vrc;
-GRANT ALL PRIVILEGES ON TABLE harvest_error TO vrc;
-GRANT ALL PRIVILEGES ON TABLE event TO vrc;
-GRANT ALL PRIVILEGES ON TABLE extrinsic TO vrc;
-GRANT ALL PRIVILEGES ON TABLE ranking TO vrc;
+GRANT ALL PRIVILEGES ON TABLE block TO polkastats;
+GRANT ALL PRIVILEGES ON TABLE harvest_error TO polkastats;
+GRANT ALL PRIVILEGES ON TABLE event TO polkastats;
+GRANT ALL PRIVILEGES ON TABLE extrinsic TO polkastats;
+GRANT ALL PRIVILEGES ON TABLE ranking TO polkastats;
 
-GRANT ALL PRIVILEGES ON TABLE era_vrc_score TO vrc;
-GRANT ALL PRIVILEGES ON TABLE era_commission TO vrc;
-GRANT ALL PRIVILEGES ON TABLE era_commission_avg TO vrc;
-GRANT ALL PRIVILEGES ON TABLE era_self_stake TO vrc;
-GRANT ALL PRIVILEGES ON TABLE era_self_stake_avg TO vrc;
-GRANT ALL PRIVILEGES ON TABLE era_relative_performance TO vrc;
-GRANT ALL PRIVILEGES ON TABLE era_relative_performance_avg TO vrc;
-GRANT ALL PRIVILEGES ON TABLE era_points TO vrc;
-GRANT ALL PRIVILEGES ON TABLE era_points_avg TO vrc;
-GRANT ALL PRIVILEGES ON TABLE featured TO vrc;
-GRANT ALL PRIVILEGES ON TABLE account TO vrc;
-GRANT ALL PRIVILEGES ON TABLE total TO vrc;
+GRANT ALL PRIVILEGES ON TABLE era_vrc_score TO polkastats;
+GRANT ALL PRIVILEGES ON TABLE era_commission TO polkastats;
+GRANT ALL PRIVILEGES ON TABLE era_commission_avg TO polkastats;
+GRANT ALL PRIVILEGES ON TABLE era_self_stake TO polkastats;
+GRANT ALL PRIVILEGES ON TABLE era_self_stake_avg TO polkastats;
+GRANT ALL PRIVILEGES ON TABLE era_relative_performance TO polkastats;
+GRANT ALL PRIVILEGES ON TABLE era_relative_performance_avg TO polkastats;
+GRANT ALL PRIVILEGES ON TABLE era_points TO polkastats;
+GRANT ALL PRIVILEGES ON TABLE era_points_avg TO polkastats;
+GRANT ALL PRIVILEGES ON TABLE featured TO polkastats;
+GRANT ALL PRIVILEGES ON TABLE account TO polkastats;
+GRANT ALL PRIVILEGES ON TABLE total TO polkastats;
 
 --
 -- Fast counters
