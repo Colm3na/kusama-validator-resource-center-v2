@@ -13,8 +13,8 @@
     "docker:build:polkadot": "docker-compose -p backend -f docker/docker-compose-polkadot.yml build --no-cache",
     "docker:clean": "bash docker/scripts/clean-dockers.sh",
     "docker:stop": "docker stop backend_crawler_1 backend_graphql-engine_1 backend_postgres_1 backend_substrate-node_1",
-    "docker:postgres:backup": "docker exec -t backend_postgres_1 pg_dump vrc -c -U vrc > vrc_dump.sql",
-    "docker:postgres:restore": "cat vrc_dump.sql | docker exec -i backend_postgres_1 psql -U vrc -d vrc && docker restart backend_postgres_1"
+    "docker:postgres:backup": "docker exec -t backend_postgres_1 pg_dump polkastats -c -U polkastats > polkastats_dump.sql",
+    "docker:postgres:restore": "cat polkastats_dump.sql | docker exec -i backend_postgres_1 psql -U polkastats -d polkastats && docker restart backend_postgres_1"
   },
   "dependencies": {
     "@polkadot/api": "^5.1.1",
