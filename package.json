@@ -20,7 +20,10 @@
     "url": "https://github.com/Colm3na/kusama-validator-resource-center-v2/issues"
   },
   "homepage": "https://github.com/Colm3na/kusama-validator-resource-center-v2#readme",
-  "workspaces": ["frontend", "backend"],
-  "scripts": {}
- }
- 
+  "workspaces": [
+    "frontend",
+    "backend"
+  ],
+  "scripts": {},
+  "dependencies": {}
+}
