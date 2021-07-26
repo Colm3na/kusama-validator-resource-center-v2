@@ -9,16 +9,23 @@ CREATE TABLE IF NOT EXISTS block (
   parent_hash TEXT NOT NULL,
   extrinsics_root TEXT NOT NULL,
   state_root TEXT NOT NULL,
+  active_era BIGINT NOT NULL,
+  current_index BIGINT NOT NULL,
+  is_election BOOLEAN NOT NULL,
+  spec_name TEXT NOT NULL,
+  spec_version INT NOT NULL,
   total_events INT NOT NULL,
   total_extrinsics INT NOT NULL,
+  total_issuance NUMERIC(40,0) NOT NULL,
   timestamp BIGINT NOT NULL,
-  PRIMARY KEY ( block_number )  
+  PRIMARY KEY ( block_number )
 );
 
-CREATE TABLE IF NOT EXISTS harvester_error (  
+CREATE TABLE IF NOT EXISTS harvest_error (  
   block_number BIGINT NOT NULL,
   error TEXT NOT NULL,
-  timestamp BIGINT NOT NULL
+  timestamp BIGINT NOT NULL,
+  PRIMARY KEY ( block_number )
 );
 
 CREATE TABLE IF NOT EXISTS event (  
@@ -42,9 +49,21 @@ CREATE TABLE IF NOT EXISTS extrinsic (
   args TEXT NOT NULL,
   hash TEXT NOT NULL,
   doc TEXT NOT NULL,
+  fee_info TEXT NOT NULL,
+  fee_details TEXT NOT NULL,
   success BOOLEAN NOT NULL,
   timestamp BIGINT NOT NULL,
   PRIMARY KEY ( block_number, extrinsic_index ) 
+);
+
+CREATE TABLE IF NOT EXISTS log  (  
+  block_number BIGINT NOT NULL,
+  log_index INT NOT NULL,
+  type TEXT,
+  engine TEXT NOT NULL,
+  data TEXT NOT NULL,
+  timestamp BIGINT NOT NULL,
+  PRIMARY KEY ( block_number, log_index ) 
 );
 
 CREATE TABLE IF NOT EXISTS ranking (
@@ -166,6 +185,21 @@ CREATE TABLE IF NOT EXISTS featured (
   PRIMARY KEY ( stash_address )
 );
 
+CREATE TABLE IF NOT EXISTS account  (  
+  account_id TEXT NOT NULL,
+  identity TEXT NOT NULL,
+  identity_display TEXT NOT NULL,
+  identity_display_parent TEXT NOT NULL,
+  balances TEXT NOT NULL,
+  available_balance TEXT NOT NULL,
+  free_balance TEXT NOT NULL,
+  locked_balance TEXT NOT NULL,
+  nonce BIGINT NOT NULL,
+  timestamp BIGINT NOT NULL,
+  block_height BIGINT NOT NULL,
+  PRIMARY KEY ( account_id )  
+);
+
 CREATE TABLE IF NOT EXISTS total (  
   name TEXT,
   count BIGINT NOT NULL,
@@ -184,15 +218,21 @@ INSERT INTO total (name, count) VALUES
   ('active_era', 0),
   ('minimum_stake', 0);
 
+CREATE INDEX IF NOT EXISTS block_finalized_idx ON block (finalized);
+CREATE INDEX IF NOT EXISTS block_block_number_idx ON block (block_number);
+CREATE INDEX IF NOT EXISTS block_block_hash_idx ON block (block_hash);
+
+CREATE INDEX IF NOT EXISTS extrinsic_block_number_idx ON extrinsic (block_number);
 CREATE INDEX IF NOT EXISTS extrinsic_section_idx ON extrinsic (section);
 CREATE INDEX IF NOT EXISTS extrinsic_method_idx ON extrinsic (method);
 CREATE INDEX IF NOT EXISTS extrinsic_signer_idx ON extrinsic (signer);
 
+CREATE INDEX IF NOT EXISTS event_block_number_idx ON event (block_number);
 CREATE INDEX IF NOT EXISTS event_section_idx ON event (section);
 CREATE INDEX IF NOT EXISTS event_method_idx ON event (method);
 
 GRANT ALL PRIVILEGES ON TABLE block TO vrc;
-GRANT ALL PRIVILEGES ON TABLE harvester_error TO vrc;
+GRANT ALL PRIVILEGES ON TABLE harvest_error TO vrc;
 GRANT ALL PRIVILEGES ON TABLE event TO vrc;
 GRANT ALL PRIVILEGES ON TABLE extrinsic TO vrc;
 GRANT ALL PRIVILEGES ON TABLE ranking TO vrc;
@@ -207,4 +247,90 @@ GRANT ALL PRIVILEGES ON TABLE era_relative_performance_avg TO vrc;
 GRANT ALL PRIVILEGES ON TABLE era_points TO vrc;
 GRANT ALL PRIVILEGES ON TABLE era_points_avg TO vrc;
 GRANT ALL PRIVILEGES ON TABLE featured TO vrc;
+GRANT ALL PRIVILEGES ON TABLE account TO vrc;
 GRANT ALL PRIVILEGES ON TABLE total TO vrc;
+
+--
+-- Fast counters
+--
+-- Taken from https://www.cybertec-postgresql.com/en/postgresql-count-made-fast/
+--
+
+-- Block
+START TRANSACTION;
+CREATE FUNCTION block_count() RETURNS trigger LANGUAGE plpgsql AS
+$$BEGIN
+  IF TG_OP = 'INSERT' THEN
+    UPDATE total SET count = count + 1 WHERE name = 'blocks';
+    RETURN NEW;
+  ELSIF TG_OP = 'DELETE' THEN
+    UPDATE total SET count = count - 1 WHERE name = 'blocks';
+    RETURN OLD;
+  ELSE
+    UPDATE total SET count = 0 WHERE name = 'blocks';
+    RETURN NULL;
+  END IF;
+END;$$;
+CREATE CONSTRAINT TRIGGER block_count_mod
+  AFTER INSERT OR DELETE ON block
+  DEFERRABLE INITIALLY DEFERRED
+  FOR EACH ROW EXECUTE PROCEDURE block_count();
+-- TRUNCATE triggers must be FOR EACH STATEMENT
+CREATE TRIGGER block_count_trunc AFTER TRUNCATE ON block
+  FOR EACH STATEMENT EXECUTE PROCEDURE block_count();
+-- initialize the counter table
+UPDATE total SET count = (SELECT count(*) FROM block) WHERE name = 'blocks';
+COMMIT;
+
+-- Extrinsics
+START TRANSACTION;
+CREATE FUNCTION extrinsic_count() RETURNS trigger LANGUAGE plpgsql AS
+$$BEGIN
+  IF TG_OP = 'INSERT' THEN
+    UPDATE total SET count = count + 1 WHERE name = 'extrinsics';
+    RETURN NEW;
+  ELSIF TG_OP = 'DELETE' THEN
+    UPDATE total SET count = count - 1 WHERE name = 'extrinsics';
+    RETURN OLD;
+  ELSE
+    UPDATE total SET count = 0 WHERE name = 'extrinsics';
+    RETURN NULL;
+  END IF;
+END;$$;
+CREATE CONSTRAINT TRIGGER extrinsic_count_mod
+  AFTER INSERT OR DELETE ON extrinsic
+  DEFERRABLE INITIALLY DEFERRED
+  FOR EACH ROW EXECUTE PROCEDURE extrinsic_count();
+-- TRUNCATE triggers must be FOR EACH STATEMENT
+CREATE TRIGGER extrinsic_count_trunc AFTER TRUNCATE ON extrinsic
+  FOR EACH STATEMENT EXECUTE PROCEDURE extrinsic_count();
+-- initialize the counter table
+UPDATE total SET count = (SELECT count(*) FROM extrinsic) WHERE name = 'extrinsics';
+COMMIT;
+
+
+-- Events
+START TRANSACTION;
+CREATE FUNCTION event_count() RETURNS trigger LANGUAGE plpgsql AS
+$$BEGIN
+  IF TG_OP = 'INSERT' THEN
+    UPDATE total SET count = count + 1 WHERE name = 'events';
+    RETURN NEW;
+  ELSIF TG_OP = 'DELETE' THEN
+    UPDATE total SET count = count - 1 WHERE name = 'events';
+    RETURN OLD;
+  ELSE
+    UPDATE total SET count = 0 WHERE name = 'events';
+    RETURN NULL;
+  END IF;
+END;$$;
+CREATE CONSTRAINT TRIGGER event_count_mod
+  AFTER INSERT OR DELETE ON event
+  DEFERRABLE INITIALLY DEFERRED
+  FOR EACH ROW EXECUTE PROCEDURE event_count();
+-- TRUNCATE triggers must be FOR EACH STATEMENT
+CREATE TRIGGER event_count_trunc AFTER TRUNCATE ON event
+  FOR EACH STATEMENT EXECUTE PROCEDURE event_count();
+-- initialize the counter table
+UPDATE total SET count = (SELECT count(*) FROM event) WHERE name = 'events';
+COMMIT;
