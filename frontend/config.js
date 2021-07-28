@@ -15,6 +15,6 @@ export const config = {
   baseURL: '/',
   showValSelectorInPage: false, // set to false when showing val selector in header
   googleAnalytics: 'G-0MDQV4GFD9',
-  backendWs: 'wss://validatorsv2.kusama.polkastats.io/api/v3',
-  backendHttp: 'https://validatorsv2.kusama.polkastats.io/api/v3',
+  backendWs: 'wss://validators.kusama.polkastats.io/api/v3',
+  backendHttp: 'https://validators.kusama.polkastats.io/api/v3',
 }
