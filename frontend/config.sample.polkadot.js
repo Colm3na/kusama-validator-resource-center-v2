@@ -7,7 +7,7 @@ export const config = {
   tokenDecimals: 10,
   historySize: 84, // 21 days
   erasPerDay: 1,
-  validatorSetSize: 24,
+  validatorSetSize: 16,
   theme: '@/assets/scss/themes/polkadot.scss',
   identiconTheme: 'polkadot',
   logo: 'img/logo/polkadot.svg',
