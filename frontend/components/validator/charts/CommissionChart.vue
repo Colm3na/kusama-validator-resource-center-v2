@@ -45,7 +45,7 @@ export default {
               ticks: {
                 beginAtZero: true,
                 suggestedMin: 0,
-                // suggestedMax: 100,
+                suggestedMax: 100,
               },
               gridLines: {
                 display: true,
