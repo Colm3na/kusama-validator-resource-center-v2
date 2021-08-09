@@ -1032,8 +1032,8 @@ const crawler = async (delayedStart) => {
         //
 
         // const eraPointsPercent = (eraPointsHistoryValidator * 100) / eraPointsHistoryTotalsSum;
-        const eraPointsAverage = eraPointsHistoryActiveTotalsSum > 0 ? (eraPointsHistoryActiveTotalsSum / numActiveValidators) : 0.0;
-        const eraPointsPercent = (eraPointsHistoryValidator * 100) / eraPointsHistoryActiveTotalsSum;
+        const eraPointsAverage = eraPointsHistoryActiveTotalsSum > 0 ? (eraPointsHistoryActiveTotalsSum / numActiveValidators) : 0;
+        const eraPointsPercent = eraPointsHistoryValidator > 0 ? (eraPointsHistoryValidator * 100) / eraPointsHistoryActiveTotalsSum : 0;
         const eraPointsRating = eraPointsHistoryValidator > eraPointsAverage ? 2 : 0;
         const payoutRating = getPayoutRating(payoutHistory);
 
