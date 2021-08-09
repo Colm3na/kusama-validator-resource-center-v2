@@ -66,6 +66,7 @@ export default {
       },
       chartData: null,
       rows: [],
+      currentEra: 0,
     }
   },
   computed: {
@@ -81,15 +82,38 @@ export default {
   },
   apollo: {
     $subscribe: {
+      currentEra: {
+        query: gql`
+          subscription total {
+            total(where: { name: { _eq: "current_era" } }, limit: 1) {
+              count
+            }
+          }
+        `,
+        result({ data }) {
+          this.currentEra = data.total[0].count
+        },
+      },
       era_relative_performance_avg: {
         query: gql`
-          subscription era_relative_performance_avg {
-            era_relative_performance_avg(order_by: { era: asc }) {
+          subscription era_relative_performance_avg($minEra: Int!) {
+            era_relative_performance_avg(
+              where: { era: { _gte: $minEra } }
+              order_by: { era: asc }
+            ) {
               era
               relative_performance_avg
             }
           }
         `,
+        variables() {
+          return {
+            minEra: this.currentEra - config.historySize,
+          }
+        },
+        skip() {
+          return this.currentEra === 0
+        },
         result({ data }) {
           this.rows = data.era_relative_performance_avg
           this.chartData = {
@@ -110,10 +134,16 @@ export default {
       },
       chain_relative_performance_avg: {
         query: gql`
-          subscription era_relative_performance($validators: [String!]) {
+          subscription era_relative_performance(
+            $minEra: Int!
+            $validators: [String!]
+          ) {
             era_relative_performance(
               order_by: { era: asc }
-              where: { stash_address: { _in: $validators } }
+              where: {
+                stash_address: { _in: $validators }
+                era: { _gte: $minEra }
+              }
             ) {
               era
               relative_performance
@@ -122,6 +152,7 @@ export default {
         `,
         variables() {
           return {
+            minEra: this.currentEra - config.historySize,
             validators: this.chainValidatorAddresses,
           }
         },
@@ -178,10 +209,16 @@ export default {
       },
       selected_relative_performance_avg: {
         query: gql`
-          subscription era_relative_performance($validators: [String!]) {
+          subscription era_relative_performance(
+            $minEra: Int!
+            $validators: [String!]
+          ) {
             era_relative_performance(
               order_by: { era: asc }
-              where: { stash_address: { _in: $validators } }
+              where: {
+                stash_address: { _in: $validators }
+                era: { _gte: $minEra }
+              }
             ) {
               era
               relative_performance
@@ -190,6 +227,7 @@ export default {
         `,
         variables() {
           return {
+            minEra: this.currentEra - config.historySize,
             validators: this.selectedValidatorAddresses,
           }
         },

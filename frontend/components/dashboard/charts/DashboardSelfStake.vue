@@ -66,6 +66,7 @@ export default {
       },
       chartData: null,
       rows: [],
+      currentEra: 0,
     }
   },
   computed: {
@@ -81,15 +82,38 @@ export default {
   },
   apollo: {
     $subscribe: {
+      currentEra: {
+        query: gql`
+          subscription total {
+            total(where: { name: { _eq: "current_era" } }, limit: 1) {
+              count
+            }
+          }
+        `,
+        result({ data }) {
+          this.currentEra = data.total[0].count
+        },
+      },
       self_stake_avg: {
         query: gql`
-          subscription era_self_stake_avg {
-            era_self_stake_avg(order_by: { era: asc }) {
+          subscription era_self_stake_avg($minEra: Int!) {
+            era_self_stake_avg(
+              where: { era: { _gte: $minEra } }
+              order_by: { era: asc }
+            ) {
               era
               self_stake_avg
             }
           }
         `,
+        variables() {
+          return {
+            minEra: this.currentEra - config.historySize,
+          }
+        },
+        skip() {
+          return this.currentEra === 0
+        },
         result({ data }) {
           this.rows = data.era_self_stake_avg
           this.chartData = {
@@ -116,10 +140,13 @@ export default {
       },
       chain_self_stake_avg: {
         query: gql`
-          subscription era_self_stake($validators: [String!]) {
+          subscription era_self_stake($minEra: Int!, $validators: [String!]) {
             era_self_stake(
               order_by: { era: asc }
-              where: { stash_address: { _in: $validators } }
+              where: {
+                stash_address: { _in: $validators }
+                era: { _gte: $minEra }
+              }
             ) {
               era
               self_stake
@@ -128,6 +155,7 @@ export default {
         `,
         variables() {
           return {
+            minEra: this.currentEra - config.historySize,
             validators: this.chainValidatorAddresses,
           }
         },
@@ -189,10 +217,13 @@ export default {
       },
       selected_self_stake_avg: {
         query: gql`
-          subscription era_self_stake($validators: [String!]) {
+          subscription era_self_stake($minEra: Int!, $validators: [String!]) {
             era_self_stake(
               order_by: { era: asc }
-              where: { stash_address: { _in: $validators } }
+              where: {
+                stash_address: { _in: $validators }
+                era: { _gte: $minEra }
+              }
             ) {
               era
               self_stake
@@ -201,6 +232,7 @@ export default {
         `,
         variables() {
           return {
+            minEra: this.currentEra - config.historySize,
             validators: this.selectedValidatorAddresses,
           }
         },
