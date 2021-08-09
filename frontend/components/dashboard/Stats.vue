@@ -60,7 +60,6 @@ export default {
           this.activeValidatorCount = data.total[0].count
         },
       },
-
       waitingValidatorCount: {
         query: gql`
           subscription total {

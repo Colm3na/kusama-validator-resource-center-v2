@@ -65,6 +65,7 @@ export default {
       },
       chartData: null,
       rows: [],
+      currentEra: 0,
     }
   },
   computed: {
@@ -94,6 +95,18 @@ export default {
   },
   apollo: {
     $subscribe: {
+      currentEra: {
+        query: gql`
+          subscription total {
+            total(where: { name: { _eq: "current_era" } }, limit: 1) {
+              count
+            }
+          }
+        `,
+        result({ data }) {
+          this.currentEra = data.total[0].count
+        },
+      },
       network_vrc_score: {
         query: gql`
           subscription era_vrc_score {
@@ -103,6 +116,9 @@ export default {
             }
           }
         `,
+        skip() {
+          return this.currentEra === 0
+        },
         result({ data }) {
           this.rows = data.era_vrc_score
           this.chartData = {
