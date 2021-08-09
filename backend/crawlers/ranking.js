@@ -946,14 +946,20 @@ const crawler = async (delayedStart) => {
         const stakeHistory = [];
         let activeEras = 0;
         let performance = 0;
+
+        // Sum of eras total points in which validator was active
+        let eraPointsHistoryActiveTotalsSum = 0;
+
         // eslint-disable-next-line
         erasPoints.forEach((eraPoints) => {
           const { era } = eraPoints;
           let eraPayoutState = 'inactive';
           let eraPerformance = 0;
           if (eraPoints.validators[stashAddress]) {
+            // validator was active in this era
             activeEras += 1;
             const points = parseInt(eraPoints.validators[stashAddress].toString(), 10);
+            eraPointsHistoryActiveTotalsSum = eraPointsHistoryActiveTotalsSum + points;
             eraPointsHistory.push({
               era: new BigNumber(era.toString()).toString(10),
               points,
@@ -1011,11 +1017,21 @@ const crawler = async (delayedStart) => {
           // total performance
           performance += eraPerformance;
         });
+
         const eraPointsHistoryValidator = eraPointsHistory.reduce(
           (total, era) => total + era.points,
           0,
         );
-        const eraPointsPercent = (eraPointsHistoryValidator * 100) / eraPointsHistoryTotalsSum;
+        
+        //
+        // for era points rating we take in account all eras stored in polkadot history (84 eras)
+        // this is not fair por waiting validators, as it's a big entry barrier for them
+        // goal is to take in account only those eras on wich validator was active for era points average 
+        // calculation and rating
+        //
+
+        // const eraPointsPercent = (eraPointsHistoryValidator * 100) / eraPointsHistoryTotalsSum;
+        const eraPointsPercent = (eraPointsHistoryValidator * 100) / eraPointsHistoryActiveTotalsSum;
         const eraPointsRating = eraPointsHistoryValidator > eraPointsAverage ? 2 : 0;
         const payoutRating = getPayoutRating(payoutHistory);
 
