@@ -1037,6 +1037,8 @@ const crawler = async (delayedStart) => {
         const eraPointsRating = eraPointsHistoryValidator > eraPointsAverage ? 2 : 0;
         const payoutRating = getPayoutRating(payoutHistory);
 
+        logger.debug(loggerOptions, `Validator ${validator.stashId} eraPointsHistoryValidator: ${eraPointsHistoryValidator} eraPointsAverage: ${eraPointsAverage} payoutRating: ${payoutRating}`);
+
         // stake
         const selfStake = active
           ? new BigNumber(validator.exposure.own.toString())

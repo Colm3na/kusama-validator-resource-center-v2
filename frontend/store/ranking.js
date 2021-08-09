@@ -302,7 +302,7 @@ export const actions = {
     `
     const { data } = await client.query({ query })
     // eslint-disable-next-line no-console
-    console.log(data)
+    // console.log(data)
     const ranking = data.ranking.map((validator) => {
       return {
         active: validator.active,
@@ -349,18 +349,15 @@ export const actions = {
     const activeValidatorsNumber = ranking.filter(({ active }) => active).length
     const totalEraPointsPercent = ranking.reduce(
       (accumulator, { eraPointsPercent }) => {
-        // eslint-disable-next-line no-console
-        console.log(accumulator, eraPointsPercent)
         return accumulator + eraPointsPercent
       },
       0
     )
     // eslint-disable-next-line no-console
-    console.log(activeValidatorsNumber)
-    // eslint-disable-next-line no-console
-    console.log(totalEraPointsPercent)
-
+    // console.log(activeValidatorsNumber)
     const eraPointsAverage = totalEraPointsPercent / activeValidatorsNumber
+    // eslint-disable-next-line no-console
+    console.log(eraPointsAverage)
     context.commit('updateList', {
       ranking,
       blockHeight,
