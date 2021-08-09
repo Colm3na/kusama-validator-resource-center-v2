@@ -715,7 +715,7 @@ const crawler = async (delayedStart) => {
       (total, num) => total + num,
       0,
     );
-    const eraPointsAverage = eraPointsHistoryTotalsSum / numActiveValidators;
+    // const eraPointsAverage = eraPointsHistoryTotalsSum / numActiveValidators;
 
     // dashboard metrics
     const activeValidatorCount = validatorAddresses.length;
@@ -1032,6 +1032,7 @@ const crawler = async (delayedStart) => {
         //
 
         // const eraPointsPercent = (eraPointsHistoryValidator * 100) / eraPointsHistoryTotalsSum;
+        const eraPointsAverage = eraPointsHistoryActiveTotalsSum / numActiveValidators;
         const eraPointsPercent = (eraPointsHistoryValidator * 100) / eraPointsHistoryActiveTotalsSum;
         const eraPointsRating = eraPointsHistoryValidator > eraPointsAverage ? 2 : 0;
         const payoutRating = getPayoutRating(payoutHistory);
