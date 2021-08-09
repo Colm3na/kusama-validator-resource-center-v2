@@ -109,13 +109,21 @@ export default {
       },
       network_vrc_score: {
         query: gql`
-          subscription era_vrc_score {
-            era_vrc_score(order_by: { era: asc }) {
+          subscription era_vrc_score($minEra: Int!) {
+            era_vrc_score(
+              order_by: { era: asc }
+              where: { era: { _gte: $minEra } }
+            ) {
               era
               vrc_score
             }
           }
         `,
+        variables() {
+          return {
+            minEra: this.currentEra - config.historySize,
+          }
+        },
         skip() {
           return this.currentEra === 0
         },
@@ -139,10 +147,13 @@ export default {
       },
       chain_vrc_score: {
         query: gql`
-          subscription era_vrc_score($validators: [String!]) {
+          subscription era_vrc_score($minEra: Int!, $validators: [String!]) {
             era_vrc_score(
               order_by: { era: asc }
-              where: { stash_address: { _in: $validators } }
+              where: {
+                stash_address: { _in: $validators }
+                era: { _gte: $minEra }
+              }
             ) {
               era
               vrc_score
@@ -151,6 +162,7 @@ export default {
         `,
         variables() {
           return {
+            minEra: this.currentEra - config.historySize,
             validators: this.chainValidatorAddresses,
           }
         },
@@ -206,10 +218,13 @@ export default {
       },
       selected_vrc_score: {
         query: gql`
-          subscription era_vrc_score($validators: [String!]) {
+          subscription era_vrc_score($minEra: Int!, $validators: [String!]) {
             era_vrc_score(
               order_by: { era: asc }
-              where: { stash_address: { _in: $validators } }
+              where: {
+                stash_address: { _in: $validators }
+                era: { _gte: $minEra }
+              }
             ) {
               era
               vrc_score
@@ -218,6 +233,7 @@ export default {
         `,
         variables() {
           return {
+            minEra: this.currentEra - config.historySize,
             validators: this.selectedValidatorAddresses,
           }
         },
