@@ -959,7 +959,8 @@ const crawler = async (delayedStart) => {
             // validator was active in this era
             activeEras += 1;
             const points = parseInt(eraPoints.validators[stashAddress].toString(), 10);
-            eraPointsHistoryActiveTotalsSum = eraPointsHistoryActiveTotalsSum + points;
+            const totalPoints = parseInt(eraPoints.eraPoints.toString(), 10);
+            eraPointsHistoryActiveTotalsSum = eraPointsHistoryActiveTotalsSum + totalPoints;
             eraPointsHistory.push({
               era: new BigNumber(era.toString()).toString(10),
               points,
