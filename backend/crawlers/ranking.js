@@ -1035,9 +1035,9 @@ const crawler = async (delayedStart) => {
         const eraPointsAverage = eraPointsHistoryActiveTotalsSum > 0 ? (eraPointsHistoryActiveTotalsSum / numActiveValidators) : 0;
         const eraPointsPercent = eraPointsHistoryValidator > 0 ? (eraPointsHistoryValidator * 100) / eraPointsHistoryActiveTotalsSum : 0;
         const eraPointsRating = eraPointsHistoryValidator > eraPointsAverage ? 2 : 0;
+        logger.debug(loggerOptions, `Validator ${validator.stashId} eraPointsHistoryValidator: ${eraPointsHistoryValidator} eraPointsAverage: ${eraPointsAverage} eraPointsRating: ${eraPointsRating}`);
+        
         const payoutRating = getPayoutRating(payoutHistory);
-
-        logger.debug(loggerOptions, `Validator ${validator.stashId} eraPointsHistoryValidator: ${eraPointsHistoryValidator} eraPointsAverage: ${eraPointsAverage} payoutRating: ${payoutRating}`);
 
         // stake
         const selfStake = active
