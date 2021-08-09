@@ -301,6 +301,8 @@ export const actions = {
       }
     `
     const { data } = await client.query({ query })
+    // eslint-disable-next-line no-console
+    console.log(data)
     const ranking = data.ranking.map((validator) => {
       return {
         active: validator.active,
@@ -344,12 +346,21 @@ export const actions = {
         selected: selectedAddresses.includes(validator.stash_address),
       }
     })
-    const eraPointsAverage =
-      ranking.reduce(
-        (accumulator, { eraPointsPercent }) =>
-          accumulator + parseFloat(eraPointsPercent),
-        0
-      ) / ranking.filter(({ active }) => active === true).length
+    const activeValidatorsNumber = ranking.filter(({ active }) => active).length
+    const totalEraPointsPercent = ranking.reduce(
+      (accumulator, { eraPointsPercent }) => {
+        // eslint-disable-next-line no-console
+        console.log(accumulator, eraPointsPercent)
+        return accumulator + eraPointsPercent
+      },
+      0
+    )
+    // eslint-disable-next-line no-console
+    console.log(activeValidatorsNumber)
+    // eslint-disable-next-line no-console
+    console.log(totalEraPointsPercent)
+
+    const eraPointsAverage = totalEraPointsPercent / activeValidatorsNumber
     context.commit('updateList', {
       ranking,
       blockHeight,
