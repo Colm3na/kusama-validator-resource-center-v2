@@ -1035,7 +1035,7 @@ const crawler = async (delayedStart) => {
         const eraPointsAverage = eraPointsHistoryActiveTotalsSum > 0 ? (eraPointsHistoryActiveTotalsSum / numActiveValidators) : 0;
         const eraPointsPercent = eraPointsHistoryValidator > 0 ? (eraPointsHistoryValidator * 100) / eraPointsHistoryActiveTotalsSum : 0;
         const eraPointsRating = eraPointsHistoryValidator > eraPointsAverage ? 2 : 0;
-        logger.debug(loggerOptions, `Validator ${validator.stashId} eraPointsHistoryValidator: ${eraPointsHistoryValidator} eraPointsAverage: ${eraPointsAverage} eraPointsRating: ${eraPointsRating}`);
+        // logger.debug(loggerOptions, `Validator ${validator.stashId} eraPointsHistoryValidator: ${eraPointsHistoryValidator} eraPointsAverage: ${eraPointsAverage} eraPointsRating: ${eraPointsRating}`);
         
         const payoutRating = getPayoutRating(payoutHistory);
 
@@ -1259,7 +1259,7 @@ const crawler = async (delayedStart) => {
       ranking.map((validator) => insertRankingValidator(client, validator, blockHeight, startTime)),
     );
 
-    logger.debug(loggerOptions, 'Cleaning old data');
+    logger.debug(loggerOptions, 'Cleaning old ranking data');
     await dbQuery(
       client,
       `DELETE FROM ranking WHERE block_height != '${blockHeight}';`,
@@ -1279,6 +1279,65 @@ const crawler = async (delayedStart) => {
         await addNewFeaturedValidator(client, ranking);
       }
     }
+
+    // delete old data from tables:
+    // era_commission
+    // era_commission_avg
+    // era_points
+    // era_points_avg
+    // era_relative_performance
+    // era_relative_performance_avg
+    // era_self_stake
+    // era_self_stake_avg
+    // era_vrc_score
+
+    logger.debug(loggerOptions, `Cleaning data older than ${config.historySize} eras`);
+    const eratoKeepFrom = activeEra - config.historySize;
+    await dbQuery(
+      client,
+      `DELETE FROM era_commission WHERE era < '${eratoKeepFrom}';`,
+      loggerOptions,
+    );
+    await dbQuery(
+      client,
+      `DELETE FROM era_commission_avg WHERE era < '${eratoKeepFrom}';`,
+      loggerOptions,
+    );
+    await dbQuery(
+      client,
+      `DELETE FROM era_points WHERE era < '${eratoKeepFrom}';`,
+      loggerOptions,
+    );
+    await dbQuery(
+      client,
+      `DELETE FROM era_points_avg WHERE era < '${eratoKeepFrom}';`,
+      loggerOptions,
+    );
+    await dbQuery(
+      client,
+      `DELETE FROM era_relative_performance WHERE era < '${eratoKeepFrom}';`,
+      loggerOptions,
+    );
+    await dbQuery(
+      client,
+      `DELETE FROM era_relative_performance_avg WHERE era < '${eratoKeepFrom}';`,
+      loggerOptions,
+    );
+    await dbQuery(
+      client,
+      `DELETE FROM era_self_stake WHERE era < '${eratoKeepFrom}';`,
+      loggerOptions,
+    );
+    await dbQuery(
+      client,
+      `DELETE FROM era_self_stake_avg WHERE era < '${eratoKeepFrom}';`,
+      loggerOptions,
+    );
+    await dbQuery(
+      client,
+      `DELETE FROM era_vrc_score WHERE era < '${eratoKeepFrom}';`,
+      loggerOptions,
+    );
 
     logger.debug(loggerOptions, 'Disconnecting from API');
     await api.disconnect().catch((error) => logger.error(loggerOptions, `API disconnect error: ${JSON.stringify(error)}`));
