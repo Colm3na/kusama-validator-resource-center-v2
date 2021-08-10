@@ -3,7 +3,11 @@
     :data="chartData"
     :options="chartOptions"
     :height="200"
-    style="background-color: rgba(0, 0, 0, 1)"
+    :style="
+      config.themeVersion === 'dark'
+        ? 'background-color: rgba(0, 0, 0, 1)'
+        : 'background-color: rgba(255, 255, 255, 1)'
+    "
   />
 </template>
 <script>
@@ -18,6 +22,7 @@ export default {
   },
   data() {
     return {
+      config,
       chartOptions: {
         responsive: true,
         legend: {
@@ -27,7 +32,7 @@ export default {
           display: true,
           text: 'elected self stake',
           fontSize: 18,
-          fontColor: '#fff',
+          fontColor: config.themeVersion === 'dark' ? '#fff' : '#000',
           fontStyle: 'lighter',
         },
         tooltips: {
@@ -38,7 +43,10 @@ export default {
             {
               gridLines: {
                 display: true,
-                color: 'rgba(255, 255, 255, 0.1)',
+                color:
+                  config.themeVersion === 'dark'
+                    ? 'rgba(255, 255, 255, 0.1)'
+                    : 'rgba(0, 0, 0, 0.1)',
               },
             },
           ],
@@ -50,7 +58,10 @@ export default {
               },
               gridLines: {
                 display: true,
-                color: 'rgba(255, 255, 255, 0.1)',
+                color:
+                  config.themeVersion === 'dark'
+                    ? 'rgba(255, 255, 255, 0.1)'
+                    : 'rgba(0, 0, 0, 0.1)',
               },
             },
           ],

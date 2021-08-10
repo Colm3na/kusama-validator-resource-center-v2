@@ -9,6 +9,7 @@ export const config = {
   erasPerDay: 1,
   validatorSetSize: 16,
   theme: '@/assets/scss/themes/polkadot.scss',
+  themeVersion: 'light', // light | dark
   identiconTheme: 'polkadot',
   logo: 'img/logo/polkadot.svg',
   favicon: 'img/favicon/polkadot.ico',

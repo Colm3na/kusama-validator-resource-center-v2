@@ -24,12 +24,12 @@ $teal: #20c997 !default;
 $cyan: #17a2b8 !default;
 
 // theme colors
-$body-bg: #000;
-$body-color: #fff;
-$primary: #fff;
+$body-bg: $white;
+$body-color: $black;
+$primary: $gray-900;
 $primary2: #e6007a;
 $secondary: #aaafb3;
-$success: #0dff7e;
+$success: #14ec79;
 $info: $cyan !default;
 $warning: $yellow !default;
 $danger: $red !default;
@@ -54,33 +54,33 @@ $theme-colors: map-merge(
 );
 
 // bootstrap variable overrides
-$border-radius: 0 !default;
-$border-radius-lg: 0 !default;
-$border-radius-sm: 0 !default;
-$pagination-color: $body-color !default;
-$pagination-bg: $dark !default;
-$pagination-border-color: $secondary !default;
-$pagination-hover-color: $primary !default;
-$pagination-hover-bg: $dark !default;
-$pagination-hover-border-color: $secondary !default;
-$pagination-active-color: $secondary !default;
-$pagination-active-bg: $dark !default;
-$pagination-active-border-color: $secondary !default;
-$pagination-disabled-color: $secondary !default;
-$pagination-disabled-bg: $dark !default;
-$pagination-disabled-border-color: $secondary !default;
-$table-dark-bg: $body-bg !default;
-$table-dark-border-color: rgba(255, 255, 255, 0.2) !default;
-$alert-bg-level: 10;
-$alert-border-level: 1;
-$alert-color-level: -10;
+$border-radius: 4px !default;
+$border-radius-lg: 4px !default;
+$border-radius-sm: 4px !default;
+// $pagination-color: $body-color !default;
+// $pagination-bg: $dark !default;
+// $pagination-border-color: $secondary !default;
+// $pagination-hover-color: $primary !default;
+// $pagination-hover-bg: $dark !default;
+// $pagination-hover-border-color: $secondary !default;
+// $pagination-active-color: $secondary !default;
+// $pagination-active-bg: $dark !default;
+// $pagination-active-border-color: $secondary !default;
+// $pagination-disabled-color: $secondary !default;
+// $pagination-disabled-bg: $dark !default;
+// $pagination-disabled-border-color: $secondary !default;
+// $table-dark-bg: $body-bg !default;
+// $table-dark-border-color: rgba(255, 255, 255, 0.2) !default;
+// $alert-bg-level: 10;
+// $alert-border-level: 1;
+// $alert-color-level: -10;
 $nav-tabs-link-active-color: $body-color !default;
 $hr-border-color: rgba(255, 255, 255, 0.2) !default;
 $custom-control-indicator-checked-bg: $primary2 !default;
 $custom-control-indicator-bg: $white !default;
-$navbar-dark-color: $light !default;
-$navbar-dark-hover-color: $white !default;
-$navbar-dark-disabled-color: $white !default;
+// $navbar-dark-color: $light !default;
+// $navbar-dark-hover-color: $white !default;
+// $navbar-dark-disabled-color: $white !default;
 $h1-font-size: 2.1rem !default;
 
 // import bootstrap scss
@@ -234,13 +234,13 @@ pre {
 
 // ranking component
 .elected-icon {
-  color: $black;
+  color: $white;
   font-size: 1.6rem;
   border: 2px solid rgb(128 128 128 / 49%);
   border-radius: 50%;
 }
 .not-elected-icon {
-  color: $black;
+  color: $white;
   font-size: 1.6rem;
   border: 2px solid rgb(128 128 128 / 49%);
   border-radius: 50%;

@@ -161,7 +161,7 @@
       </b-row>
       <!-- Ranking table -->
       <b-table
-        dark
+        :dark="config.themeVersion === 'dark'"
         hover
         :fields="fields"
         :items="filteredRanking"

@@ -1,20 +1,21 @@
 export const config = {
-  name: 'kusama',
+  name: 'polkadot',
   title: 'Validator Resource Center and Ranking',
   nodeWs: 'wss://kusama-rpc.polkadot.io',
-  denom: 'KSM',
+  denom: 'DOT',
   addressPrefix: 2,
-  tokenDecimals: 12,
+  tokenDecimals: 10,
   historySize: 84, // 21 days
-  erasPerDay: 4,
-  validatorSetSize: 24,
-  theme: '@/assets/scss/themes/kusama.scss',
+  erasPerDay: 1,
+  validatorSetSize: 16,
+  theme: '@/assets/scss/themes/polkadot.scss',
+  themeVersion: 'light', // light | dark
   identiconTheme: 'polkadot',
-  logo: 'img/logo/kusama.svg',
-  favicon: 'img/favicon/kusama.ico',
+  logo: 'img/logo/polkadot.svg',
+  favicon: 'img/favicon/polkadot.ico',
   baseURL: '/',
   showValSelectorInPage: false, // set to false when showing val selector in header
-  googleAnalytics: 'G-0MDQV4GFD9',
-  backendWs: 'wss://validators.kusama.polkastats.io/api/v3',
-  backendHttp: 'https://validators.kusama.polkastats.io/api/v3',
+  googleAnalytics: '',
+  backendWs: 'wss://validators.polkadot.polkastats.io/api/v3',
+  backendHttp: 'https://validators.polkadot.polkastats.io/api/v3',
 }

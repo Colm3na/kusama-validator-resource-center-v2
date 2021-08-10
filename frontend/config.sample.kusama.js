@@ -9,6 +9,7 @@ export const config = {
   erasPerDay: 4,
   validatorSetSize: 24,
   theme: '@/assets/scss/themes/kusama.scss',
+  themeVersion: 'dark', // light | dark
   identiconTheme: 'polkadot',
   logo: 'img/logo/kusama.svg',
   favicon: 'img/favicon/kusama.ico',

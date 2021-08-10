@@ -1,5 +1,5 @@
 <template>
-  <b-navbar type="dark" variant="dark">
+  <b-navbar :type="config.themeVersion === 'dark' ? 'dark' : 'light'">
     <b-container fluid>
       <span v-if="collapsed" v-b-tooltip.hover title="Show sidebar">
         <font-awesome-icon

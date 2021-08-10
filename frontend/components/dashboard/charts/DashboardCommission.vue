@@ -3,7 +3,11 @@
     :chart-data="chartData"
     :options="chartOptions"
     class="py-4"
-    style="height: 400px; background-color: rgba(0, 0, 0, 1)"
+    :style="
+      config.themeVersion === 'dark'
+        ? 'height: 400px; background-color: rgba(0, 0, 0, 1)'
+        : 'height: 400px; background-color: rgba(255, 255, 255, 1)'
+    "
   />
 </template>
 
@@ -26,7 +30,7 @@ export default {
           display: true,
           text: 'Average commission',
           fontSize: 18,
-          fontColor: '#fff',
+          fontColor: config.themeVersion === 'dark' ? '#fff' : '#000',
           fontStyle: 'lighter',
         },
         tooltips: {
@@ -37,7 +41,10 @@ export default {
             {
               gridLines: {
                 display: true,
-                color: 'rgba(255, 255, 255, 0.1)',
+                color:
+                  config.themeVersion === 'dark'
+                    ? 'rgba(255, 255, 255, 0.1)'
+                    : 'rgba(0, 0, 0, 0.1)',
               },
               scaleLabel: {
                 display: true,
@@ -54,7 +61,10 @@ export default {
               },
               gridLines: {
                 display: true,
-                color: 'rgba(255, 255, 255, 0.1)',
+                color:
+                  config.themeVersion === 'dark'
+                    ? 'rgba(255, 255, 255, 0.1)'
+                    : 'rgba(0, 0, 0, 0.1)',
               },
               scaleLabel: {
                 display: true,
