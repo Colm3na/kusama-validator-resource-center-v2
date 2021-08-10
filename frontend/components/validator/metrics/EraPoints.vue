@@ -23,14 +23,12 @@
     </div>
     <div class="description">
       <p v-if="rating === 2">
-        Above average! Validator got {{ percent.toFixed(2) }}% of the total era
-        points in the last 21 days while average was
-        {{ average.toFixed(2) }}%<br />
+        Above average! Validator got {{ percent.toFixed(3) }}% of the total era
+        points of the last {{ activeEras }} eras where it was active<br />
       </p>
       <p v-else>
-        Below average! Validator got {{ percent.toFixed(2) }}% of the total era
-        points in the last 21 days while average was
-        {{ average.toFixed(2) }}%<br />
+        Below average! Validator got {{ percent.toFixed(3) }}% of the total era
+        points of the last {{ activeEras }} eras where it was active<br />
       </p>
     </div>
   </div>
@@ -53,6 +51,11 @@ export default {
     percent: {
       type: Number,
       default: () => 0,
+    },
+  },
+  computed: {
+    activeEras() {
+      return this.eraPointsHistory.filter((era) => era.points !== 0).length
     },
   },
 }

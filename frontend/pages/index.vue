@@ -30,7 +30,7 @@
 
       <Stats />
       <Suggestions :validators="chainValidatorAddresses" />
-      <DashboardVRCScore />
+      <!-- <DashboardVRCScore /> -->
       <div class="row">
         <div class="col-md-6">
           <DashboardCommission />
